@@ -1,5 +1,5 @@
 {
-  "id": "9714e7e3-a69d-473e-9630-1bd5d4eb193d",
+  "id": "f182bfc1-6602-48d9-9caf-750576368191",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -761,7 +761,7 @@
         },
         "narasumber": {
           "name": "narasumber",
-          "type": "varchar(255)",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         },
@@ -800,6 +800,14 @@
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": false
+        },
+        "jenis_webinar": {
+          "name": "jenis_webinar",
+          "type": "webinar_jenis",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'external'"
         },
         "link_daftar": {
           "name": "link_daftar",
@@ -928,6 +936,14 @@
         "asn",
         "admin",
         "super_admin"
+      ]
+    },
+    "public.webinar_jenis": {
+      "name": "webinar_jenis",
+      "schema": "public",
+      "values": [
+        "internal",
+        "external"
       ]
     },
     "public.webinar_status": {

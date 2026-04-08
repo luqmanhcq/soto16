@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1775107605384,
-      "tag": "0000_unusual_shiver_man",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1775460190751,
-      "tag": "0001_naive_mastermind",
+      "when": 1775629679032,
+      "tag": "0000_naive_wiccan",
       "breakpoints": true
     }
   ]
