@@ -17,6 +17,12 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
+ CREATE TYPE "public"."webinar_jenis" AS ENUM('internal', 'external');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
  CREATE TYPE "public"."webinar_status" AS ENUM('draft', 'publish', 'selesai');
 EXCEPTION
  WHEN duplicate_object THEN null;
@@ -116,13 +122,14 @@ CREATE TABLE IF NOT EXISTS "webinars" (
 	"slug" varchar(255) NOT NULL,
 	"kategori" varchar(100),
 	"deskripsi" text,
-	"narasumber" varchar(255),
+	"narasumber" text,
 	"jumlah_jp" integer,
 	"nilai_min" integer,
 	"tanggal_mulai" date,
 	"tanggal_selesai" date,
 	"kuota" integer,
 	"penyelenggara" varchar(255),
+	"jenis_webinar" "webinar_jenis" DEFAULT 'external' NOT NULL,
 	"link_daftar" text,
 	"link_zoom" text,
 	"link_youtube" text,
