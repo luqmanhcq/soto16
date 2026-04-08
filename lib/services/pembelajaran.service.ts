@@ -84,7 +84,7 @@ export class PembelajaranService {
     }
 
     async getPersonalProgress(userId: number, pembelajaranId: number) {
-        return await progressRepository.findProgress(userId, pembelajaranId)
+        return await progressRepository.findByUserIdAndPembelajaranId(userId, pembelajaranId)
     }
 }
 

@@ -80,6 +80,7 @@ async function main() {
             deskripsi: 'Membahas strategi percepatan transformasi digital di lingkungan instansi pemerintah sesuai SPBE.',
             narasumber: 'Bapak Rudiantara',
             jumlah_jp: 5,
+            nilai_min: 70,
             tanggal_mulai: '2026-04-15',
             tanggal_selesai: '2026-04-15',
             kuota: 100,
@@ -95,6 +96,7 @@ async function main() {
             deskripsi: 'Mengembangkan mindset kepemimpinan yang adaptif dan melayani untuk meningkatkan performa tim.',
             narasumber: 'Ibu Najwa Shihab',
             jumlah_jp: 3,
+            nilai_min: 60,
             tanggal_mulai: '2026-04-20',
             tanggal_selesai: '2026-04-20',
             kuota: 250,
@@ -110,6 +112,7 @@ async function main() {
             deskripsi: 'Penyusunan laporan keuangan dengan standar akrual terbaru untuk akuntabilitas tinggi.',
             narasumber: 'Tim BPKP',
             jumlah_jp: 8,
+            nilai_min: 80,
             tanggal_mulai: '2026-05-10',
             tanggal_selesai: '2026-05-12',
             kuota: 50,
@@ -161,11 +164,58 @@ async function main() {
                 where: (p, { eq }) => eq(p.slug, course.slug)
             })
             if (!existing) {
-                await db.insert(schema.pembelajaranTable).values(course)
+                const result = await db.insert(schema.pembelajaranTable).values(course).returning()
+                const courseId = result[0].id
                 console.log(`Created course: ${course.nama}`)
+
+                // Seed Materials for this course
+                if (course.slug === 'cybersecurity-asn') {
+                    await db.insert(schema.materiTable).values([
+                        { pembelajaran_id: courseId, nama: 'Ancaman Digital 2026', urutan: 1, link_video: 'https://vimeo.com/76979871' },
+                        { pembelajaran_id: courseId, nama: 'Mengenal Phising & Social Engineering', urutan: 2, link_video: 'https://vimeo.com/76979871' },
+                        { pembelajaran_id: courseId, nama: 'Praktik Keamanan Password', urutan: 3, link_file: 'https://example.com/panduan.pdf' }
+                    ])
+                } else if (course.slug === 'etika-komunikasi-publik') {
+                    await db.insert(schema.materiTable).values([
+                        { pembelajaran_id: courseId, nama: 'Regulasi Media Sosial ASN', urutan: 1, link_video: 'https://vimeo.com/76979871' },
+                        { pembelajaran_id: courseId, nama: 'Studi Kasus Pelanggaran Etika', urutan: 2, link_file: 'https://example.com/kasus.pdf' }
+                    ])
+                }
             }
         } catch (error) {
             console.error(`Error creating course ${course.nama}:`, error)
+        }
+    }
+
+    // --- SEEDING PENGUMUMAN ---
+    console.log('--- SEEDING PENGUMUMAN ---')
+    const announcements = [
+        {
+            judul: 'Pemeliharaan Sistem Berkala',
+            slug: 'maintenance-system-berkala',
+            deskripsi: 'SI-SOTO akan melakukan pemeliharaan rutin pada hari Minggu, 12 April 2026 pukul 00:00 - 04:00 WIB.',
+            gambar: 'https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?q=80&w=800'
+        },
+        {
+            judul: 'Penerimaan Sertifikat Diklat Luar Negeri',
+            slug: 'penerimaan-sertifikat-luar-negeri',
+            deskripsi: 'Kini Anda dapat mengusulkan sertifikat dari lembaga internasional melalui menu Sertifikat Usulan.',
+            gambar: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=800',
+            link_file: 'https://example.com/panduan-sertifikat-ln.pdf'
+        }
+    ]
+
+    for (const ann of announcements) {
+        try {
+            const existing = await db.query.pengumumanTable.findFirst({
+                where: (p, { eq }) => eq(p.slug, ann.slug)
+            })
+            if (!existing) {
+                await db.insert(schema.pengumumanTable).values(ann)
+                console.log(`Created announcement: ${ann.judul}`)
+            }
+        } catch (error) {
+            console.error(`Error creating announcement ${ann.judul}:`, error)
         }
     }
 

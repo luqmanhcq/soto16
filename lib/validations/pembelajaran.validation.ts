@@ -25,6 +25,7 @@ export const updateMateriSchema = createMateriSchema.partial()
 
 export const progressSchema = z.object({
     pembelajaran_id: z.number().int().positive(),
+    current_materi_id: z.number().int().positive().optional().nullable(),
     progress: z.number().int().min(0).max(100),
     status: z.enum(['belum_mulai', 'proses', 'selesai']).default('belum_mulai'),
 })

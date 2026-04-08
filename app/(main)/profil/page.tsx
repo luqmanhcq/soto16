@@ -18,6 +18,7 @@ import {
     Fingerprint,
     Info
 } from 'lucide-react'
+import FullPageLoader from '@/components/FullPageLoader'
 
 export default function ProfilePage() {
     const { user, login } = useAuth()
@@ -110,6 +111,7 @@ export default function ProfilePage() {
 
     return (
         <div className="p-8 lg:p-12 max-w-6xl mx-auto space-y-12">
+            {loading && <FullPageLoader message="Update Identitas..." subMessage="Sinkronisasi Server BKD" />}
             <header className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between mb-8">
                 <div className="flex items-center gap-8">
                     <div className="h-28 w-28 rounded-[2.5rem] bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-4xl font-black text-white shadow-2xl shadow-indigo-100 ring-4 ring-white">

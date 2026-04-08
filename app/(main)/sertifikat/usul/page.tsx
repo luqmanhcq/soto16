@@ -2,8 +2,9 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Send, Upload, FileDescription, Calendar, Users, Award, ShieldCheck, Loader2 } from 'lucide-react'
+import { ArrowLeft, Send, Upload, ShieldCheck, Loader2 } from 'lucide-react'
 import Link from 'next/link'
+import FullPageLoader from '@/components/FullPageLoader'
 
 export default function NewProposalPage() {
     const router = useRouter()
@@ -53,6 +54,7 @@ export default function NewProposalPage() {
 
     return (
         <div className="p-8 lg:p-12 max-w-4xl mx-auto space-y-10">
+            {loading && <FullPageLoader message="Mengirim Usulan..." subMessage="Validasi Berkas Sertifikat" />}
             <Link
                 href="/sertifikat"
                 className="inline-flex items-center gap-2 text-slate-500 hover:text-blue-600 font-black transition-all mb-4 uppercase tracking-widest text-xs"
@@ -147,7 +149,7 @@ export default function NewProposalPage() {
                             {loading ? <Loader2 className="h-6 w-6 animate-spin" /> : <Send className="h-6 w-6" />}
                             AJUKAN USULAN SEKARANG
                         </button>
-                        <p className="text-[10px] font-black text-slate-300 uppercase tracking-tighter">KEBIJAKAN SI-SOTO Ver v1.0.2</p>
+                        <p className="text-[10px] font-black text-slate-300 uppercase tracking-tighter">KEBIJAKAN SI-SOTO Ver 1.0</p>
                     </div>
                 </form>
             </section>

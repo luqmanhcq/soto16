@@ -57,7 +57,7 @@ export default function DashboardPage() {
                 </div>
                 <div className="hidden lg:flex items-center gap-3 px-6 py-3 bg-white rounded-2xl border border-slate-100 shadow-xl shadow-slate-200/50">
                     <Zap className="h-5 w-5 text-amber-500 fill-amber-500" />
-                    <span className="text-sm font-black text-slate-700 tracking-tight">SI-SOTO VERSI 2.0 AKTIF</span>
+                    <span className="text-sm font-black text-slate-700 tracking-tight">SI-SOTO VERSI 1.0 AKTIF</span>
                 </div>
             </header>
 

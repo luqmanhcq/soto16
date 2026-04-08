@@ -23,9 +23,9 @@ export async function PUT(request: NextRequest) {
 
     try {
         const body = await request.json()
-        const validated = changePasswordSchema.parse(body)
+        const validated = updatePasswordSchema.parse(body)
 
-        await userService.changePassword(user.id, validated)
+        await userService.updatePassword(user.id, validated)
         return successResponse(null, 'Kata sandi berhasil diperbarui')
     } catch (error) {
         if (error instanceof ZodError) return validationErrorResponse(error.errors as any)

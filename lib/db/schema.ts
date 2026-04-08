@@ -27,10 +27,10 @@ export const usersTable = pgTable(
     created_at: timestamp('created_at').defaultNow().notNull(),
     updated_at: timestamp('updated_at').defaultNow().notNull(),
   },
-  (table) => [
-    uniqueIndex('users_email_idx').on(table.email),
-    uniqueIndex('users_nip_idx').on(table.nip),
-  ]
+  (table) => ({
+    emailIdx: uniqueIndex('users_email_idx').on(table.email),
+    nipIdx: uniqueIndex('users_nip_idx').on(table.nip),
+  })
 )
 
 export const webinarsTable = pgTable(
@@ -61,9 +61,9 @@ export const webinarsTable = pgTable(
     created_at: timestamp('created_at').defaultNow().notNull(),
     updated_at: timestamp('updated_at').defaultNow().notNull(),
   },
-  (table) => [
-    uniqueIndex('webinars_slug_idx').on(table.slug),
-  ]
+  (table) => ({
+    slugIdx: uniqueIndex('webinars_slug_idx').on(table.slug),
+  })
 )
 
 export const webinarParticipantsTable = pgTable(
@@ -74,11 +74,11 @@ export const webinarParticipantsTable = pgTable(
     webinar_id: integer('webinar_id').notNull(),
     created_at: timestamp('created_at').defaultNow().notNull(),
   },
-  (table) => [
-    foreignKey({ columns: [table.user_id], foreignColumns: [usersTable.id] }).onDelete('cascade'),
-    foreignKey({ columns: [table.webinar_id], foreignColumns: [webinarsTable.id] }).onDelete('cascade'),
-    uniqueIndex('webinar_participants_user_webinar_idx').on(table.user_id, table.webinar_id),
-  ]
+  (table) => ({
+    userFk: foreignKey({ columns: [table.user_id], foreignColumns: [usersTable.id] }).onDelete('cascade'),
+    webinarFk: foreignKey({ columns: [table.webinar_id], foreignColumns: [webinarsTable.id] }).onDelete('cascade'),
+    userWebinarIdx: uniqueIndex('webinar_participants_user_webinar_idx').on(table.user_id, table.webinar_id),
+  })
 )
 
 export const pembelajaranTable = pgTable(
@@ -96,9 +96,9 @@ export const pembelajaranTable = pgTable(
     created_at: timestamp('created_at').defaultNow().notNull(),
     updated_at: timestamp('updated_at').defaultNow().notNull(),
   },
-  (table) => [
-    uniqueIndex('pembelajaran_slug_idx').on(table.slug),
-  ]
+  (table) => ({
+    slugIdx: uniqueIndex('pembelajaran_slug_idx').on(table.slug),
+  })
 )
 
 export const materiTable = pgTable(
@@ -113,10 +113,10 @@ export const materiTable = pgTable(
     created_at: timestamp('created_at').defaultNow().notNull(),
     updated_at: timestamp('updated_at').defaultNow().notNull(),
   },
-  (table) => [
-    foreignKey({ columns: [table.pembelajaran_id], foreignColumns: [pembelajaranTable.id] }).onDelete('cascade'),
-    index('materi_pembelajaran_id_idx').on(table.pembelajaran_id),
-  ]
+  (table) => ({
+    pembelajaranFk: foreignKey({ columns: [table.pembelajaran_id], foreignColumns: [pembelajaranTable.id] }).onDelete('cascade'),
+    pembelajaranIdIdx: index('materi_pembelajaran_id_idx').on(table.pembelajaran_id),
+  })
 )
 
 export const pembelajaranProgressTable = pgTable(
@@ -132,11 +132,11 @@ export const pembelajaranProgressTable = pgTable(
     created_at: timestamp('created_at').defaultNow().notNull(),
     updated_at: timestamp('updated_at').defaultNow().notNull(),
   },
-  (table) => [
-    foreignKey({ columns: [table.user_id], foreignColumns: [usersTable.id] }).onDelete('cascade'),
-    foreignKey({ columns: [table.pembelajaran_id], foreignColumns: [pembelajaranTable.id] }).onDelete('cascade'),
-    uniqueIndex('pembelajaran_progress_user_pembelajaran_idx').on(table.user_id, table.pembelajaran_id),
-  ]
+  (table) => ({
+    userFk: foreignKey({ columns: [table.user_id], foreignColumns: [usersTable.id] }).onDelete('cascade'),
+    pembelajaranFk: foreignKey({ columns: [table.pembelajaran_id], foreignColumns: [pembelajaranTable.id] }).onDelete('cascade'),
+    userPembelajaranIdx: uniqueIndex('pembelajaran_progress_user_pembelajaran_idx').on(table.user_id, table.pembelajaran_id),
+  })
 )
 
 export const sertifikatUsulanTable = pgTable(
@@ -154,10 +154,10 @@ export const sertifikatUsulanTable = pgTable(
     created_at: timestamp('created_at').defaultNow().notNull(),
     updated_at: timestamp('updated_at').defaultNow().notNull(),
   },
-  (table) => [
-    foreignKey({ columns: [table.user_id], foreignColumns: [usersTable.id] }).onDelete('cascade'),
-    index('sertifikat_usulan_user_id_idx').on(table.user_id),
-  ]
+  (table) => ({
+    userFk: foreignKey({ columns: [table.user_id], foreignColumns: [usersTable.id] }).onDelete('cascade'),
+    userIdIdx: index('sertifikat_usulan_user_id_idx').on(table.user_id),
+  })
 )
 
 export const pengumumanTable = pgTable(
@@ -172,9 +172,9 @@ export const pengumumanTable = pgTable(
     created_at: timestamp('created_at').defaultNow().notNull(),
     updated_at: timestamp('updated_at').defaultNow().notNull(),
   },
-  (table) => [
-    uniqueIndex('pengumuman_slug_idx').on(table.slug),
-  ]
+  (table) => ({
+    slugIdx: uniqueIndex('pengumuman_slug_idx').on(table.slug),
+  })
 )
 
 // ============ RELATIONS ============
