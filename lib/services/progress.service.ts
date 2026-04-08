@@ -3,7 +3,13 @@ import { ProgressDto } from '@/lib/validations/pembelajaran.validation'
 
 export class ProgressService {
     async trackProgress(userId: number, data: ProgressDto) {
-        return await progressRepository.upsert(userId, data)
+        return await progressRepository.upsert(
+            userId,
+            data.pembelajaran_id,
+            data.current_materi_id || null,
+            data.progress,
+            data.status
+        )
     }
 
     async getProgress(userId: number, pembelajaranId: number) {
@@ -13,7 +19,7 @@ export class ProgressService {
     }
 
     async getUserHistory(userId: number) {
-        return await progressRepository.getByUser(userId)
+        return await progressRepository.findByUserId(userId)
     }
 }
 

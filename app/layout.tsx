@@ -18,6 +18,8 @@ export const metadata: Metadata = {
 };
 
 import { AuthProvider } from "@/lib/contexts/auth-context";
+import TopLoadingBar from "@/components/TopLoadingBar";
+import { Suspense } from "react";
 
 export default function RootLayout({
   children,
@@ -26,11 +28,16 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="id"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-slate-50 text-slate-900">
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <Suspense fallback={null}>
+            <TopLoadingBar />
+          </Suspense>
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );

@@ -17,10 +17,12 @@ import {
 } from 'lucide-react'
 import { useAuth } from '@/lib/contexts/auth-context'
 import { useRouter } from 'next/navigation'
+import FullPageLoader from '@/components/FullPageLoader'
 
 export default function AdminSertifikatPage() {
     const [proposals, setProposals] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
+    const [actionLoading, setActionLoading] = useState(false)
     const [search, setSearch] = useState('')
     const [filterStatus, setFilterStatus] = useState('all')
     const { user } = useAuth()
@@ -48,6 +50,7 @@ export default function AdminSertifikatPage() {
 
     async function handleAction(id: number, status: 'disetujui' | 'ditolak') {
         if (!confirm(`Konfirmasi untuk ${status} usulan ini?`)) return
+        setActionLoading(true)
         try {
             const res = await fetch(`/api/sertifikat/${id}/approval`, {
                 method: 'PATCH',
@@ -59,6 +62,8 @@ export default function AdminSertifikatPage() {
             }
         } catch (err) {
             alert('Gagal melakukan aksi approval')
+        } finally {
+            setActionLoading(false)
         }
     }
 
@@ -71,6 +76,7 @@ export default function AdminSertifikatPage() {
 
     return (
         <div className="p-8 lg:p-12 space-y-10">
+            {actionLoading && <FullPageLoader message="Otorisasi Berkas..." subMessage="Update Status Sertifikasi ASN" />}
             <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div className="space-y-2">
                     <h1 className="text-4xl font-black text-slate-900 tracking-tighter uppercase italic">Pusat Verifikasi <span className="text-blue-600">Sertifikat.</span></h1>

@@ -3,7 +3,7 @@ import { pembelajaranProgressTable, materiTable } from '@/lib/db/schema'
 import { eq, and, sql } from 'drizzle-orm'
 
 export class ProgressRepository {
-    async findProgress(userId: number, pembelajaranId: number) {
+    async findByUserIdAndPembelajaranId(userId: number, pembelajaranId: number) {
         const result = await db.query.pembelajaranProgressTable.findFirst({
             where: and(
                 eq(pembelajaranProgressTable.user_id, userId),
@@ -13,8 +13,17 @@ export class ProgressRepository {
         return result || null
     }
 
-    async upsert(userId: number, pembelajaranId: number, currentMateriId: number, progressPercent: number, status: 'belum_mulai' | 'proses' | 'selesai') {
-        const existing = await this.findProgress(userId, pembelajaranId)
+    async findByUserId(userId: number) {
+        return await db.query.pembelajaranProgressTable.findMany({
+            where: eq(pembelajaranProgressTable.user_id, userId),
+            with: {
+                pembelajaran: true
+            }
+        })
+    }
+
+    async upsert(userId: number, pembelajaranId: number, currentMateriId: number | null, progressPercent: number, status: 'belum_mulai' | 'proses' | 'selesai') {
+        const existing = await this.findByUserIdAndPembelajaranId(userId, pembelajaranId)
 
         if (existing) {
             const result = await db
@@ -44,7 +53,7 @@ export class ProgressRepository {
     }
 
     async getPlayerProgress(userId: number, pembelajaranId: number) {
-        return await this.findProgress(userId, pembelajaranId)
+        return await this.findByUserIdAndPembelajaranId(userId, pembelajaranId)
     }
 }
 

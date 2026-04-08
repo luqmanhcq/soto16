@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Save, Loader2, Link as LinkIcon, Image as ImageIcon, Calendar, Type, Upload, X } from 'lucide-react'
 import Link from 'next/link'
+import FullPageLoader from '@/components/FullPageLoader'
 
 interface Narasumber {
     nama: string
@@ -174,6 +175,7 @@ export default function WebinarForm({ id, initialData }: WebinarFormProps) {
 
     return (
         <div className="p-8 lg:p-12 max-w-5xl mx-auto">
+            {loading && <FullPageLoader message="Sinkronisasi Data..." subMessage="Menyimpan Modul Webinar" />}
             <Link
                 href="/webinar"
                 className="flex items-center gap-2 text-slate-500 hover:text-blue-600 font-semibold mb-6 transition-colors"

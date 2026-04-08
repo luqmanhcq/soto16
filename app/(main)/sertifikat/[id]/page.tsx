@@ -18,6 +18,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import FullPageLoader from '@/components/FullPageLoader'
 
 export default function SertifikatDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params)
@@ -99,6 +100,7 @@ export default function SertifikatDetailPage({ params }: { params: Promise<{ id:
 
     return (
         <div className="p-8 lg:p-12 max-w-5xl mx-auto space-y-12 min-h-screen">
+            {actionLoading && <FullPageLoader message="Sinkronisasi Status..." subMessage="Update Verifikasi Sertifikat" />}
             <Link
                 href="/sertifikat"
                 className="inline-flex items-center gap-2 text-slate-500 hover:text-blue-600 font-black transition-all mb-4 uppercase tracking-widest text-xs"

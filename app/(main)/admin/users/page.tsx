@@ -25,6 +25,7 @@ import {
 } from 'lucide-react'
 import { useAuth } from '@/lib/contexts/auth-context'
 import { useRouter } from 'next/navigation'
+import FullPageLoader from '@/components/FullPageLoader'
 
 export default function UserManagementPage() {
     const { user } = useAuth()
@@ -211,6 +212,7 @@ export default function UserManagementPage() {
 
     return (
         <div className="p-8 lg:p-12 space-y-10">
+            {submitting && <FullPageLoader message="Sinkronisasi Server..." subMessage="Update Otoritas Pengguna" />}
             <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div className="space-y-4">
                     <div className="inline-flex items-center gap-3 px-4 py-2 bg-indigo-50 text-indigo-600 rounded-2xl border border-indigo-100">

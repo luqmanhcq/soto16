@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Save, Loader2, Type, Bell, Link as LinkIcon, FileText, Upload, X } from 'lucide-react'
 import Link from 'next/link'
+import FullPageLoader from '@/components/FullPageLoader'
 
 interface PengumumanFormProps {
     id?: string
@@ -104,6 +105,7 @@ export default function PengumumanForm({ id, initialData }: PengumumanFormProps)
 
     return (
         <div className="p-8 lg:p-12 max-w-4xl mx-auto">
+            {loading && <FullPageLoader message="Broadcast Informasi..." subMessage="Update Pengumuman Platform" />}
             <Link
                 href="/admin/pengumuman"
                 className="flex items-center gap-2 text-slate-500 hover:text-amber-600 font-bold mb-8 transition-all"
