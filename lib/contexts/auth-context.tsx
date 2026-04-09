@@ -58,11 +58,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             throw new Error(result.message || 'Login gagal')
         }
 
-        // In /api/auth/login, the data property contains { token, user }
+        // Set user state dari response
         setUser(result.data.user)
 
-        // Redirect based on role
-        router.push('/dashboard')
+        // Refresh router cache agar Next.js membaca cookie token yang baru di-set
+        // oleh API. TANPA ini, middleware bisa saja tidak melihat cookie baru
+        // pada client-side navigation berikutnya.
+        router.refresh()
+        // Redirect ke dashboard dilakukan oleh login/page.tsx (handleSubmit)
     }
 
     const logout = async () => {

@@ -17,12 +17,15 @@ export async function POST(request: NextRequest) {
     const response = successResponse(result, 'Login berhasil', 200)
 
     // Set cookie for middleware
+    // sameSite: 'lax' bisa gagal di balik reverse proxy HTTPS dengan subdomain
+    // Gunakan 'strict' agar cookie selalu dikirim untuk same-origin requests
+    const isProduction = process.env.NODE_ENV === 'production'
     response.cookies.set('token', result.token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: isProduction,       // hanya HTTPS di production
       sameSite: 'lax',
       path: '/',
-      maxAge: 60 * 60 * 24 * 7, // 1 week
+      maxAge: 60 * 60 * 24 * 7,  // 1 week
     })
 
     return response
