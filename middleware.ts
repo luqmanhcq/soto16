@@ -20,15 +20,17 @@ export function middleware(request: NextRequest) {
         pathname.startsWith('/uploads')
 
     // ── Build base URL yang benar di balik reverse proxy HTTPS ───────────────
-    // aaPanel reverse proxy meneruskan header x-forwarded-proto=https
-    // Next.js request.url bisa saja masih http:// → kita koreksi agar redirect
-    // tidak memaksa browser kembali ke http
+    // Gunakan env variable jika ada, atau deteksi dari header
+    const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL || process.env.NEXT_PUBLIC_API_URL
+    
     const proto = request.headers.get('x-forwarded-proto') ?? 
                   (request.url.startsWith('https') ? 'https' : 'http')
     const host  = request.headers.get('x-forwarded-host') ?? 
                   request.headers.get('host') ?? 
                   request.nextUrl.host
-    const baseUrl = `${proto}://${host}`
+    
+    // Prioritaskan serverUrl dari env agar tidak lari ke localhost
+    const baseUrl = serverUrl || `${proto}://${host}`
 
     if (token) {
         // Jika sudah login, jangan biarkan akses halaman login
