@@ -9,6 +9,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "pm2:start": "pm2 start npm --name soto16 -- start:3001",
+    "pm2:dev": "pm2 start npm --name soto16-dev -- run dev:3001",
     "db:generate": "drizzle-kit generate --config drizzle.config.ts",
     "db:migrate": "drizzle-kit migrate --config drizzle.config.ts",
     "db:migrate:prod": "npx tsx lib/db/migrate.ts",
