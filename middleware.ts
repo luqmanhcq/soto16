@@ -19,24 +19,31 @@ export function middleware(request: NextRequest) {
         pathname.startsWith('/api/pengumuman') ||
         pathname.startsWith('/uploads')
 
+    // ── Build base URL yang benar di balik reverse proxy HTTPS ───────────────
+    // aaPanel reverse proxy meneruskan header x-forwarded-proto=https
+    // Next.js request.url bisa saja masih http:// → kita koreksi agar redirect
+    // tidak memaksa browser kembali ke http
+    const proto = request.headers.get('x-forwarded-proto') ?? 
+                  (request.url.startsWith('https') ? 'https' : 'http')
+    const host  = request.headers.get('x-forwarded-host') ?? 
+                  request.headers.get('host') ?? 
+                  request.nextUrl.host
+    const baseUrl = `${proto}://${host}`
+
     if (token) {
-        // Redirect from login to dashboard
+        // Jika sudah login, jangan biarkan akses halaman login
         if (pathname === '/login') {
-            return NextResponse.redirect(new URL('/dashboard', request.url))
+            return NextResponse.redirect(new URL('/dashboard', baseUrl))
         }
         return NextResponse.next()
     }
 
-    // If NOT authenticated
-    if (!token) {
-        // Public paths are OK
-        if (isPublicPath) return NextResponse.next()
+    // Jika TIDAK memiliki token
+    // Public paths boleh diakses
+    if (isPublicPath) return NextResponse.next()
 
-        // Everything else redirects to login
-        return NextResponse.redirect(new URL('/login', request.url))
-    }
-
-    return NextResponse.next()
+    // Semua route yang butuh auth → redirect ke login
+    return NextResponse.redirect(new URL('/login', baseUrl))
 }
 
 // See "Matching Paths" below to learn more
