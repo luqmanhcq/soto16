@@ -7,7 +7,9 @@ export function middleware(request: NextRequest) {
 
     // Redirect legacy /home to root /
     if (pathname === '/home') {
-        return NextResponse.redirect(new URL('/', request.url))
+        const url = request.nextUrl.clone()
+        url.pathname = '/'
+        return NextResponse.redirect(url)
     }
 
     // Define public paths that DON'T require auth
@@ -19,36 +21,25 @@ export function middleware(request: NextRequest) {
         pathname.startsWith('/api/pengumuman') ||
         pathname.startsWith('/uploads')
 
-    // ── Build base URL yang benar di balik reverse proxy HTTPS ───────────────
-    // Gunakan env variable jika ada, atau deteksi dari header
-    const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL || process.env.NEXT_PUBLIC_API_URL
-    
-    const proto = request.headers.get('x-forwarded-proto') ?? 
-                  (request.url.startsWith('https') ? 'https' : 'http')
-    const host  = request.headers.get('x-forwarded-host') ?? 
-                  request.headers.get('host') ?? 
-                  request.nextUrl.host
-    
-    // Prioritaskan serverUrl dari env agar tidak lari ke localhost
-    const baseUrl = serverUrl || `${proto}://${host}`
-
     if (token) {
-        // Jika sudah login, jangan biarkan akses halaman login
+        // Sudah login, jangan akses /login lagi
         if (pathname === '/login') {
-            return NextResponse.redirect(new URL('/dashboard', baseUrl))
+            const url = request.nextUrl.clone()
+            url.pathname = '/dashboard'
+            return NextResponse.redirect(url)
         }
         return NextResponse.next()
     }
 
-    // Jika TIDAK memiliki token
-    // Public paths boleh diakses
+    // Belum login: public paths boleh
     if (isPublicPath) return NextResponse.next()
 
-    // Semua route yang butuh auth → redirect ke login
-    return NextResponse.redirect(new URL('/login', baseUrl))
+    // Semua protected route → redirect ke /login
+    const url = request.nextUrl.clone()
+    url.pathname = '/login'
+    return NextResponse.redirect(url)
 }
 
-// See "Matching Paths" below to learn more
 export const config = {
     matcher: [
         '/((?!_next/static|_next/image|favicon.ico|uploads).*)',

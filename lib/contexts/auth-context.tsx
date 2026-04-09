@@ -60,12 +60,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         // Set user state dari response
         setUser(result.data.user)
-
-        // Refresh router cache agar Next.js membaca cookie token yang baru di-set
-        // oleh API. TANPA ini, middleware bisa saja tidak melihat cookie baru
-        // pada client-side navigation berikutnya.
-        router.refresh()
-        // Redirect ke dashboard dilakukan oleh login/page.tsx (handleSubmit)
+        // Cookie sudah otomatis di-set oleh browser dari Set-Cookie header.
+        // Redirect ditangani oleh login/page.tsx
     }
 
     const logout = async () => {
