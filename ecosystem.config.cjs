@@ -1,82 +1,34 @@
-// PM2 Ecosystem Config for SI-SOTO
-// Usage:
-//   Production : pm2 start ecosystem.config.cjs
-//   Development: pm2 start ecosystem.config.cjs --env development --only soto16-dev
-//   Reload     : pm2 reload ecosystem.config.cjs --only soto16
-
 module.exports = {
   apps: [
-    // ─── Production ────────────────────────────────────────────────────────────
     {
-      name: "soto16",
-      script: "node_modules/.bin/next",
-      args: "start -p 3001",
-      cwd: "./",
-      instances: "max",        // gunakan semua CPU core (cluster mode)
-      exec_mode: "cluster",
-
-      env_production: {
-        NODE_ENV: "production",
-        PORT: 3001,
-      },
-
-      // Default env (kalau tidak pakai --env)
-      env: {
-        NODE_ENV: "production",
-        PORT: 3001,
-      },
-
-      // ── Watch & Reload ────────────────────────────────────────────────────────
-      watch: false,
-      ignore_watch: [
-        "node_modules",
-        ".next",
-        ".git",
-        "logs",
-        "*.log",
-      ],
-
-      // ── Logging ───────────────────────────────────────────────────────────────
-      log_date_format: "YYYY-MM-DD HH:mm:ss Z",
-      out_file: "./logs/pm2-out.log",
-      error_file: "./logs/pm2-error.log",
-      merge_logs: true,
-
-      // ── Restart Policy ────────────────────────────────────────────────────────
-      max_memory_restart: "512M",
-      restart_delay: 3000,
-      max_restarts: 10,
-      min_uptime: "10s",
-
-      // ── Graceful Shutdown ────────────────────────────────────────────────────
-      kill_timeout: 5000,
-      wait_ready: true,
-      listen_timeout: 10000,
-    },
-
-    // ─── Development ───────────────────────────────────────────────────────────
-    {
-      name: "soto16-dev",
-      script: "node_modules/.bin/next",
-      args: "dev -p 3001",
-      cwd: "./",
+      name: 'soto16',
+      script: 'node_modules/next/dist/bin/next',
+      args: 'start',
+      // __dirname = direktori tempat file ini berada (selalu benar, tanpa path hardcode)
+      cwd: __dirname,
       instances: 1,
-      exec_mode: "fork",
-
-      env_development: {
-        NODE_ENV: "development",
-        PORT: 3001,
-      },
-
-      watch: false,
-
-      log_date_format: "YYYY-MM-DD HH:mm:ss Z",
-      out_file: "./logs/pm2-dev-out.log",
-      error_file: "./logs/pm2-dev-error.log",
-      merge_logs: true,
-
-      max_memory_restart: "1G",
       autorestart: true,
+      max_restarts: 5,
+      min_uptime: '10s',
+      restart_delay: 3000,
+      watch: false,
+      max_memory_restart: '512M',
+      env: {
+        NODE_ENV: 'production',
+        PORT: 3001,
+        HOSTNAME: '0.0.0.0',
+        NEXTAUTH_URL: 'http://sisoto.lokermegilan.my.id',
+        NEXT_PUBLIC_SERVER_URL: 'http://sisoto.lokermegilan.my.id',
+        NEXT_PUBLIC_API_URL: 'https://absensisscasn.lamongankab.go.id',
+        DATABASE_URL: 'postgresql://postgres:1453@localhost:5432/sisoto',
+        JWT_SECRET: 'ganti-dengan-secret-yang-kuat-dan-panjang-minimal-32-karakter',
+      },
+      error_file: './logs/pm2-error.log',
+      out_file: './logs/pm2-out.log',
+      log_file: './logs/pm2-combined.log',
+      time: true,
+      merge_logs: true,
+      log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
     },
   ],
-};
+}
