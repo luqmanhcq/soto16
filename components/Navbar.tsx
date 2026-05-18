@@ -25,10 +25,11 @@ export default function Navbar() {
         <nav className="fixed top-0 inset-x-0 z-50 bg-white/70 backdrop-blur-3xl border-b border-slate-100 px-6 lg:px-12 py-4">
             <div className="max-w-7xl mx-auto flex items-center justify-between">
                 <Link href="/" className="flex items-center gap-3 group transition-transform hover:scale-105">
-                    <div className="h-10 w-10 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-indigo-100 group-hover:rotate-12 transition-transform">
-                        <ShieldCheck className="h-6 w-6" />
-                    </div>
-                    <span className="text-2xl font-black text-slate-900 tracking-tighter uppercase italic">SI-SOTO</span>
+                    <img 
+                        src="/logo-soto.png?v=3" 
+                        alt="SI-SOTO Logo" 
+                        className="h-16 w-auto object-contain"
+                    />
                 </Link>
 
                 {/* Desktop Nav */}

@@ -20,10 +20,6 @@ EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 
-DO $$ BEGIN
- CREATE TYPE "public"."webinar_jenis" AS ENUM('internal', 'external');
-EXCEPTION
- WHEN duplicate_object THEN null;
 END $$;
 
 DO $$ BEGIN
@@ -63,7 +59,6 @@ CREATE TABLE IF NOT EXISTS "webinars" (
 	"tanggal_selesai" date,
 	"kuota" integer,
 	"penyelenggara" varchar(255),
-	"jenis_webinar" "webinar_jenis" DEFAULT 'external' NOT NULL,
 	"link_daftar" text,
 	"link_zoom" text,
 	"link_youtube" text,
@@ -141,12 +136,26 @@ CREATE TABLE IF NOT EXISTS "pengumuman" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"judul" varchar(255) NOT NULL,
 	"slug" varchar(255) NOT NULL,
+	"kategori" varchar(100) DEFAULT 'PENGUMUMAN/INFORMASI LAINNYA' NOT NULL,
 	"deskripsi" text,
 	"gambar" text,
 	"link_file" text,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
 	CONSTRAINT "pengumuman_slug_unique" UNIQUE("slug")
+);
+
+CREATE TABLE IF NOT EXISTS "carousels" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"title" varchar(255) NOT NULL,
+	"subtitle" text,
+	"image" text NOT NULL,
+	"link" text,
+	"cta_text" varchar(50) DEFAULT 'Lihat Detail',
+	"is_active" boolean DEFAULT true NOT NULL,
+	"order" integer DEFAULT 0 NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 
 -- Foreign Keys

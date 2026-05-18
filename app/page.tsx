@@ -22,39 +22,26 @@ import {
   Zap,
   ArrowUpRight,
   Globe,
+  Target,
+  Users,
   FileCheck
 } from 'lucide-react'
 
-// --- SAMPLE DATA (REAL DATA SHOULD BE FETCHED FROM API) ---
-const HERO_SLIDES = [
+// --- FALLBACK DATA (IN CASE API IS EMPTY) ---
+const FALLBACK_SLIDES = [
   {
     id: 1,
-    title: "Transformasi Digital Talenta ASN",
-    subtitle: "Tingkatkan kompetensi Anda dengan akses eksklusif ke webinar dan kursus mandiri bersertifikat.",
+    title: "SI-SOTO LAMONGAN",
+    subtitle: "Strategi Optimalisasi Talenta Organisasi: Kawah candradimuka pengembangan kompetensi ASN untuk Lamongan Megilan.",
     image: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=2070",
     link: "/login",
-    cta: "Mulai Sekarang"
-  },
-  {
-    id: 2,
-    title: "Webinar: Kebijakan AI 2026",
-    subtitle: "Pelajari bagaimana kecerdasan buatan merevolusi pelayanan publik di Indonesia.",
-    image: "https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=2070",
-    link: "/webinar",
-    cta: "Lihat Jadwal"
-  },
-  {
-    id: 3,
-    title: "Sertifikasi Kompetensi Global",
-    subtitle: "Akumulasi poin JP tahunan Anda melalui program pembelajaran yang terakreditasi.",
-    image: "https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2070",
-    link: "/sertifikat",
-    cta: "Ajukan Sertifikat"
+    cta_text: "Mulai Sekarang"
   }
 ]
 
 export default function LandingPage() {
   const { user } = useAuth()
+  const [heroSlides, setHeroSlides] = useState<any[]>([])
   const [currentSlide, setCurrentSlide] = useState(0)
   const [searchQuery, setSearchQuery] = useState('')
   const [activeTab, setActiveTab] = useState<'webinar' | 'pembelajaran'>('webinar')
@@ -65,19 +52,21 @@ export default function LandingPage() {
 
   // Carousel Logic
   useEffect(() => {
+    const slidesCount = heroSlides.length > 0 ? heroSlides.length : FALLBACK_SLIDES.length
     const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length)
+      setCurrentSlide((prev) => (prev + 1) % slidesCount)
     }, 6000)
     return () => clearInterval(timer)
-  }, [])
+  }, [heroSlides.length])
 
   // Fetch Featured Content
   useEffect(() => {
     async function fetchData() {
       try {
-        const [wRes, pRes] = await Promise.all([
+        const [wRes, pRes, cRes] = await Promise.all([
           fetch('/api/webinar?limit=3'),
-          fetch('/api/pembelajaran?limit=3')
+          fetch('/api/pembelajaran?limit=3'),
+          fetch('/api/carousel?active=true')
         ])
         if (wRes.ok) {
           const wData = await wRes.json()
@@ -86,6 +75,12 @@ export default function LandingPage() {
         if (pRes.ok) {
           const pData = await pRes.json()
           setFeaturedCourses(pData.data.slice(0, 3) || [])
+        }
+        if (cRes.ok) {
+          const cData = await cRes.json()
+          if (cData.data && cData.data.length > 0) {
+            setHeroSlides(cData.data)
+          }
         }
       } catch (error) {
         console.error('Failed to fetch landing page data', error)
@@ -96,8 +91,9 @@ export default function LandingPage() {
     fetchData()
   }, [])
 
-  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length)
-  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length)
+  const activeSlides = heroSlides.length > 0 ? heroSlides : FALLBACK_SLIDES
+  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % activeSlides.length)
+  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + activeSlides.length) % activeSlides.length)
 
   return (
     <div className="min-h-screen bg-white">
@@ -106,7 +102,7 @@ export default function LandingPage() {
 
       {/* Hero Carousel */}
       <header className="relative h-[85vh] overflow-hidden group">
-        {HERO_SLIDES.map((slide, index) => (
+        {activeSlides.map((slide, index) => (
           <div
             key={slide.id}
             className={`absolute inset-0 transition-all duration-1000 ease-in-out transform ${index === currentSlide ? 'opacity-100 scale-100' : 'opacity-0 scale-110 pointer-events-none'}`}
@@ -115,18 +111,18 @@ export default function LandingPage() {
             <img src={slide.image} className="w-full h-full object-cover" alt={slide.title} />
             <div className="absolute inset-0 z-20 flex flex-col justify-center px-6 lg:px-24">
               <div className="max-w-3xl space-y-8">
-                <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-600 text-white text-[10px] font-black uppercase tracking-widest rounded-lg">
-                  FEATURED PROGRAM 2026
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-500 text-white text-[10px] font-black uppercase tracking-widest rounded-lg">
+                  PROGRAM UNGGULAN PEMKAB LAMONGAN
                 </div>
                 <h1 className="text-6xl lg:text-8xl font-black text-white leading-tight tracking-tighter">
                   {slide.title}
                 </h1>
-                <p className="text-xl text-slate-200 font-bold max-w-xl border-l-4 border-indigo-500 pl-6 backdrop-blur-sm bg-black/10 py-4 rounded-r-2xl">
+                <p className="text-xl text-slate-200 font-bold max-w-xl border-l-4 border-amber-500 pl-6 backdrop-blur-sm bg-black/10 py-4 rounded-r-2xl">
                   {slide.subtitle}
                 </p>
                 <div className="pt-4 flex items-center gap-6">
-                  <Link href={user ? "/dashboard" : slide.link} className="px-10 py-5 bg-white text-slate-900 font-black text-lg rounded-3xl hover:bg-indigo-500 hover:text-white transition-all transform hover:-translate-y-2 shadow-2xl active:scale-90 flex items-center gap-3 group">
-                    {user ? "Masuk Dashboard" : slide.cta} <ArrowRight className="h-5 w-5 group-hover:translate-x-2 transition-transform" />
+                  <Link href={user ? "/dashboard" : (slide.link || "/login")} className="px-10 py-5 bg-white text-slate-900 font-black text-lg rounded-3xl hover:bg-indigo-500 hover:text-white transition-all transform hover:-translate-y-2 shadow-2xl active:scale-90 flex items-center gap-3 group">
+                    {user ? "Masuk Dashboard" : (slide.cta_text || slide.cta || "Mulai Sekarang")} <ArrowRight className="h-5 w-5 group-hover:translate-x-2 transition-transform" />
                   </Link>
                 </div>
               </div>
@@ -146,11 +142,11 @@ export default function LandingPage() {
 
         {/* Indicators */}
         <div className="absolute bottom-12 left-12 z-30 flex gap-2">
-          {HERO_SLIDES.map((_, i) => (
+          {activeSlides.map((_, i) => (
             <button
               key={i}
               onClick={() => setCurrentSlide(i)}
-              className={`h-1.5 transition-all duration-500 rounded-full ${i === currentSlide ? 'w-12 bg-indigo-500' : 'w-4 bg-white/30'}`}
+              className={`h-1.5 transition-all duration-500 rounded-full ${i === currentSlide ? 'w-12 bg-amber-500' : 'w-4 bg-white/30'}`}
             />
           ))}
         </div>
@@ -223,7 +219,6 @@ export default function LandingPage() {
                         <span className="flex items-center gap-1.5"><Clock className="h-3 w-3 text-indigo-600" /> {webinar.waktu}</span>
                       </div>
                       <div className="flex items-center gap-2 mb-3">
-                        <span className="inline-flex px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-slate-100 text-slate-600">{(webinar.jenis_webinar || 'external').toUpperCase()}</span>
                         <span className="inline-flex px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-indigo-50 text-indigo-600">{webinar.kategori || 'UMUM'}</span>
                       </div>
                       <h4 className="text-2xl font-black text-slate-900 leading-[1.1] group-hover:text-indigo-600 transition-colors line-clamp-2">{webinar.nama_webinar}</h4>
@@ -290,6 +285,66 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Identity & Philosophy Spill */}
+      <section className="py-40 px-6 lg:px-24 bg-slate-900 relative overflow-hidden rounded-[4rem] mx-6 mb-32">
+        <div className="absolute top-0 right-0 p-20 opacity-10 pointer-events-none">
+          <Zap className="h-96 w-96 text-white" />
+        </div>
+        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-24 items-center relative z-10">
+          <div className="space-y-12 animate-in fade-in slide-in-from-left-8 duration-1000">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 text-indigo-400 rounded-2xl border border-white/5 backdrop-blur-md">
+              <ShieldCheck className="h-4 w-4" />
+              <span className="text-[10px] font-black uppercase tracking-widest italic">Filosofi Platform</span>
+            </div>
+            <h2 className="text-5xl lg:text-7xl font-black text-white tracking-tighter leading-none uppercase italic">
+              SI-SOTO <br /><span className="text-indigo-500">Wadah Kolaborasi.</span>
+            </h2>
+            <p className="text-xl text-indigo-200/60 font-bold leading-relaxed italic border-l-4 border-indigo-500 pl-8">
+              "Bukan sekadar aplikasi pendataan, melainkan kawah candradimuka yang menyatukan potensi ASN menjadi harmoni kekuatan organisasi."
+            </p>
+            <div className="grid grid-cols-2 gap-6 pt-6">
+              <div className="space-y-2">
+                <p className="text-sm font-black text-white uppercase italic tracking-widest">BANGKIT</p>
+                <p className="text-xs text-indigo-300 font-bold leading-relaxed">Belajar tanpa batas, berkarya dengan tuntas, untuk Lamongan Megilan!</p>
+              </div>
+              <div className="space-y-2">
+                <p className="text-sm font-black text-white uppercase italic tracking-widest">OPTIMALISASI</p>
+                <p className="text-xs text-indigo-300 font-bold leading-relaxed">Memastikan pengembangan talenta yang tepat guna dan tepat sasaran.</p>
+              </div>
+            </div>
+            <Link href="/tentang" className="inline-flex items-center gap-4 text-xs font-black text-indigo-400 uppercase tracking-widest hover:text-white transition-all group">
+              Pelajari Makna Konseptual <ArrowRight className="h-4 w-4 group-hover:translate-x-2 transition-transform" />
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 gap-6 animate-in fade-in slide-in-from-right-8 duration-1000">
+            <div className="aspect-square bg-white/5 border border-white/10 rounded-3xl flex flex-col items-center justify-center p-8 text-center gap-4 hover:bg-white/10 transition-all group cursor-default text-white">
+              <div className="h-12 w-12 bg-indigo-500 rounded-xl flex items-center justify-center group-hover:rotate-12 transition-transform shadow-xl shadow-indigo-500/20">
+                <Target className="h-6 w-6 text-white" />
+              </div>
+              <p className="text-[10px] font-black uppercase tracking-widest leading-none">Strategi</p>
+            </div>
+            <div className="aspect-square bg-white/5 border border-white/10 rounded-3xl flex flex-col items-center justify-center p-8 text-center gap-4 hover:bg-white/10 transition-all group cursor-default mt-12 text-white">
+              <div className="h-12 w-12 bg-emerald-500 rounded-xl flex items-center justify-center group-hover:rotate-12 transition-transform shadow-xl shadow-emerald-500/20">
+                <Zap className="h-6 w-6 text-white" />
+              </div>
+              <p className="text-[10px] font-black uppercase tracking-widest leading-none">Optimalisasi</p>
+            </div>
+            <div className="aspect-square bg-white/5 border border-white/10 rounded-3xl flex flex-col items-center justify-center p-8 text-center gap-4 hover:bg-white/10 transition-all group cursor-default -mt-12 text-white">
+              <div className="h-12 w-12 bg-amber-500 rounded-xl flex items-center justify-center group-hover:rotate-12 transition-transform shadow-xl shadow-amber-500/20">
+                <Users className="h-6 w-6 text-white" />
+              </div>
+              <p className="text-[10px] font-black uppercase tracking-widest leading-none">Talenta</p>
+            </div>
+            <div className="aspect-square bg-white/5 border border-white/10 rounded-3xl flex flex-col items-center justify-center p-8 text-center gap-4 hover:bg-white/10 transition-all group cursor-default text-white">
+              <div className="h-12 w-12 bg-indigo-600 rounded-xl flex items-center justify-center group-hover:rotate-12 transition-transform shadow-xl shadow-indigo-600/20">
+                <Globe className="h-6 w-6 text-white" />
+              </div>
+              <p className="text-[10px] font-black uppercase tracking-widest leading-none">Organisasi</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Why Choose Section */}
       <section className="py-32 px-6 lg:px-12 bg-white">
         <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-24 items-center">
@@ -328,10 +383,10 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-20">
           <div className="col-span-2 space-y-8">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 bg-indigo-600 rounded-xl flex items-center justify-center font-black italic text-xl">S</div>
-              <span className="text-2xl font-black tracking-tighter">SI-SOTO PRATAMA</span>
+              <img src="/logo-soto.png?v=3" alt="Logo" className="h-12 w-auto" />
+              <span className="text-2xl font-black tracking-tighter italic">SI-SOTO.</span>
             </div>
-            <p className="text-slate-400 font-bold max-w-sm leading-relaxed">Penyelenggara pengembangan talenta berbasis digital untuk meningkatkan profesionalitas ASN di era pemerintahan cerdas.</p>
+            <p className="text-slate-400 font-bold max-w-sm leading-relaxed uppercase text-[10px] tracking-widest italic">Kawah Candradimuka Pengembangan Kompetensi ASN <br />Kabupaten Lamongan.</p>
             <div className="flex gap-4">
               {[1, 2, 3, 4].map(i => <div key={i} className="h-10 w-10 rounded-xl bg-white/5 border border-white/10 hover:bg-white hover:text-slate-900 transition-all cursor-pointer flex items-center justify-center text-xs font-black">X{i}</div>)}
             </div>
@@ -350,18 +405,18 @@ export default function LandingPage() {
             <ul className="space-y-4 text-slate-400 font-bold">
               <li className="flex flex-col">
                 <span className="text-[10px] text-slate-600">EMAIL SUPPORT</span>
-                <span>helpdesk@soto.go.id</span>
+                <span>bkpsdm@lamongankab.go.id</span>
               </li>
               <li className="flex flex-col">
                 <span className="text-[10px] text-slate-600">LOKASI</span>
-                <span>Gedung BKD Lt. 4, Kompleks Perkantoran Provinsi</span>
+                <span>Gedung Pemda Kab. Lamongan Lantai 6, Jl. KH. Ahmad Dahlan No. 1, Lamongan</span>
               </li>
             </ul>
           </div>
         </div>
         <div className="max-w-7xl mx-auto pt-20 mt-20 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-xs font-black text-slate-500 uppercase tracking-widest">&copy; 2026 PEMERINTAH PROVINSI. ALL RIGHTS RESERVED.</p>
-          <p className="text-[10px] font-black text-indigo-500 italic uppercase">Optimized with Advanced Agentic Coding Technology</p>
+          <p className="text-xs font-black text-slate-500 uppercase tracking-widest">&copy; 2026 PEMERINTAH KABUPATEN LAMONGAN. ALL RIGHTS RESERVED.</p>
+          <p className="text-[10px] font-black text-amber-500 italic uppercase">Optimized with Advanced Agentic Coding Technology</p>
         </div>
       </footer>
     </div>

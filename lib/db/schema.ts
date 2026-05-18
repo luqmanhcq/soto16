@@ -5,9 +5,9 @@ import { relations } from 'drizzle-orm'
 
 export const userRoleEnum = pgEnum('user_role', ['asn', 'admin', 'super_admin'])
 export const webinarStatusEnum = pgEnum('webinar_status', ['draft', 'publish', 'selesai'])
-export const webinarJenisEnum = pgEnum('webinar_jenis', ['internal', 'external'])
 export const sertifikatStatusEnum = pgEnum('sertifikat_status', ['diajukan', 'disetujui', 'ditolak'])
 export const pembelajaranStatusEnum = pgEnum('pembelajaran_status', ['belum_mulai', 'proses', 'selesai'])
+export const webinarQuestionTypeEnum = pgEnum('webinar_question_type', ['post_test', 'monev'])
 
 // ============ TABLES ============
 
@@ -48,7 +48,6 @@ export const webinarsTable = pgTable(
     tanggal_selesai: date('tanggal_selesai'),
     kuota: integer('kuota'),
     penyelenggara: varchar('penyelenggara', { length: 255 }),
-    jenis_webinar: webinarJenisEnum('jenis_webinar').default('external').notNull(),
     link_daftar: text('link_daftar'),
     link_zoom: text('link_zoom'),
     link_youtube: text('link_youtube'),
@@ -166,6 +165,7 @@ export const pengumumanTable = pgTable(
     id: serial('id').primaryKey(),
     judul: varchar('judul', { length: 255 }).notNull(),
     slug: varchar('slug', { length: 255 }).notNull().unique(),
+    kategori: varchar('kategori', { length: 100 }).default('PENGUMUMAN/INFORMASI LAINNYA').notNull(),
     deskripsi: text('deskripsi'),
     gambar: text('gambar'),
     link_file: text('link_file'),
@@ -174,6 +174,89 @@ export const pengumumanTable = pgTable(
   },
   (table) => ({
     slugIdx: uniqueIndex('pengumuman_slug_idx').on(table.slug),
+  })
+)
+
+export const carouselsTable = pgTable(
+  'carousels',
+  {
+    id: serial('id').primaryKey(),
+    title: varchar('title', { length: 255 }).notNull(),
+    subtitle: text('subtitle'),
+    image: text('image').notNull(),
+    link: text('link'),
+    cta_text: varchar('cta_text', { length: 50 }).default('Lihat Detail'),
+    is_active: boolean('is_active').default(true).notNull(),
+    order: integer('order').default(0).notNull(),
+    created_at: timestamp('created_at').defaultNow().notNull(),
+    updated_at: timestamp('updated_at').defaultNow().notNull(),
+  }
+)
+
+export const webinarQuestionsTable = pgTable(
+  'webinar_questions',
+  {
+    id: serial('id').primaryKey(),
+    webinar_id: integer('webinar_id').notNull(),
+    type: webinarQuestionTypeEnum('type').notNull(),
+    question_text: text('question_text').notNull(),
+    order: integer('order').default(0).notNull(),
+    created_at: timestamp('created_at').defaultNow().notNull(),
+    updated_at: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    webinarFk: foreignKey({ columns: [table.webinar_id], foreignColumns: [webinarsTable.id] }).onDelete('cascade'),
+    webinarIdIdx: index('webinar_questions_webinar_id_idx').on(table.webinar_id),
+  })
+)
+
+export const webinarOptionsTable = pgTable(
+  'webinar_options',
+  {
+    id: serial('id').primaryKey(),
+    question_id: integer('question_id').notNull(),
+    option_text: text('option_text').notNull(),
+    is_correct: boolean('is_correct').default(false).notNull(),
+    order: integer('order').default(0).notNull(),
+  },
+  (table) => ({
+    questionFk: foreignKey({ columns: [table.question_id], foreignColumns: [webinarQuestionsTable.id] }).onDelete('cascade'),
+    questionIdIdx: index('webinar_options_question_id_idx').on(table.question_id),
+  })
+)
+
+export const webinarUserAnswersTable = pgTable(
+  'webinar_user_answers',
+  {
+    id: serial('id').primaryKey(),
+    user_id: integer('user_id').notNull(),
+    webinar_id: integer('webinar_id').notNull(),
+    question_id: integer('question_id').notNull(),
+    option_id: integer('option_id').notNull(),
+    type: webinarQuestionTypeEnum('type').notNull(),
+    created_at: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    userFk: foreignKey({ columns: [table.user_id], foreignColumns: [usersTable.id] }).onDelete('cascade'),
+    webinarFk: foreignKey({ columns: [table.webinar_id], foreignColumns: [webinarsTable.id] }).onDelete('cascade'),
+    questionFk: foreignKey({ columns: [table.question_id], foreignColumns: [webinarQuestionsTable.id] }).onDelete('cascade'),
+    optionFk: foreignKey({ columns: [table.option_id], foreignColumns: [webinarOptionsTable.id] }).onDelete('cascade'),
+    userWebinarIdx: index('webinar_user_answers_user_webinar_idx').on(table.user_id, table.webinar_id),
+  })
+)
+
+export const webinarAttendancesTable = pgTable(
+  'webinar_attendances',
+  {
+    id: serial('id').primaryKey(),
+    user_id: integer('user_id').notNull(),
+    webinar_id: integer('webinar_id').notNull(),
+    created_at: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    userFk: foreignKey({ columns: [table.user_id], foreignColumns: [usersTable.id] }).onDelete('cascade'),
+    webinarFk: foreignKey({ columns: [table.webinar_id], foreignColumns: [webinarsTable.id] }).onDelete('cascade'),
+    userWebinarIdx: uniqueIndex('webinar_attendances_user_webinar_idx').on(table.user_id, table.webinar_id),
   })
 )
 
@@ -187,6 +270,30 @@ export const usersRelations = relations(usersTable, ({ many }) => ({
 
 export const webinarsRelations = relations(webinarsTable, ({ many }) => ({
   participants: many(webinarParticipantsTable),
+  questions: many(webinarQuestionsTable),
+  userAnswers: many(webinarUserAnswersTable),
+  attendances: many(webinarAttendancesTable),
+}))
+
+export const webinarAttendancesRelations = relations(webinarAttendancesTable, ({ one }) => ({
+  user: one(usersTable, { fields: [webinarAttendancesTable.user_id], references: [usersTable.id] }),
+  webinar: one(webinarsTable, { fields: [webinarAttendancesTable.webinar_id], references: [webinarsTable.id] }),
+}))
+
+export const webinarQuestionsRelations = relations(webinarQuestionsTable, ({ one, many }) => ({
+  webinar: one(webinarsTable, { fields: [webinarQuestionsTable.webinar_id], references: [webinarsTable.id] }),
+  options: many(webinarOptionsTable),
+}))
+
+export const webinarOptionsRelations = relations(webinarOptionsTable, ({ one }) => ({
+  question: one(webinarQuestionsTable, { fields: [webinarOptionsTable.question_id], references: [webinarQuestionsTable.id] }),
+}))
+
+export const webinarUserAnswersRelations = relations(webinarUserAnswersTable, ({ one }) => ({
+  user: one(usersTable, { fields: [webinarUserAnswersTable.user_id], references: [usersTable.id] }),
+  webinar: one(webinarsTable, { fields: [webinarUserAnswersTable.webinar_id], references: [webinarsTable.id] }),
+  question: one(webinarQuestionsTable, { fields: [webinarUserAnswersTable.question_id], references: [webinarQuestionsTable.id] }),
+  option: one(webinarOptionsTable, { fields: [webinarUserAnswersTable.option_id], references: [webinarOptionsTable.id] }),
 }))
 
 export const webinarParticipantsRelations = relations(webinarParticipantsTable, ({ one }) => ({

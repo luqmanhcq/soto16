@@ -12,7 +12,9 @@ import {
     MoreHorizontal,
     ExternalLink,
     Calendar,
-    Users
+    Users,
+    ClipboardCheck,
+    UserCheck
 } from 'lucide-react'
 import { useAuth } from '@/lib/contexts/auth-context'
 import { useRouter } from 'next/navigation'
@@ -112,7 +114,6 @@ export default function AdminWebinarPage() {
                             <tr className="bg-slate-50/50">
                                 <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Konten Webinar</th>
                                 <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Jadwal & Kuota</th>
-                                <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Jenis</th>
                                 <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Status</th>
                                 <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Peserta</th>
                                 <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Aksi</th>
@@ -150,11 +151,6 @@ export default function AdminWebinarPage() {
                                             </div>
                                         </td>
                                         <td className="px-8 py-6">
-                                            <span className={`inline-block px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-tighter italic ${webinar.jenis_webinar === 'internal' ? 'bg-slate-100 text-slate-600' : 'bg-indigo-50 text-indigo-600'}`}>
-                                                {(webinar.jenis_webinar || 'external').toUpperCase()}
-                                            </span>
-                                        </td>
-                                        <td className="px-8 py-6">
                                             <span className={`inline-block px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-tighter italic ${webinar.status === 'publish' ? 'bg-emerald-50 text-emerald-600' :
                                                     webinar.status === 'draft' ? 'bg-slate-100 text-slate-600' : 'bg-amber-50 text-amber-600'
                                                 }`}>
@@ -175,6 +171,20 @@ export default function AdminWebinarPage() {
                                         </td>
                                         <td className="px-8 py-6 text-right">
                                             <div className="flex items-center justify-end gap-2">
+                                                <Link
+                                                    href={`/admin/webinar/${webinar.id}/questions`}
+                                                    className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
+                                                    title="Manajemen Kuis & Evaluasi"
+                                                >
+                                                    <ClipboardCheck className="h-5 w-5" />
+                                                </Link>
+                                                <Link
+                                                    href={`/admin/webinar/${webinar.id}/attendance`}
+                                                    className="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all"
+                                                    title="Daftar Absensi"
+                                                >
+                                                    <UserCheck className="h-5 w-5" />
+                                                </Link>
                                                 <Link
                                                     href={`/webinar/${webinar.id}/edit`}
                                                     className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"

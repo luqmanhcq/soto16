@@ -30,15 +30,11 @@ export default function WebinarForm({ id, initialData }: WebinarFormProps) {
         nilai_min: 70,
         tanggal_mulai: '',
         tanggal_selesai: '',
-        kuota: 100,
         penyelenggara: '',
-        jenis_webinar: 'external',
         link_daftar: '',
         link_zoom: '',
         link_youtube: '',
         link_materi: '',
-        link_post_test: '',
-        link_monev: '',
         link_sertifikat: '',
         gambar: '',
         status: 'draft'
@@ -49,8 +45,7 @@ export default function WebinarForm({ id, initialData }: WebinarFormProps) {
     useEffect(() => {
         if (initialData) {
             setFormData({
-                ...initialData,
-                jenis_webinar: initialData.jenis_webinar || 'external',
+                ...initialData
             })
             if (initialData.narasumber) {
                 // Gunakan JSON jika memungkinkan (Clean Code & Best Practice)
@@ -93,7 +88,6 @@ export default function WebinarForm({ id, initialData }: WebinarFormProps) {
         setFormData(prev => ({
             ...prev,
             [name]: type === 'number' ? parseInt(value) || 0 : value,
-            ...(name === 'jenis_webinar' && value === 'internal' ? { link_daftar: '' } : {}),
         }))
     }
 
@@ -235,6 +229,17 @@ export default function WebinarForm({ id, initialData }: WebinarFormProps) {
                         </select>
                     </div>
 
+                    <div>
+                        <label className="block text-sm font-bold text-slate-700 mb-2">Penyelenggara</label>
+                        <input
+                            name="penyelenggara"
+                            className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-slate-900"
+                            placeholder="Instansi penyelenggara..."
+                            value={formData.penyelenggara}
+                            onChange={handleChange}
+                        />
+                    </div>
+
                     <div className="md:col-span-2">
                         <label className="block text-sm font-bold text-slate-700 mb-2 italic">Visual Banner / Poster Webinar (Upload)</label>
                         <div className="relative group/banner border-2 border-dashed border-slate-200 rounded-3xl p-4 bg-slate-50 hover:bg-slate-100 hover:border-slate-300 transition-all text-center">
@@ -342,76 +347,46 @@ export default function WebinarForm({ id, initialData }: WebinarFormProps) {
                         </div>
                     </div>
 
-                    <div className="md:col-span-2 grid gap-6 md:grid-cols-2">
+                    <div className="md:col-span-2 grid gap-6 md:grid-cols-2 bg-slate-50/50 p-8 rounded-[2rem] border border-slate-100">
+                        <div className="md:col-span-2">
+                             <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest mb-4">Waktu & Kapasitas</h3>
+                        </div>
                         <div>
-                            <label className="block text-sm font-bold text-slate-700 mb-2">Penyelenggara</label>
+                            <label className="block text-sm font-bold text-slate-700 mb-2">Tanggal Mulai</label>
                             <input
-                                name="penyelenggara"
-                                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-slate-900"
-                                placeholder="Instansi penyelenggara..."
-                                value={formData.penyelenggara}
+                                name="tanggal_mulai"
+                                type="date"
+                                required
+                                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-slate-900"
+                                value={formData.tanggal_mulai}
                                 onChange={handleChange}
                             />
                         </div>
 
                         <div>
-                            <label className="block text-sm font-bold text-slate-700 mb-2">Jenis Webinar</label>
-                            <select
-                                name="jenis_webinar"
-                                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-slate-900"
-                                value={formData.jenis_webinar}
+                            <label className="block text-sm font-bold text-slate-700 mb-2">Tanggal Selesai</label>
+                            <input
+                                name="tanggal_selesai"
+                                type="date"
+                                required
+                                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-slate-900"
+                                value={formData.tanggal_selesai}
                                 onChange={handleChange}
-                            >
-                                <option value="external">External</option>
-                                <option value="internal">Internal</option>
-                            </select>
+                            />
                         </div>
-                    </div>
 
-                    <div>
-                        <label className="block text-sm font-bold text-slate-700 mb-2">Tanggal Mulai</label>
-                        <input
-                            name="tanggal_mulai"
-                            type="date"
-                            required
-                            className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-slate-900"
-                            value={formData.tanggal_mulai}
-                            onChange={handleChange}
-                        />
-                    </div>
+                        <div>
+                            <label className="block text-sm font-bold text-slate-700 mb-2">Jumlah JP</label>
+                            <input
+                                name="jumlah_jp"
+                                type="number"
+                                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-slate-900"
+                                value={formData.jumlah_jp}
+                                onChange={handleChange}
+                            />
+                        </div>
 
-                    <div>
-                        <label className="block text-sm font-bold text-slate-700 mb-2">Tanggal Selesai</label>
-                        <input
-                            name="tanggal_selesai"
-                            type="date"
-                            required
-                            className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-slate-900"
-                            value={formData.tanggal_selesai}
-                            onChange={handleChange}
-                        />
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-bold text-slate-700 mb-2">Jumlah JP</label>
-                        <input
-                            name="jumlah_jp"
-                            type="number"
-                            className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-slate-900"
-                            value={formData.jumlah_jp}
-                            onChange={handleChange}
-                        />
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-bold text-slate-700 mb-2">Kuota Peserta</label>
-                        <input
-                            name="kuota"
-                            type="number"
-                            className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-slate-900"
-                            value={formData.kuota}
-                            onChange={handleChange}
-                        />
+                        </div>
                     </div>
                 </section>
 
@@ -421,18 +396,16 @@ export default function WebinarForm({ id, initialData }: WebinarFormProps) {
                         Koleksi Link Eksternal
                     </h3>
                     <div className="grid gap-6 md:grid-cols-2">
-                        {formData.jenis_webinar === 'external' && (
-                            <div>
-                                <label className="block text-sm font-bold text-slate-700 mb-2">Link Pendaftaran</label>
-                                <input
-                                    name="link_daftar"
-                                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-slate-900"
-                                    placeholder="https://..."
-                                    value={formData.link_daftar}
-                                    onChange={handleChange}
-                                />
-                            </div>
-                        )}
+                        <div>
+                            <label className="block text-sm font-bold text-slate-700 mb-2">Link Pendaftaran</label>
+                            <input
+                                name="link_daftar"
+                                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-slate-900"
+                                placeholder="https://..."
+                                value={formData.link_daftar}
+                                onChange={handleChange}
+                            />
+                        </div>
                         <div>
                             <label className="block text-sm font-bold text-slate-700 mb-2">Link Zoom Meeting</label>
                             <input
@@ -444,32 +417,22 @@ export default function WebinarForm({ id, initialData }: WebinarFormProps) {
                             />
                         </div>
                         <div>
+                            <label className="block text-sm font-bold text-slate-700 mb-2">Link YouTube Webinar</label>
+                            <input
+                                name="link_youtube"
+                                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-slate-900"
+                                placeholder="https://youtube.com/watch?v=..."
+                                value={formData.link_youtube}
+                                onChange={handleChange}
+                            />
+                        </div>
+                        <div>
                             <label className="block text-sm font-bold text-slate-700 mb-2">Link Materi</label>
                             <input
                                 name="link_materi"
                                 className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-slate-900"
                                 placeholder="https://drive.google.com/..."
                                 value={formData.link_materi}
-                                onChange={handleChange}
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-bold text-slate-700 mb-2">Link Post Test / Tugas</label>
-                            <input
-                                name="link_post_test"
-                                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-slate-900"
-                                placeholder="https://google.forms/..."
-                                value={formData.link_post_test}
-                                onChange={handleChange}
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-bold text-slate-700 mb-2">Link Monev</label>
-                            <input
-                                name="link_monev"
-                                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-slate-900"
-                                placeholder="https://..."
-                                value={formData.link_monev}
                                 onChange={handleChange}
                             />
                         </div>

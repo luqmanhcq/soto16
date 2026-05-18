@@ -12,7 +12,6 @@ export const createWebinarSchema = z.object({
     tanggal_selesai: z.string().optional().nullable(), // Will be parsed as Date
     kuota: z.number().int().nonnegative().optional().nullable(),
     penyelenggara: z.string().optional().nullable(),
-    jenis_webinar: z.enum(['internal', 'external']).default('external'),
     link_daftar: z.string().url('Link pendaftaran harus berupa URL valid').optional().nullable().or(z.literal('')),
     link_zoom: z.string().url('Link zoom harus berupa URL valid').optional().nullable().or(z.literal('')),
     link_youtube: z.string().url('Link youtube harus berupa URL valid').optional().nullable().or(z.literal('')),

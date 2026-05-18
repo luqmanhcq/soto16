@@ -17,6 +17,7 @@ export default function PengumumanForm({ id, initialData }: PengumumanFormProps)
     const [formData, setFormData] = useState({
         judul: '',
         slug: '',
+        kategori: 'PENGUMUMAN/INFORMASI LAINNYA',
         deskripsi: '',
         gambar: '',
         link_file: ''
@@ -41,7 +42,7 @@ export default function PengumumanForm({ id, initialData }: PengumumanFormProps)
         }
     }, [formData.judul, id])
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target
         setFormData(prev => ({ ...prev, [name]: value }))
     }
@@ -126,7 +127,7 @@ export default function PengumumanForm({ id, initialData }: PengumumanFormProps)
                 </header>
 
                 <div className="space-y-10">
-                    <div className="space-y-6">
+                    <div className="grid md:grid-cols-2 gap-8">
                         <div className="space-y-2">
                             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-4">Judul Pengumuman</label>
                             <input
@@ -140,6 +141,23 @@ export default function PengumumanForm({ id, initialData }: PengumumanFormProps)
                         </div>
 
                         <div className="space-y-2">
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-4">Kategori Informasi</label>
+                            <select
+                                name="kategori"
+                                required
+                                className="w-full bg-slate-50 rounded-2xl px-6 py-5 outline-none border border-slate-100 focus:border-amber-500 focus:bg-white transition-all text-sm font-black text-slate-900 appearance-none"
+                                value={formData.kategori}
+                                onChange={handleChange}
+                            >
+                                <option value="WEBINAR EKSTERNAL">WEBINAR EKSTERNAL</option>
+                                <option value="PEMBELAJARAN ONLINE EKSTERNAL">PEMBELAJARAN ONLINE EKSTERNAL</option>
+                                <option value="PENAWARAN PENGEMBANGAN KOMPETENSI">PENAWARAN PENGEMBANGAN KOMPETENSI</option>
+                                <option value="PENGUMUMAN/INFORMASI LAINNYA">PENGUMUMAN/INFORMASI LAINNYA</option>
+                            </select>
+                        </div>
+                    </div>
+
+                        <div className="space-y-2">
                             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-4">Slug URL Bersih</label>
                             <input
                                 name="slug"
@@ -149,7 +167,6 @@ export default function PengumumanForm({ id, initialData }: PengumumanFormProps)
                                 value={formData.slug}
                             />
                         </div>
-                    </div>
 
                     <div className="space-y-6">
                         <div className="space-y-2">

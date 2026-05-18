@@ -85,7 +85,6 @@ async function main() {
             tanggal_selesai: '2026-04-15',
             kuota: 100,
             penyelenggara: 'Dinas Kominfo',
-            jenis_webinar: 'internal' as const,
             status: 'publish' as const,
             gambar: 'https://images.unsplash.com/photo-1573163281534-10d8479e3966?q=80&w=800'
         },
@@ -101,7 +100,6 @@ async function main() {
             tanggal_selesai: '2026-04-20',
             kuota: 250,
             penyelenggara: 'BKD Provinsi',
-            jenis_webinar: 'external' as const,
             status: 'publish' as const,
             gambar: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=800'
         },
@@ -117,7 +115,6 @@ async function main() {
             tanggal_selesai: '2026-05-12',
             kuota: 50,
             penyelenggara: 'BPKAD',
-            jenis_webinar: 'internal' as const,
             status: 'publish' as const,
             gambar: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?q=80&w=800'
         }
@@ -193,12 +190,14 @@ async function main() {
         {
             judul: 'Pemeliharaan Sistem Berkala',
             slug: 'maintenance-system-berkala',
+            kategori: 'PENGUMUMAN/INFORMASI LAINNYA',
             deskripsi: 'SI-SOTO akan melakukan pemeliharaan rutin pada hari Minggu, 12 April 2026 pukul 00:00 - 04:00 WIB.',
             gambar: 'https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?q=80&w=800'
         },
         {
             judul: 'Penerimaan Sertifikat Diklat Luar Negeri',
             slug: 'penerimaan-sertifikat-luar-negeri',
+            kategori: 'PENAWARAN PENGEMBANGAN KOMPETENSI',
             deskripsi: 'Kini Anda dapat mengusulkan sertifikat dari lembaga internasional melalui menu Sertifikat Usulan.',
             gambar: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=800',
             link_file: 'https://example.com/panduan-sertifikat-ln.pdf'
@@ -216,6 +215,43 @@ async function main() {
             }
         } catch (error) {
             console.error(`Error creating announcement ${ann.judul}:`, error)
+        }
+    }
+
+    // --- SEEDING CAROUSELS ---
+    console.log('--- SEEDING CAROUSELS ---')
+    const carousels = [
+        {
+            title: 'SELAMAT DATANG DI SI-SOTO',
+            subtitle: 'Strategi Optimalisasi Talenta Organisasi Pemerintah Kabupaten Lamongan.',
+            image: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=2070',
+            link: '/tentang',
+            cta_text: 'PELAJARI SELENGKAPNYA',
+            is_active: true,
+            order: 1
+        },
+        {
+            title: 'ASN BANGKIT!',
+            subtitle: 'Bangun Akselerasi Nilai Guna, Kompetensi, Inovasi dan Talenta untuk Lamongan Megilan.',
+            image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=2071',
+            link: '/webinar',
+            cta_text: 'IKUTI WEBINAR',
+            is_active: true,
+            order: 2
+        }
+    ]
+
+    for (const carousel of carousels) {
+        try {
+            const existing = await db.query.carouselsTable.findFirst({
+                where: (c, { eq }) => eq(c.title, carousel.title)
+            })
+            if (!existing) {
+                await db.insert(schema.carouselsTable).values(carousel)
+                console.log(`Created carousel: ${carousel.title}`)
+            }
+        } catch (error) {
+            console.error(`Error creating carousel ${carousel.title}:`, error)
         }
     }
 

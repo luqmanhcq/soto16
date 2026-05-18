@@ -34,6 +34,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         { name: 'Data Webinar', href: '/admin/webinar', icon: Video },
         { name: 'Data E-Learning', href: '/admin/pembelajaran', icon: BookOpen },
         { name: 'Data Pengumuman', href: '/admin/pengumuman', icon: Home },
+        { name: 'Data Carousel', href: '/admin/carousel', icon: LayoutDashboard },
         { name: 'Approval Sertifikat', href: '/admin/sertifikat', icon: FileCheck },
     ]
 
@@ -50,7 +51,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm" onClick={() => setIsSidebarOpen(false)} />
                 <nav className="fixed inset-y-0 left-0 w-64 bg-white p-6 shadow-2xl flex flex-col">
                     <div className="flex items-center justify-between mb-10">
-                        <span className="text-2xl font-bold text-blue-600">SI-SOTO</span>
+                        <img src="/logo-soto.png?v=3" alt="Logo" className="h-10 w-auto" />
                         <button onClick={() => setIsSidebarOpen(false)}><X className="h-6 w-6 text-slate-400" /></button>
                     </div>
                     <div className="flex-1 space-y-2">
@@ -113,10 +114,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             {/* Desktop Sidebar */}
             <nav className="hidden lg:flex w-72 flex-col bg-white border-r border-slate-200 p-8">
                 <div className="mb-12">
-                    <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                        SI-SOTO
-                    </h1>
-                    <p className="text-xs text-slate-400 font-medium tracking-widest mt-1">CORE UNIVERSITY PLATFORM</p>
+                    <img src="/logo-soto.png?v=3" alt="Logo" className="h-14 w-auto" />
+                    <p className="text-[10px] text-slate-400 font-black tracking-[0.3em] mt-3 uppercase leading-none italic">Talent Hub Platform</p>
                 </div>
 
                 <div className="flex-1 space-y-2">
@@ -126,8 +125,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                             key={item.name}
                             href={item.href}
                             className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-200 ${isActive(item.href)
-                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-200 translate-x-2'
-                                : 'text-slate-500 hover:bg-slate-50 hover:text-blue-600'
+                                ? 'bg-amber-500 text-white shadow-lg shadow-amber-200 translate-x-2'
+                                : 'text-slate-500 hover:bg-slate-50 hover:text-amber-600'
                                 }`}
                         >
                             <item.icon className={`h-5 w-5 ${isActive(item.href) ? 'text-white' : ''}`} />
@@ -195,9 +194,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
             {/* Main Content */}
             <div className="flex-1 flex flex-col overflow-hidden">
-                <header className="lg:hidden h-16 bg-white border-b border-slate-200 flex items-center px-6">
+                <header className="lg:hidden h-16 bg-white border-b border-slate-200 flex items-center px-6 gap-4">
                     <button onClick={() => setIsSidebarOpen(true)}><Menu className="h-6 w-6 text-slate-600" /></button>
-                    <span className="ml-4 font-bold text-slate-800">SI-SOTO</span>
+                    <img src="/logo-soto.png?v=3" alt="Logo" className="h-8 w-auto" />
                 </header>
                 <main className="flex-1 overflow-y-auto focus:outline-none">
                     {children}

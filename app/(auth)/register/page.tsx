@@ -77,10 +77,7 @@ export default function RegisterPage() {
                     
                     <div className="relative z-10">
                         <Link href="/" className="inline-flex items-center gap-3 group">
-                            <div className="h-12 w-12 bg-white rounded-2xl flex items-center justify-center shadow-xl group-hover:rotate-12 transition-transform duration-500">
-                                <ShieldCheck className="h-7 w-7 text-indigo-600" />
-                            </div>
-                            <span className="text-2xl font-black text-white tracking-tighter">SI-SOTO.</span>
+                            <img src="/logo-soto.png" alt="Logo" className="h-16 w-auto" />
                         </Link>
                     </div>
 
@@ -111,9 +108,7 @@ export default function RegisterPage() {
                     <div className="max-w-md mx-auto w-full space-y-8">
                         <header className="space-y-3">
                             <div className="lg:hidden flex justify-center mb-6">
-                                <div className="h-14 w-14 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-2xl">
-                                    <ShieldCheck className="h-8 w-8 text-white" />
-                                </div>
+                                <img src="/logo-soto.png" alt="Logo" className="h-16 w-auto" />
                             </div>
                             <h1 className="text-3xl font-black text-white tracking-tight leading-none">Buat Akun Baru</h1>
                             <p className="text-slate-500 font-bold text-sm">Lengkapi data diri Anda secara lengkap.</p>
