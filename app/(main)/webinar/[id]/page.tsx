@@ -10,10 +10,16 @@ import {
     ExternalLink,
     Video,
     FileText,
-    ClipboardList,
+    Play,
+    ClipboardCheck,
+    MessageSquare,
+    ArrowRight,
     Award,
     VideoIcon,
-    Play
+    ClipboardList,
+    UserCheck,
+    Loader2,
+    Youtube
 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -23,6 +29,8 @@ export default function WebinarDetailPage({ params }: { params: Promise<{ id: st
     const [webinar, setWebinar] = useState<any>(null)
     const [loading, setLoading] = useState(true)
     const [isJoined, setIsJoined] = useState(false)
+    const [isAttended, setIsAttended] = useState(false)
+    const [attending, setAttending] = useState(false)
     const [joining, setJoining] = useState(false)
 
     useEffect(() => {
@@ -33,6 +41,11 @@ export default function WebinarDetailPage({ params }: { params: Promise<{ id: st
                     const result = await res.json()
                     setWebinar(result.data)
                     setIsJoined(result.data.isJoined || false)
+
+                    // Fetch attendance status
+                    const attRes = await fetch(`/api/webinar/${id}/attendance`)
+                    const attData = await attRes.json()
+                    if (attRes.ok) setIsAttended(attData.data.isAttended)
                 }
             } catch (error) {
                 console.error('Failed to fetch webinar', error)
@@ -43,16 +56,49 @@ export default function WebinarDetailPage({ params }: { params: Promise<{ id: st
         fetchData()
     }, [id])
 
+    const handleAttendance = async () => {
+        setAttending(true)
+        try {
+            const res = await fetch(`/api/webinar/${id}/attendance`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            const result = await res.json()
+            if (res.ok) {
+                setIsAttended(true)
+                alert('Absensi berhasil dicatat!')
+            } else {
+                alert(result.message)
+            }
+        } catch (error) {
+            alert('Gagal melakukan absensi')
+        } finally {
+            setAttending(false)
+        }
+    }
+
     const handleJoin = async () => {
         setJoining(true)
         try {
             const res = await fetch(`/api/webinar/${id}/join`, { method: 'POST' })
-            if (res.ok) {
-                setIsJoined(true)
-                alert('Berhasil mendaftar webinar!')
+            const contentType = res.headers.get('content-type')
+            
+            if (contentType && contentType.includes('application/json')) {
+                const result = await res.json()
+                if (res.ok) {
+                    setIsJoined(true)
+                    alert('Berhasil mendaftar webinar!')
+                } else {
+                    alert(`Gagal: ${result.message || 'Error tidak diketahui'}`)
+                }
+            } else {
+                const errorText = await res.text()
+                console.error('Server returned non-JSON response:', errorText)
+                alert(`Terjadi kesalahan server (Server Error). Silakan hubungi admin.`)
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error('Failed to join webinar', error)
+            alert(`Kesalahan Koneksi: ${error.message}`)
         } finally {
             setJoining(false)
         }
@@ -85,9 +131,6 @@ export default function WebinarDetailPage({ params }: { params: Promise<{ id: st
                             <div className="flex items-center gap-2.5">
                                 <Calendar className="h-5 w-5 text-blue-500" />
                                 <span className="font-bold text-slate-700">{new Date(webinar.tanggal_mulai).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
-                            </div>
-                            <div className="flex items-center gap-2.5">
-                                <span className="inline-flex px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-slate-100 text-slate-700">{(webinar.jenis_webinar || 'external').toUpperCase()}</span>
                             </div>
                             <div className="flex items-center gap-2.5">
                                 <Users className="h-5 w-5 text-blue-500" />
@@ -193,14 +236,59 @@ export default function WebinarDetailPage({ params }: { params: Promise<{ id: st
                                     BERHASIL MENDAFTAR (OK)
                                 </div>
 
-                                <p className="text-slate-400 font-bold text-[11px] tracking-widest uppercase text-center py-4">Tautan Penting & Sumberdaya</p>
+                                <div className="grid gap-4 mt-6">
+                                    <Link
+                                        href={`/webinar/${id}/test?type=post_test`}
+                                        className="flex items-center justify-between p-6 rounded-[2rem] bg-indigo-600 text-white font-black text-xs uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-100"
+                                    >
+                                        <div className="flex items-center gap-4">
+                                            <ClipboardCheck className="h-5 w-5" />
+                                            KERJAKAN POST-TEST
+                                        </div>
+                                        <ArrowRight className="h-4 w-4" />
+                                    </Link>
+                                    
+                                    <Link
+                                        href={`/webinar/${id}/test?type=monev`}
+                                        className="flex items-center justify-between p-6 rounded-[2rem] bg-white border-2 border-indigo-50 text-indigo-600 font-black text-xs uppercase tracking-widest hover:border-indigo-600 transition-all"
+                                    >
+                                        <div className="flex items-center gap-4">
+                                            <MessageSquare className="h-5 w-5" />
+                                            ISI MONEV KEGIATAN
+                                        </div>
+                                        <ArrowRight className="h-4 w-4" />
+                                    </Link>
+                                </div>
+
+                                {/* Attendance Section */}
+                                <div className="mt-4">
+                                    {isAttended ? (
+                                        <div className="flex items-center justify-center gap-3 p-6 rounded-[2rem] bg-emerald-50 border-2 border-emerald-100 text-emerald-600 font-black text-xs uppercase tracking-widest italic">
+                                            <UserCheck className="h-5 w-5" />
+                                            ABSENSI BERHASIL (OK)
+                                        </div>
+                                    ) : (
+                                        <button
+                                            onClick={handleAttendance}
+                                            disabled={attending}
+                                            className="w-full flex items-center justify-between p-6 rounded-[2rem] bg-emerald-600 text-white font-black text-xs uppercase tracking-widest hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-100 disabled:opacity-50"
+                                        >
+                                            <div className="flex items-center gap-4">
+                                                {attending ? <Loader2 className="h-5 w-5 animate-spin" /> : <UserCheck className="h-5 w-5" />}
+                                                KLIK UNTUK ABSENSI
+                                            </div>
+                                            <ArrowRight className="h-4 w-4" />
+                                        </button>
+                                    )}
+                                </div>
+
+                                <p className="text-slate-400 font-bold text-[11px] tracking-widest uppercase text-center py-6">Tautan Penting & Sumberdaya</p>
 
                                 {[
-                                    ...(webinar.jenis_webinar === 'external' ? [{ name: 'Link Pendaftaran Eksternal', href: webinar.link_daftar, icon: ExternalLink, disabled: !webinar.link_daftar }] : []),
+                                    { name: 'Link Pendaftaran Eksternal', href: webinar.link_daftar, icon: ExternalLink, disabled: !webinar.link_daftar },
                                     { name: 'Akses Zoom Meeting', href: webinar.link_zoom, icon: VideoIcon, disabled: !webinar.link_zoom },
+                                    { name: 'Link YouTube Webinar', href: webinar.link_youtube, icon: Youtube, disabled: !webinar.link_youtube },
                                     { name: 'Unduh Materi & PPT', href: webinar.link_materi, icon: FileText, disabled: !webinar.link_materi },
-                                    { name: 'Post Test / Tugas', href: webinar.link_post_test, icon: ClipboardList, disabled: !webinar.link_post_test },
-                                    { name: 'Formulir Monev', href: webinar.link_monev, icon: ClipboardList, disabled: !webinar.link_monev },
                                     { name: 'Unduh Sertifikat', href: webinar.link_sertifikat, icon: Award, disabled: !webinar.link_sertifikat },
                                 ].map((link, idx) => (
                                     <a

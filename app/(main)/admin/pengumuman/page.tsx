@@ -93,6 +93,7 @@ export default function AdminPengumumanPage() {
                         <thead>
                             <tr className="bg-slate-50/50">
                                 <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Judul & Detail Berita</th>
+                                <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Kategori</th>
                                 <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Tanggal Rilis</th>
                                 <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Tindakan</th>
                             </tr>
@@ -117,6 +118,11 @@ export default function AdminPengumumanPage() {
                                                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1.5 line-clamp-1 italic">{item.deskripsi}</p>
                                                 </div>
                                             </div>
+                                        </td>
+                                        <td className="px-8 py-6">
+                                            <span className="inline-block px-3 py-1 rounded-lg bg-amber-50 text-amber-600 text-[9px] font-black uppercase tracking-tighter italic">
+                                                {item.kategori || 'UMUM'}
+                                            </span>
                                         </td>
                                         <td className="px-8 py-6">
                                             <p className="text-xs font-black text-slate-700 flex items-center gap-2">

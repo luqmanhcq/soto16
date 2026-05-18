@@ -67,28 +67,25 @@ export class WebinarService {
     }
 
     async join(webinarId: number, userId: number) {
+        console.log(`[Service] Joining webinar ${webinarId} for user ${userId}`)
         const webinar = await webinarRepository.findById(webinarId)
         if (!webinar) {
+            console.error(`[Service] Webinar ${webinarId} not found`)
             throw new Error('Webinar tidak ditemukan')
         }
 
+        console.log(`[Service] Webinar status: ${webinar.status}`)
         if (webinar.status !== 'publish') {
             throw new Error('Webinar tidak tersedia untuk dikuti')
         }
 
         const alreadyJoined = await webinarRepository.isJoined(webinarId, userId)
+        console.log(`[Service] Already joined: ${alreadyJoined}`)
         if (alreadyJoined) {
             throw new Error('Anda sudah terdaftar di webinar ini')
         }
 
-        // Check kuota
-        if (webinar.kuota !== null) {
-            const participants = await webinarRepository.getParticipants(webinarId)
-            if (participants.length >= webinar.kuota) {
-                throw new Error('Kuota webinar sudah penuh')
-            }
-        }
-
+        console.log('[Service] Executing repository join...')
         return await webinarRepository.join(webinarId, userId)
     }
 

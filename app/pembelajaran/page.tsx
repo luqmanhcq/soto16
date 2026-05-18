@@ -40,10 +40,10 @@ export default function PublicPembelajaranPage() {
                         <BookOpen className="h-4 w-4" />
                         <span className="text-[10px] font-black uppercase tracking-widest italic">Core Competence Curriculum</span>
                     </div>
-                    <h1 className="text-6xl lg:text-7xl font-black text-slate-900 tracking-tighter italic uppercase leading-none">
-                        Platform <br /><span className="text-emerald-600">Belajar Mandiri.</span>
+                    <h1 className="text-3xl lg:text-4xl font-black text-slate-900 tracking-tighter italic uppercase leading-none">
+                        PROGRAM PEMBELAJARAN MANDIRI “KOYA” <br /><span className="text-emerald-600">(Kolaboratif Online yang akseleratif).</span>
                     </h1>
-                    <p className="max-w-2xl text-slate-400 font-bold text-lg leading-relaxed italic border-l-4 border-emerald-50 pl-10">Kembangkan potensi teknis dan leadership Anda dengan kurikulum terstandarisasi yang bisa dipelajari sesuai ritme pribadi Anda.</p>
+                    <p className="max-w-2xl text-slate-400 font-bold text-lg leading-relaxed italic border-l-4 border-emerald-50 pl-10">Meracik Kompetensi, Membangun Lamongan MEGILAN.</p>
 
                     <div className="pt-10 flex flex-col md:flex-row gap-6">
                         <div className="flex-1 flex items-center gap-4 bg-slate-50 border border-slate-100 p-5 rounded-[2rem] focus-within:bg-white focus-within:ring-4 focus-within:ring-emerald-50 transition-all shadow-inner group">

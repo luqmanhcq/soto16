@@ -76,6 +76,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             throw new Error('Tidak dapat terhubung ke server. Periksa koneksi internet Anda.')
         }
 
+<<<<<<< HEAD
         // Tangani kasus response bukan JSON (mis. 502 Bad Gateway HTML dari Nginx)
         if (!res.headers.get('content-type')?.includes('application/json')) {
             throw new Error(
@@ -99,6 +100,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(result.data.user)
         // Cookie sudah otomatis di-set browser dari header Set-Cookie.
         // Redirect ke /dashboard ditangani oleh login/page.tsx
+=======
+        // Set user state dari response
+        setUser(result.data.user)
+        // Cookie sudah otomatis di-set oleh browser dari Set-Cookie header.
+        // Redirect ditangani oleh login/page.tsx
+>>>>>>> f0e7dfb9cbb1b7976eb3040a70d795bd4663e6fb
     }
 
     const logout = async (): Promise<void> => {

@@ -24,20 +24,30 @@ export async function POST(
     try {
         const { id } = await params
         const idNum = parseInt(id)
+        console.log(`[API] Attempting join for Webinar ID: ${idNum}, User ID: ${user.id}`)
 
         if (isNaN(idNum)) {
+            console.error(`[API] Invalid Webinar ID: ${id}`)
             return errorResponse('ID harus berupa angka', 400)
         }
 
+        console.log('[API] Calling webinarService.join...')
         const registration = await webinarService.join(idNum, user.id)
+        console.log('[API] Join successful:', registration.id)
+        
         return successResponse(registration, 'Berhasil mendaftar webinar', 201)
-    } catch (error) {
-        if (error instanceof Error) {
-            if (error.message.includes('tidak ditemukan')) {
-                return errorResponse(error.message, 404)
-            }
-            return errorResponse(error.message, 400)
+    } catch (error: any) {
+        console.error('Join Webinar Error:', error)
+        
+        // Handle specific database errors
+        if (error.code === '23505') {
+            return errorResponse('Anda sudah terdaftar di webinar ini', 400)
         }
-        return internalErrorResponse()
+        if (error.code === '23503') {
+            return errorResponse('Data referensi (User/Webinar) tidak valid', 400)
+        }
+
+        const message = error instanceof Error ? error.message : 'Gagal mendaftar webinar'
+        return errorResponse(message, 400)
     }
 }

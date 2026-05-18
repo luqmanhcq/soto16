@@ -63,10 +63,7 @@ export default function LoginPage() {
                     
                     <div className="relative z-10">
                         <Link href="/" className="inline-flex items-center gap-3 group">
-                            <div className="h-12 w-12 bg-white rounded-2xl flex items-center justify-center shadow-xl group-hover:rotate-12 transition-transform duration-500">
-                                <ShieldCheck className="h-7 w-7 text-indigo-600" />
-                            </div>
-                            <span className="text-2xl font-black text-white tracking-tighter">SI-SOTO.</span>
+                            <img src="/logo-soto.png?v=3" alt="Logo" className="h-16 w-auto" />
                         </Link>
                     </div>
 
@@ -100,9 +97,7 @@ export default function LoginPage() {
                     <div className="max-w-sm mx-auto w-full space-y-10">
                         <header className="space-y-3">
                             <div className="lg:hidden flex justify-center mb-8">
-                                <div className="h-14 w-14 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-2xl shadow-indigo-500/40">
-                                    <ShieldCheck className="h-8 w-8 text-white" />
-                                </div>
+                                <img src="/logo-soto.png?v=3" alt="Logo" className="h-16 w-auto" />
                             </div>
                             <h1 className="text-3xl font-black text-white tracking-tight leading-none">Login Akun</h1>
                             <p className="text-slate-500 font-bold text-sm">Gunakan NIP dan password akun SI-SOTO Anda.</p>

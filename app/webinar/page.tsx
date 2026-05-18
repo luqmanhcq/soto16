@@ -41,10 +41,10 @@ export default function PublicWebinarPage() {
                         <Video className="h-4 w-4" />
                         <span className="text-[10px] font-black uppercase tracking-widest italic">Live Knowledge Transfer</span>
                     </div>
-                    <h1 className="text-6xl lg:text-7xl font-black text-slate-900 tracking-tighter italic uppercase leading-none">
-                        Eksplorasi <br /><span className="text-indigo-600">Webinar Kompetensi.</span>
+                    <h1 className="text-3xl lg:text-4xl font-black text-slate-900 tracking-tighter italic uppercase leading-none">
+                        Program Webinar "ASN Bangkit"<br /><span className="text-indigo-600">(Bangun Akselerasi Nilai Guna, Kompetensi, Inovasi dan Talenta)</span>
                     </h1>
-                    <p className="max-w-2xl text-slate-400 font-bold text-lg leading-relaxed">Bergabunglah dengan ribuan ASN lainnya dalam sesi peningkatan skill digital yang dipandu oleh praktisi ahli dari berbagai sektor.</p>
+                    <p className="max-w-2xl text-slate-400 font-bold text-lg leading-relaxed">Belajar tanpa batas, berkarya dengan tuntas, untuk Lamongan Megilan.</p>
 
                     <div className="pt-10 flex flex-col md:flex-row gap-6">
                         <div className="flex-1 flex items-center gap-4 bg-slate-50 border border-slate-100 p-5 rounded-[2rem] focus-within:bg-white focus-within:ring-4 focus-within:ring-indigo-50 transition-all shadow-inner group">
@@ -79,9 +79,8 @@ export default function PublicWebinarPage() {
                                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
                                             alt={item.nama_webinar}
                                         />
-                                        <div className="absolute top-6 left-6 px-4 py-2 bg-white/90 backdrop-blur rounded-2xl shadow-xl border border-white/50 space-y-1">
+                                        <div className="absolute top-6 left-6 px-4 py-2 bg-white/90 backdrop-blur rounded-2xl shadow-xl border border-white/50 flex flex-col items-center">
                                             <span className="text-[10px] font-black text-indigo-600 uppercase tracking-widest leading-none">{item.kategori || 'GENERAL'}</span>
-                                            <span className="text-[10px] font-black text-slate-700 uppercase tracking-widest leading-none">{(item.jenis_webinar || 'external').toUpperCase()}</span>
                                         </div>
                                     </div>
                                     <div className="p-10 flex-1 flex flex-col">

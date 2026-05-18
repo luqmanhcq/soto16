@@ -1,6 +1,6 @@
 import { db } from '@/lib/db'
 import { webinarsTable, webinarParticipantsTable } from '@/lib/db/schema'
-import { eq, desc, and } from 'drizzle-orm'
+import { eq, desc, and, sql } from 'drizzle-orm'
 import { CreateWebinarDto, UpdateWebinarDto } from '@/lib/validations/webinar.validation'
 
 export type Webinar = typeof webinarsTable.$inferSelect
@@ -70,9 +70,19 @@ export class WebinarRepository {
             .values({
                 webinar_id: webinarId,
                 user_id: userId,
+                created_at: new Date(),
             })
             .returning()
         return result[0]
+    }
+
+    async countParticipants(webinarId: number): Promise<number> {
+        const result = await db
+            .select({ count: sql<number>`count(*)` })
+            .from(webinarParticipantsTable)
+            .where(eq(webinarParticipantsTable.webinar_id, webinarId))
+        
+        return Number(result[0]?.count || 0)
     }
 
     async isJoined(webinarId: number, userId: number) {
