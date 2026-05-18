@@ -1,0 +1,53 @@
+# =============================================================
+# NGINX CONFIG — SI-SOTO Reverse Proxy
+# File ini BUKAN bagian dari kode Next.js.
+# Salin isi konfigurasi ini ke server Nginx Anda.
+#
+# Lokasi: /etc/nginx/sites-available/sisoto
+# Aktifkan: sudo ln -s /etc/nginx/sites-available/sisoto /etc/nginx/sites-enabled/
+# Test:     sudo nginx -t
+# Reload:   sudo systemctl reload nginx
+# =============================================================
+
+server {
+    listen 80;
+    server_name sisoto.lokermegilan.my.id;
+
+    # Upload size untuk file Excel/dokumen
+    client_max_body_size 20M;
+
+    # Timeout yang cukup untuk Next.js cold start
+    proxy_connect_timeout 60s;
+    proxy_send_timeout    60s;
+    proxy_read_timeout    60s;
+
+    location / {
+        proxy_pass http://127.0.0.1:3001;
+
+        # Header wajib untuk reverse proxy agar Next.js tahu request asli
+        proxy_http_version  1.1;
+        proxy_set_header    Upgrade           $http_upgrade;
+        proxy_set_header    Connection        'upgrade';
+        proxy_set_header    Host              $host;
+        proxy_set_header    X-Real-IP         $remote_addr;
+        proxy_set_header    X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header    X-Forwarded-Proto $scheme;
+        proxy_cache_bypass  $http_upgrade;
+
+        # Agar Set-Cookie dari Next.js diteruskan ke browser
+        proxy_pass_header   Set-Cookie;
+    }
+
+    # Static files Next.js — cache langsung di Nginx (performa lebih baik)
+    location /_next/static/ {
+        proxy_pass http://127.0.0.1:3001;
+        proxy_set_header Host $host;
+        add_header Cache-Control "public, max-age=31536000, immutable";
+    }
+
+    # File upload/public
+    location /uploads/ {
+        proxy_pass http://127.0.0.1:3001;
+        proxy_set_header Host $host;
+    }
+}

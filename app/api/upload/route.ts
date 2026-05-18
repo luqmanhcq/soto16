@@ -20,7 +20,16 @@ export async function POST(request: NextRequest) {
         const extension = originalName.split('.').pop()
         const fileName = `${uuidv4()}.${extension}`
 
-        const path = join(process.cwd(), 'public', 'uploads', 'webinars', fileName)
+        const uploadDir = join(process.cwd(), 'public', 'uploads', 'webinars')
+        // Ensure directory exists
+        try {
+            const { mkdir } = await import('fs/promises')
+            await mkdir(uploadDir, { recursive: true })
+        } catch (err) {
+            // Ignore if exists
+        }
+
+        const path = join(uploadDir, fileName)
         await writeFile(path, buffer)
 
         // Return the public URL

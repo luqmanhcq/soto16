@@ -16,16 +16,19 @@ export async function POST(request: NextRequest) {
 
     const response = successResponse(result, 'Login berhasil', 200)
 
-    // Set cookie for middleware
-    // sameSite: 'lax' bisa gagal di balik reverse proxy HTTPS dengan subdomain
-    // Gunakan 'strict' agar cookie selalu dikirim untuk same-origin requests
+    // Set cookie for middleware/proxy
     const isProduction = process.env.NODE_ENV === 'production'
+    
+    // Deteksi apakah domain menggunakan HTTPS (untuk reverse proxy)
+    // Jika domain Anda http://sisoto... maka secure harus FALSE
+    const isSecure = isProduction && (request.nextUrl.protocol === 'https:' || request.headers.get('x-forwarded-proto') === 'https')
+
     response.cookies.set('token', result.token, {
       httpOnly: true,
-      secure: isProduction,       // hanya HTTPS di production
-      sameSite: 'lax',
+      secure: isSecure, 
+      sameSite: isSecure ? 'none' : 'lax', // 'none' hanya boleh jika secure: true (HTTPS)
       path: '/',
-      maxAge: 60 * 60 * 24 * 7,  // 1 week
+      maxAge: 60 * 60 * 24 * 7, // 7 hari
     })
 
     return response
