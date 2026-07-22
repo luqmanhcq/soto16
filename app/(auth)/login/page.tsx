@@ -3,18 +3,44 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ShieldCheck, Mail, Lock, ArrowRight, Loader2, AlertCircle, CheckCircle2, Zap } from 'lucide-react'
+import { ShieldCheck, Mail, Lock, ArrowRight, Loader2, AlertCircle, CheckCircle2, Zap, Building2 } from 'lucide-react'
 import { useAuth } from '@/lib/contexts/auth-context'
 
 export default function LoginPage() {
     const router = useRouter()
-    const { login } = useAuth()
+    const { login, user, isLoading: authLoading } = useAuth()
     const [formData, setFormData] = useState({
         nip: '',
         password: ''
     })
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
+
+    React.useEffect(() => {
+        if (!authLoading && user) {
+            router.refresh()
+            router.replace('/dashboard')
+        }
+    }, [user, authLoading, router])
+
+    // Check for SSO error from URL query params
+    React.useEffect(() => {
+        const params = new URLSearchParams(window.location.search)
+        const ssoError = params.get('error')
+        if (ssoError === 'sso_no_token') {
+            setError('Token SSO tidak ditemukan. Silakan coba login kembali melalui SiMEGILAN.')
+        } else if (ssoError === 'sso_failed') {
+            const msg = params.get('msg') || 'Autentikasi SSO gagal.'
+            setError(msg)
+        }
+    }, [])
+
+    const handleSsoLogin = () => {
+        const ssoBaseUrl = process.env.NEXT_PUBLIC_SSO_BASE_URL || 'https://simegilan.lamongankab.go.id'
+        const callbackUrl = `${window.location.origin}/api/auth/sso-callback`
+        const ssoLoginUrl = `${ssoBaseUrl}/login?redirect_uri=${encodeURIComponent(callbackUrl)}`
+        window.location.href = ssoLoginUrl
+    }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -26,6 +52,7 @@ export default function LoginPage() {
 
         try {
             await login(nip, password)
+            router.refresh()
             router.push('/dashboard')
         } catch (err: any) {
             setError(err.message || 'Login gagal. Periksa kembali NIP dan password.')
@@ -63,7 +90,7 @@ export default function LoginPage() {
                     
                     <div className="relative z-10">
                         <Link href="/" className="inline-flex items-center gap-3 group">
-                            <img src="/logo-soto.png?v=3" alt="Logo" className="h-16 w-auto" />
+                            <img src="/surajaya_corpu.webp" alt="Logo" className="h-16 w-auto" />
                         </Link>
                     </div>
 
@@ -97,10 +124,10 @@ export default function LoginPage() {
                     <div className="max-w-sm mx-auto w-full space-y-10">
                         <header className="space-y-3">
                             <div className="lg:hidden flex justify-center mb-8">
-                                <img src="/logo-soto.png?v=3" alt="Logo" className="h-16 w-auto" />
+                                <img src="/surajaya_corpu.webp" alt="Logo" className="h-16 w-auto" />
                             </div>
                             <h1 className="text-3xl font-black text-white tracking-tight leading-none">Login Akun</h1>
-                            <p className="text-slate-500 font-bold text-sm">Gunakan NIP dan password akun SI-SOTO Anda.</p>
+                            <p className="text-slate-500 font-bold text-sm">Masuk ke Surajaya Corpu menggunakan akun SiMEGILAN Anda.</p>
                         </header>
 
                         {error && (
@@ -109,6 +136,23 @@ export default function LoginPage() {
                                 <span className="text-xs font-bold uppercase italic tracking-tight">{error}</span>
                             </div>
                         )}
+
+                        {/* SSO Login Button */}
+                        <button
+                            onClick={handleSsoLogin}
+                            type="button"
+                            className="w-full py-4 bg-emerald-600 text-white rounded-2xl font-black text-base shadow-xl shadow-emerald-500/20 hover:bg-emerald-500 hover:shadow-emerald-500/40 active:scale-95 transition-all flex items-center justify-center gap-3 h-14"
+                        >
+                            <Building2 className="h-5 w-5" />
+                            LOGIN DENGAN SiMEGILAN
+                        </button>
+
+                        {/* Divider */}
+                        <div className="relative flex items-center py-2">
+                            <div className="flex-grow border-t border-white/5"></div>
+                            <span className="mx-4 text-[10px] font-black text-slate-600 uppercase tracking-widest">atau login manual</span>
+                            <div className="flex-grow border-t border-white/5"></div>
+                        </div>
 
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="space-y-2">
@@ -160,9 +204,8 @@ export default function LoginPage() {
                         </form>
 
                         <footer className="text-center pt-8 border-t border-white/5 space-y-6">
-                            <p className="text-slate-500 text-xs font-bold">
-                                Belum memiliki akun? {' '}
-                                <Link href="/register" className="text-indigo-500 hover:text-white transition-colors">Daftar di sini</Link>
+                            <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">
+                                Login manual untuk admin atau pengguna yang belum terdaftar di SiMEGILAN
                             </p>
                         </footer>
                     </div>

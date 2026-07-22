@@ -122,7 +122,7 @@ export default function PembelajaranForm({ id, initialData }: PembelajaranFormPr
                     </div>
                     <div>
                         <h2 className="text-3xl font-black text-slate-900 tracking-tight">{id ? 'Sunting' : 'Terbitkan'} Pembelajaran Baru</h2>
-                        <p className="text-slate-400 font-semibold italic text-sm mt-1 tracking-tight">Kembangkan kurikulum pembelajaran mandiri untuk ASN SI-SOTO.</p>
+                        <p className="text-slate-400 font-semibold italic text-sm mt-1 tracking-tight">Kembangkan kurikulum pembelajaran mandiri untuk ASN Surajaya Corpu.</p>
                     </div>
                 </header>
 

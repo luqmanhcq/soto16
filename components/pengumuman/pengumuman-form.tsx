@@ -122,7 +122,7 @@ export default function PengumumanForm({ id, initialData }: PengumumanFormProps)
                     </div>
                     <div>
                         <h2 className="text-3xl font-black text-slate-900 tracking-tight">{id ? 'Sunting' : 'Terbitkan'} Pengumuman</h2>
-                        <p className="text-slate-400 font-bold italic text-sm mt-1 tracking-tight uppercase leading-none">Berbagikan Informasi Terkini Kepada ASN SI-SOTO.</p>
+                        <p className="text-slate-400 font-bold italic text-sm mt-1 tracking-tight uppercase leading-none">Berbagikan Informasi Terkini Kepada ASN Surajaya Corpu.</p>
                     </div>
                 </header>
 

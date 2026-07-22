@@ -17,6 +17,7 @@ import {
     Flame,
     LayoutDashboard,
     ShieldCheck,
+    FileCheck,
     Calendar
 } from 'lucide-react'
 import Link from 'next/link'
@@ -57,7 +58,7 @@ export default function DashboardPage() {
                 </div>
                 <div className="hidden lg:flex items-center gap-3 px-6 py-3 bg-white rounded-2xl border border-slate-100 shadow-xl shadow-slate-200/50">
                     <Zap className="h-5 w-5 text-amber-500 fill-amber-500" />
-                    <span className="text-sm font-black text-slate-700 tracking-tight">SI-SOTO VERSI 1.0 AKTIF</span>
+                    <span className="text-sm font-black text-slate-700 tracking-tight">SURAJAYA CORPU V1.0</span>
                 </div>
             </header>
 
@@ -199,11 +200,29 @@ export default function DashboardPage() {
                         </button>
                     </div>
 
+                    <div className="bg-white p-8 rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100">
+                        <div className="flex items-start justify-between gap-6">
+                            <div>
+                                <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">Sertifikat Saya</p>
+                                <h3 className="text-2xl font-black text-slate-900 mb-2">Lihat & Unduh</h3>
+                                <p className="text-slate-500 text-sm leading-relaxed">Akses semua sertifikat yang disetujui dan unduh langsung dari daftar.</p>
+                                <p className="mt-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Sertifikat disetujui: {stats?.certificates?.approved || 0}</p>
+                            </div>
+                            <FileCheck className="h-14 w-14 text-blue-600" />
+                        </div>
+                        <Link
+                            href="/sertifikat"
+                            className="mt-8 inline-flex items-center justify-center w-full rounded-2xl bg-blue-600 px-5 py-4 text-sm font-black text-white hover:bg-blue-700 transition-all"
+                        >
+                            Lihat Daftar Sertifikat
+                        </Link>
+                    </div>
+
                     <div className="bg-white p-10 rounded-[3rem] shadow-xl shadow-slate-200/50 border border-slate-100">
                         <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest mb-6">Pusat Bantuan</h3>
                         <div className="space-y-4">
                             <button className="flex items-center justify-between w-full p-4 rounded-xl hover:bg-slate-50 transition-all group">
-                                <span className="text-sm font-bold text-slate-700">Panduan SI-SOTO</span>
+                                <span className="text-sm font-bold text-slate-700">Panduan</span>
                                 <ArrowRight className="h-4 w-4 text-slate-300 group-hover:translate-x-1 transition-all" />
                             </button>
                             <button className="flex items-center justify-between w-full p-4 rounded-xl hover:bg-slate-50 transition-all group border-t border-slate-50 pt-6">

@@ -26,8 +26,8 @@ export default function Navbar() {
             <div className="max-w-7xl mx-auto flex items-center justify-between">
                 <Link href="/" className="flex items-center gap-3 group transition-transform hover:scale-105">
                     <img 
-                        src="/logo-soto.png?v=3" 
-                        alt="SI-SOTO Logo" 
+                        src="/surajaya_corpu.webp"
+                        alt="Surajaya Corpu Logo" 
                         className="h-16 w-auto object-contain"
                     />
                 </Link>
@@ -71,7 +71,7 @@ export default function Navbar() {
                         </Link>
                     )}
 
-                    <button onClick={() => setIsOpen(!isOpen)} className="md:hidden h-10 w-10 flex items-center justify-center bg-slate-50 rounded-xl">
+                    <button onClick={() => setIsOpen(!isOpen)} className="md:hidden h-10 w-10 flex items-center justify-center bg-slate-50 rounded-xl text-slate-900">
                         {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
                     </button>
                 </div>

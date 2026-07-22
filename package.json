@@ -9,7 +9,6 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-
     "pm2:start": "pm2 start ecosystem.config.cjs",
     "pm2:start:dev": "pm2 start ecosystem.config.cjs --env development --only soto16-dev",
     "pm2:stop": "pm2 stop soto16",
@@ -24,26 +23,36 @@
     "pm2:logs:dev": "pm2 logs soto16-dev",
     "pm2:monit": "pm2 monit",
     "pm2:save": "pm2 save",
-
     "deploy": "npm run build && npm run pm2:reload",
     "deploy:fresh": "npm run build && pm2 start ecosystem.config.cjs",
-
     "db:generate": "drizzle-kit generate --config drizzle.config.ts",
     "db:migrate": "drizzle-kit migrate --config drizzle.config.ts",
     "db:migrate:prod": "npx tsx lib/db/migrate.ts",
     "db:studio": "drizzle-kit studio --config drizzle.config.ts",
-    "db:seed": "npx tsx lib/db/seed.ts"
+    "db:init": "npx tsx lib/db/init.ts",
+    "db:seed": "npx tsx lib/db/seed.ts",
+    "db:setup": "npx tsx lib/db/init.ts && npx tsx lib/db/seed.ts"
   },
   "dependencies": {
+    "axios": "^1.7.0",
+    "axios-cookiejar-support": "^5.0.0",
     "bcryptjs": "^2.4.3",
+    "cheerio": "^1.0.0",
+    "docx-pdf": "^0.0.1",
+    "docx2pdf-converter": "^1.1.0",
+    "docxtemplater": "^3.68.7",
     "dotenv": "^16.4.5",
-    "drizzle-orm": "^0.33.0",
+    "drizzle-orm": "^0.45.2",
     "jsonwebtoken": "^9.0.2",
+    "libreoffice-convert": "^1.5.0",
     "lucide-react": "^0.446.0",
-    "next": "16.2.1",
+    "next": "^16.2.7",
+    "pdf-lib": "^1.17.1",
+    "pizzip": "^3.2.0",
     "postgres": "^3.4.4",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "tough-cookie": "^5.0.0",
     "uuid": "^13.0.0",
     "xlsx": "^0.18.5",
     "zod": "^3.22.4"
@@ -56,10 +65,11 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/uuid": "^10.0.0",
-    "drizzle-kit": "^0.22.0",
+    "drizzle-kit": "^0.18.1",
     "eslint": "^9",
     "eslint-config-next": "16.2.1",
     "tailwindcss": "^4",
+    "tsx": "^4.23.1",
     "typescript": "^5"
   }
 }

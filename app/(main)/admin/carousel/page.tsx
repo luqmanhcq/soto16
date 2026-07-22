@@ -296,7 +296,7 @@ export default function AdminCarouselPage() {
                                         required
                                         type="text"
                                         className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-amber-50 focus:bg-white transition-all font-bold text-slate-700"
-                                        placeholder="Contoh: SI-SOTO LAMONGAN"
+                                        placeholder="Contoh: SURAJAYA CORPU"
                                         value={formData.title}
                                         onChange={e => setFormData({ ...formData, title: e.target.value })}
                                     />

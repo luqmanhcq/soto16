@@ -1,5 +1,5 @@
 import { db } from '@/lib/db'
-import { webinarsTable, webinarParticipantsTable } from '@/lib/db/schema'
+import { webinarsTable, webinarParticipantsTable, webinarUserAnswersTable, webinarQuestionsTable } from '@/lib/db/schema'
 import { eq, desc, and, sql } from 'drizzle-orm'
 import { CreateWebinarDto, UpdateWebinarDto } from '@/lib/validations/webinar.validation'
 
@@ -34,21 +34,35 @@ export class WebinarRepository {
     }
 
     async create(data: CreateWebinarDto): Promise<Webinar> {
+        const insertData = {
+            ...data,
+            tanggal_mulai: data.tanggal_mulai ? new Date(data.tanggal_mulai) : null,
+            tanggal_selesai: data.tanggal_selesai ? new Date(data.tanggal_selesai) : null,
+        }
         const result = await db
             .insert(webinarsTable)
-            .values(data as any)
+            .values(insertData as any)
             .returning()
 
         return result[0]
     }
 
     async update(id: number, data: UpdateWebinarDto): Promise<Webinar | null> {
+        const updateData: any = {
+            ...data,
+            updated_at: new Date(),
+        }
+
+        if (data.tanggal_mulai !== undefined) {
+            updateData.tanggal_mulai = data.tanggal_mulai ? new Date(data.tanggal_mulai) : null
+        }
+        if (data.tanggal_selesai !== undefined) {
+            updateData.tanggal_selesai = data.tanggal_selesai ? new Date(data.tanggal_selesai) : null
+        }
+
         const result = await db
             .update(webinarsTable)
-            .set({
-                ...data,
-                updated_at: new Date(),
-            } as any)
+            .set(updateData)
             .where(eq(webinarsTable.id, id))
             .returning()
 
@@ -102,6 +116,39 @@ export class WebinarRepository {
                 user: true,
             } as any,
         })
+    }
+
+    async getUserCompletionStatus(webinarId: number, userId: number) {
+        // Check if user has answered post-test questions
+        const postTestAnswers = await db.query.webinarUserAnswersTable.findMany({
+            where: and(
+                eq(webinarUserAnswersTable.user_id, userId),
+                eq(webinarUserAnswersTable.webinar_id, webinarId),
+                eq(webinarUserAnswersTable.type, 'post_test')
+            ),
+        })
+
+        // Check if user has answered monev questions
+        const monevAnswers = await db.query.webinarUserAnswersTable.findMany({
+            where: and(
+                eq(webinarUserAnswersTable.user_id, userId),
+                eq(webinarUserAnswersTable.webinar_id, webinarId),
+                eq(webinarUserAnswersTable.type, 'monev')
+            ),
+        })
+
+        // Check if webinar has post-test and monev questions
+        const questions = await db.query.webinarQuestionsTable.findMany({
+            where: eq(webinarQuestionsTable.webinar_id, webinarId),
+        })
+
+        const hasPostTestQuestions = questions.some(q => q.type === 'post_test')
+        const hasMonevQuestions = questions.some(q => q.type === 'monev')
+
+        return {
+            hasPostTest: !hasPostTestQuestions || postTestAnswers.length > 0,
+            hasMonev: !hasMonevQuestions || monevAnswers.length > 0,
+        }
     }
 }
 

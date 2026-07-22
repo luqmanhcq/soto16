@@ -117,7 +117,7 @@ export default function PublicPembelajaranPage() {
             </main>
 
             <footer className="py-20 border-t border-slate-50 text-center bg-white">
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">&copy; 2026 SI-SOTO E-LEARNING HUB. PENGETAHUAN TANPA BATAS.</p>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">&copy; 2026 SURAJAYA CORPU E-LEARNING HUB. PENGETAHUAN TANPA BATAS.</p>
             </footer>
         </div>
     )

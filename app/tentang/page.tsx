@@ -18,17 +18,17 @@ export default function AboutPage() {
                             <ShieldCheck className="h-4 w-4" />
                             <span className="text-[10px] font-black uppercase tracking-widest italic">Profil Platform Terintegrasi</span>
                         </div>
-                        <h1 className="text-6xl lg:text-8xl font-black text-slate-900 tracking-tighter leading-none italic uppercase">SI-<span className="text-indigo-600">SOTO.</span></h1>
+                        <h1 className="text-6xl lg:text-8xl font-black text-slate-900 tracking-tighter leading-none italic uppercase">SURAJAYA<span className="text-indigo-600">CORPU.</span></h1>
                         <p className="text-xl text-slate-500 font-bold leading-relaxed border-l-4 border-indigo-100 pl-8 italic">
                             Sistem Informasi - Strategi Optimalisasi Talenta Organisasi adalah platform digital terintegrasi yang menjadi kawah candradimuka bagi pengembangan kompetensi ASN di lingkungan Pemerintah Kabupaten Lamongan.
                         </p>
                         <p className="text-slate-400 font-medium leading-relaxed max-w-xl">
-                            Lahir dari semangat inisiasi Corporate University (Corpu), SI-SOTO hadir sebagai "wadah kolaborasi" yang menyatukan berbagai potensi pegawai menjadi satu harmoni kekuatan organisasi.
+                            Lahir dari semangat inisiasi Corporate University (Corpu), Surajaya Corpu hadir sebagai "wadah kolaborasi" yang menyatukan berbagai potensi pegawai menjadi satu harmoni kekuatan organisasi.
                         </p>
                     </div>
                     <div className="relative">
                         <div className="aspect-square bg-slate-100 rounded-[4rem] overflow-hidden rotate-2 shadow-2xl shadow-indigo-100 border-8 border-white group">
-                            <img src="/logo-soto.png" className="w-full h-full object-contain p-12 group-hover:scale-105 transition-all duration-1000" alt="Logo SI-SOTO" />
+                            <img src="/surajaya_corpu.webp" className="w-full h-full object-contain p-12 group-hover:scale-105 transition-all duration-1000" alt="Logo Surajaya Corpu" />
                         </div>
                         <div className="absolute -bottom-10 -left-10 bg-white p-8 rounded-3xl shadow-2xl border border-slate-100 space-y-2 animate-bounce-slow">
                             <p className="text-4xl font-black text-indigo-600 italic leading-none">Corpu</p>
@@ -40,11 +40,11 @@ export default function AboutPage() {
                 {/* 4 Pilar Utama */}
                 <section className="bg-slate-900 py-40 px-6 lg:px-24 relative overflow-hidden rounded-[5rem] mx-6">
                     <div className="absolute inset-0 opacity-5 pointer-events-none flex items-center justify-center">
-                        <span className="text-[20rem] font-black text-white italic">SOTO</span>
+                        <span className="text-[20rem] font-black text-white italic">CORPU</span>
                     </div>
                     <div className="max-w-7xl mx-auto relative z-10 space-y-20">
                         <div className="text-center space-y-4">
-                            <h2 className="text-5xl font-black text-white tracking-tighter uppercase italic">Makna Konseptual SOTO</h2>
+                            <h2 className="text-5xl font-black text-white tracking-tighter uppercase italic">Makna Konseptual Surajaya Corpu</h2>
                             <p className="text-indigo-400 font-bold uppercase tracking-widest text-xs">Empat Pilar Utama Ekosistem Pembelajaran</p>
                         </div>
                         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -169,7 +169,7 @@ export default function AboutPage() {
             </main>
 
             <footer className="text-center py-20 border-t border-slate-100 bg-white">
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest tracking-[0.4em] leading-none">&copy; 2026 SI-SOTO PEMKAB LAMONGAN. INTEGRITAS TANPA BATAS.</p>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest tracking-[0.4em] leading-none">&copy; 2026 BKPSDM Kabupaten Lamongan.</p>
             </footer>
         </div>
     )

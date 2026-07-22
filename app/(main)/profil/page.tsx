@@ -271,7 +271,7 @@ export default function ProfilePage() {
 
                     <div className="mt-12 pt-12 border-t border-white/5 flex flex-col items-center gap-4">
                         <p className="text-sm font-bold text-white/20 italic text-center">Demi keamanan, disarankan mengubah kata sandi secara berkala setiap 3 bulan.</p>
-                        <p className="text-[10px] font-black text-indigo-400 uppercase tracking-tighter">SI-SOTO Identity Service v1.0</p>
+                        <p className="text-[10px] font-black text-indigo-400 uppercase tracking-tighter">Surajaya Corpu</p>
                     </div>
                 </section>
             </div>
