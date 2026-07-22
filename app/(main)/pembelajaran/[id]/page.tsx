@@ -106,7 +106,7 @@ export default function PembelajaranDetailPage({ params }: { params: Promise<{ i
                             <div className="h-20 w-20 rounded-3xl bg-indigo-500 flex items-center justify-center mb-6 shadow-xl shadow-indigo-500/20">
                                 <GraduationCap className="h-10 w-10" />
                             </div>
-                            <h3 className="text-center text-xl font-bold mb-2">Program Sertifikasi SI-SOTO</h3>
+                            <h3 className="text-center text-xl font-bold mb-2">Program Sertifikasi Surajaya Corpu</h3>
                             <p className="text-center text-indigo-200 text-sm opacity-60">Selesaikan seluruh kurikulum untuk mendapatkan sertifikat kompetensi.</p>
                         </div>
 

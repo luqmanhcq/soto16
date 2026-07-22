@@ -19,7 +19,8 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "tough-cookie": ["./types/tough-cookie.d.ts"]
     }
   },
   "include": [

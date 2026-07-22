@@ -1,7 +1,6 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  serverExternalPackages: ["bcryptjs", "jsonwebtoken", "postgres", "xlsx"],
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  serverExternalPackages: ["bcryptjs", "jsonwebtoken", "postgres", "xlsx", "axios", "axios-cookiejar-support", "tough-cookie", "cheerio"],
 
   // Diperlukan agar Next.js percaya pada X-Forwarded-* headers dari reverse proxy
   // Tanpa ini, request.url di Proxy/API routes akan menunjuk ke http://localhost bukan https://domain.com
@@ -13,7 +12,7 @@ const nextConfig: NextConfig = {
         source: "/(.*)",
         headers: [
           { key: "X-Content-Type-Options", value: "nosniff" },
-          { key: "X-Frame-Options", value: "DENY" },
+          { key: "X-Frame-Options", value: "SAMEORIGIN" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
         ],
       },
@@ -21,4 +20,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+module.exports = nextConfig;

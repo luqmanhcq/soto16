@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Save, Loader2, Link as LinkIcon, Image as ImageIcon, Calendar, Type, Upload, X } from 'lucide-react'
+import { ArrowLeft, Save, Loader2, Link as LinkIcon, Image as ImageIcon, Calendar, Type, Upload, X, FileText } from 'lucide-react'
 import Link from 'next/link'
 import FullPageLoader from '@/components/FullPageLoader'
 
@@ -31,21 +31,32 @@ export default function WebinarForm({ id, initialData }: WebinarFormProps) {
         tanggal_mulai: '',
         tanggal_selesai: '',
         penyelenggara: '',
-        link_daftar: '',
         link_zoom: '',
         link_youtube: '',
         link_materi: '',
-        link_sertifikat: '',
+        template_sertifikat: '',
         gambar: '',
         status: 'draft'
     })
 
+
+
     const [narasumberList, setNarasumberList] = useState<Narasumber[]>([{ nama: '', jabatan: '', instansi: '' }])
+
+    const formatDateTimeLocal = (dateStr: string | null | undefined) => {
+        if (!dateStr) return ''
+        const d = new Date(dateStr)
+        if (isNaN(d.getTime())) return ''
+        const pad = (num: number) => String(num).padStart(2, '0')
+        return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
+    }
 
     useEffect(() => {
         if (initialData) {
             setFormData({
-                ...initialData
+                ...initialData,
+                tanggal_mulai: formatDateTimeLocal(initialData.tanggal_mulai),
+                tanggal_selesai: formatDateTimeLocal(initialData.tanggal_selesai),
             })
             if (initialData.narasumber) {
                 // Gunakan JSON jika memungkinkan (Clean Code & Best Practice)
@@ -109,6 +120,33 @@ export default function WebinarForm({ id, initialData }: WebinarFormProps) {
                 setFormData(prev => ({ ...prev, gambar: data.url }))
             } else {
                 alert(data.message || 'Gagal mengunggah gambar')
+            }
+        } catch (error) {
+            console.error('Upload Error:', error)
+            alert('Kesalahan jaringan saat mengunggah')
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const handleTemplateUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (!file) return
+
+        const uploadData = new FormData()
+        uploadData.append('file', file)
+
+        setLoading(true)
+        try {
+            const res = await fetch('/api/upload', {
+                method: 'POST',
+                body: uploadData,
+            })
+            const data = await res.json()
+            if (res.ok) {
+                setFormData(prev => ({ ...prev, template_sertifikat: data.url }))
+            } else {
+                alert(data.message || 'Gagal mengunggah template sertifikat')
             }
         } catch (error) {
             console.error('Upload Error:', error)
@@ -277,6 +315,64 @@ export default function WebinarForm({ id, initialData }: WebinarFormProps) {
                     </div>
 
                     <div className="md:col-span-2">
+                        <label className="block text-sm font-bold text-slate-700 mb-1 italic">Template Sertifikat (PDF, PNG, JPG, atau DOCX) - Kosongkan jika tidak ada sertifikat otomatis</label>
+                        <div className="mb-3 text-left">
+                            <a 
+                                href="https://drive.google.com/file/d/1pRbQbTxxJe0H082XwwodLCmRI88J7b6j/view" 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1.5 text-[11px] text-blue-600 hover:text-blue-800 font-black bg-blue-50 hover:bg-blue-100 px-3.5 py-1.5 rounded-lg transition-all"
+                            >
+                                <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                                </svg>
+                                UNDUH CONTOH TEMPLATE WORD (.DOCX) ACUAN
+                            </a>
+                        </div>
+                        <div className="relative group/template border-2 border-dashed border-slate-200 rounded-3xl p-4 bg-slate-50 hover:bg-slate-100 hover:border-slate-300 transition-all text-center">
+                            {formData.template_sertifikat ? (
+                                <div className="relative p-6 bg-white rounded-2xl shadow-md border border-slate-100 flex flex-col items-center">
+                                    <div className="h-16 w-16 rounded-2xl bg-red-50 flex items-center justify-center text-red-600 mb-2">
+                                        <FileText className="h-8 w-8" />
+                                    </div>
+                                    <span className="text-sm font-bold text-slate-700 max-w-md truncate">Template Sertifikat Terupload ({formData.template_sertifikat.split('.').pop()?.toUpperCase()})</span>
+                                    <a
+                                        href={formData.template_sertifikat}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-xs text-blue-600 font-semibold hover:underline mt-1"
+                                    >
+                                        Lihat / Unduh File Template
+                                    </a>
+                                    <button
+                                        type="button"
+                                        onClick={() => setFormData(prev => ({ ...prev, template_sertifikat: '' }))}
+                                        className="absolute -top-2 -right-2 h-8 w-8 bg-red-600 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-red-700 transition-all"
+                                    >
+                                        <X className="h-4 w-4" />
+                                    </button>
+                                </div>
+                            ) : (
+                                <label className="flex flex-col items-center justify-center py-10 cursor-pointer">
+                                    <div className="h-16 w-16 rounded-2xl bg-white border border-slate-100 shadow-sm flex items-center justify-center text-slate-400 group-hover/template:scale-110 group-hover/template:text-blue-600 transition-all">
+                                        <Upload className="h-8 w-8" />
+                                    </div>
+                                    <span className="text-xs font-black text-slate-400 mt-4 uppercase tracking-widest">Pilih Template Sertifikat</span>
+                                    <span className="text-[10px] text-slate-300 mt-1 uppercase">PDF, PNG, JPG, atau DOCX (Maks 5MB) (Sistem otomatis mengganti {"${nomer}, ${nama}, ${nip}, ${opd} atau [nomer], [nama], [nip], [opd]"})</span>
+                                    <input
+                                        type="file"
+                                        accept="application/pdf,image/png,image/jpeg,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                                        className="hidden"
+                                        onChange={handleTemplateUpload}
+                                    />
+                                </label>
+                            )}
+                        </div>
+                    </div>
+
+
+
+                    <div className="md:col-span-2">
                         <label className="block text-sm font-bold text-slate-700 mb-2">Deskripsi Webinar</label>
                         <textarea
                             name="deskripsi"
@@ -352,10 +448,10 @@ export default function WebinarForm({ id, initialData }: WebinarFormProps) {
                              <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest mb-4">Waktu & Kapasitas</h3>
                         </div>
                         <div>
-                            <label className="block text-sm font-bold text-slate-700 mb-2">Tanggal Mulai</label>
+                            <label className="block text-sm font-bold text-slate-700 mb-2">Tanggal Mulai *</label>
                             <input
                                 name="tanggal_mulai"
-                                type="date"
+                                type="datetime-local"
                                 required
                                 className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-slate-900"
                                 value={formData.tanggal_mulai}
@@ -364,10 +460,10 @@ export default function WebinarForm({ id, initialData }: WebinarFormProps) {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-bold text-slate-700 mb-2">Tanggal Selesai</label>
+                            <label className="block text-sm font-bold text-slate-700 mb-2">Tanggal Selesai *</label>
                             <input
                                 name="tanggal_selesai"
-                                type="date"
+                                type="datetime-local"
                                 required
                                 className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-slate-900"
                                 value={formData.tanggal_selesai}
@@ -376,16 +472,16 @@ export default function WebinarForm({ id, initialData }: WebinarFormProps) {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-bold text-slate-700 mb-2">Jumlah JP</label>
+                            <label className="block text-sm font-bold text-slate-700 mb-2">Jumlah JP *</label>
                             <input
                                 name="jumlah_jp"
                                 type="number"
+                                min="1"
+                                required
                                 className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-slate-900"
                                 value={formData.jumlah_jp}
                                 onChange={handleChange}
                             />
-                        </div>
-
                         </div>
                     </div>
                 </section>
@@ -396,16 +492,6 @@ export default function WebinarForm({ id, initialData }: WebinarFormProps) {
                         Koleksi Link Eksternal
                     </h3>
                     <div className="grid gap-6 md:grid-cols-2">
-                        <div>
-                            <label className="block text-sm font-bold text-slate-700 mb-2">Link Pendaftaran</label>
-                            <input
-                                name="link_daftar"
-                                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-slate-900"
-                                placeholder="https://..."
-                                value={formData.link_daftar}
-                                onChange={handleChange}
-                            />
-                        </div>
                         <div>
                             <label className="block text-sm font-bold text-slate-700 mb-2">Link Zoom Meeting</label>
                             <input
@@ -433,16 +519,6 @@ export default function WebinarForm({ id, initialData }: WebinarFormProps) {
                                 className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-slate-900"
                                 placeholder="https://drive.google.com/..."
                                 value={formData.link_materi}
-                                onChange={handleChange}
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-bold text-slate-700 mb-2">Link Sertifikat Eksternal</label>
-                            <input
-                                name="link_sertifikat"
-                                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-slate-900"
-                                placeholder="https://..."
-                                value={formData.link_sertifikat}
                                 onChange={handleChange}
                             />
                         </div>

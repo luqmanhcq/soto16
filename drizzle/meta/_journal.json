@@ -8,6 +8,20 @@
       "when": 1775629679032,
       "tag": "0000_naive_wiccan",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1780885575858,
+      "tag": "0001_typical_prowler",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1752500000000,
+      "tag": "0002_webinar_date_columns",
+      "breakpoints": true
     }
   ]
 }

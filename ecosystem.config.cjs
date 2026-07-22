@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 module.exports = {
   apps: [
     {
@@ -18,11 +17,19 @@ module.exports = {
         NODE_ENV: 'production',
         PORT: 3001,
         HOSTNAME: '0.0.0.0',
-        NEXTAUTH_URL: 'http://sisoto.lokermegilan.my.id',
-        NEXT_PUBLIC_SERVER_URL: 'http://sisoto.lokermegilan.my.id',
+        NEXTAUTH_URL: 'http://soto.lokermegilan.my.id',
+        NEXT_PUBLIC_SERVER_URL: 'http://soto.lokermegilan.my.id',
+        NEXT_PUBLIC_APP_URL: 'http://soto.lokermegilan.my.id',
         NEXT_PUBLIC_API_URL: 'https://absensisscasn.lamongankab.go.id',
         DATABASE_URL: 'postgresql://postgres:1453@localhost:5432/sisoto',
         JWT_SECRET: 'ganti-dengan-secret-yang-kuat-dan-panjang-minimal-32-karakter',
+        // SSO Integration with SiMEGILAN
+        SIMEGILAN_DATABASE_URL: 'postgresql://postgres:1453@localhost:5432/simegilan',
+        SSO_BASE_URL: 'https://simegilan.lamongankab.go.id',
+        NEXT_PUBLIC_SSO_BASE_URL: 'https://simegilan.lamongankab.go.id',
+        // SSO Role Mapping (comma-separated NIPs for initial admin provisioning)
+        SSO_ADMIN_NIPS: '',
+        SSO_SUPER_ADMIN_NIPS: '1993102920220310002',
       },
       error_file: './logs/pm2-error.log',
       out_file: './logs/pm2-out.log',
@@ -33,39 +40,3 @@ module.exports = {
     },
   ],
 }
-=======
-module.exports = {
-  apps: [
-    {
-      name: 'soto16',
-      script: 'node_modules/next/dist/bin/next',
-      args: 'start -H 0.0.0.0',
-      cwd: './',
-      instances: 1,
-      autorestart: true,
-      watch: false,
-      max_memory_restart: '1G',
-      port: 3001,
-      env: {
-        NODE_ENV: 'production',
-        NEXT_PUBLIC_SERVER_URL: 'https://absensisscasn.lamongankab.go.id',
-        PORT: 3001,
-      },
-      env_development: {
-        NODE_ENV: 'development',
-        PORT: 3001,
-      },
-      env_staging: {
-        NODE_ENV: 'production',
-        PORT: 3001,
-      },
-      error_file: './logs/pm2-error.log',
-      out_file: './logs/pm2-out.log',
-      log_file: './logs/pm2-combined.log',
-      time: true,
-      merge_logs: true,
-      log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
-    },
-  ],
-}
->>>>>>> f0e7dfb9cbb1b7976eb3040a70d795bd4663e6fb

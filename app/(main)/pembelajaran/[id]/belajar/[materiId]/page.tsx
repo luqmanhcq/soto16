@@ -136,7 +136,7 @@ export default function BelajarPage({ params }: { params: Promise<{ id: string; 
                     </button>
                     <div className="flex items-center gap-4">
                         <GraduationCap className="h-6 w-6 text-indigo-600" />
-                        <span className="font-bold text-slate-700 hidden sm:inline">Kurikulum Terakreditasi SI-SOTO</span>
+                        <span className="font-bold text-slate-700 hidden sm:inline">Kurikulum Terakreditasi Surajaya Corpu</span>
                     </div>
                     <button
                         onClick={handleComplete}

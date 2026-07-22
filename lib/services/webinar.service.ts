@@ -13,11 +13,13 @@ export class WebinarService {
         }
 
         let isJoined = false
+        let completionStatus = { hasPostTest: false, hasMonev: false }
         if (userId) {
             isJoined = await webinarRepository.isJoined(id, userId)
+            completionStatus = await webinarRepository.getUserCompletionStatus(id, userId)
         }
 
-        return { ...webinar, isJoined }
+        return { ...webinar, isJoined, ...completionStatus }
     }
 
     async getBySlug(slug: string, userId?: number) {
@@ -27,11 +29,13 @@ export class WebinarService {
         }
 
         let isJoined = false
+        let completionStatus = { hasPostTest: false, hasMonev: false }
         if (userId && webinar.id) {
             isJoined = await webinarRepository.isJoined(webinar.id, userId)
+            completionStatus = await webinarRepository.getUserCompletionStatus(webinar.id, userId)
         }
 
-        return { ...webinar, isJoined }
+        return { ...webinar, isJoined, ...completionStatus }
     }
 
     async create(data: CreateWebinarDto) {

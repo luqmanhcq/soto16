@@ -15,7 +15,7 @@ export default function FullPageLoader({
         <div className="fixed inset-0 z-[100] bg-slate-950/60 backdrop-blur-md flex flex-col items-center justify-center space-y-4 animate-in fade-in duration-300">
             <div className="relative">
                 <div className="h-20 w-20 border-4 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin" />
-                <img src="/logo-soto.png" alt="Logo" className="h-10 w-auto absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+                <img src="/surajaya_corpu.webp" alt="Logo" className="h-10 w-auto absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
             </div>
             <div className="text-center">
                 <p className="text-white font-black tracking-[0.2em] text-xs uppercase italic">{message}</p>

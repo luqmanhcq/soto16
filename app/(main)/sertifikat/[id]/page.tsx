@@ -51,7 +51,7 @@ export default function SertifikatDetailPage({ params }: { params: Promise<{ id:
         setActionLoading(true)
         try {
             const url = `/api/sertifikat/${id}/${action}`
-            const body = action === 'reject' ? { reason: 'Dokumen tidak sesuai kriteria SI-SOTO' } : {}
+            const body = action === 'reject' ? { reason: 'Dokumen tidak sesuai kriteria Surajaya Corpu' } : {}
 
             const res = await fetch(url, {
                 method: 'POST',
@@ -185,7 +185,7 @@ export default function SertifikatDetailPage({ params }: { params: Promise<{ id:
                                 <div className="flex flex-col items-center animate-in fade-in zoom-in duration-500">
                                     <CheckCircle2 className="h-20 w-20 text-green-500 mb-4 drop-shadow-xl" />
                                     <h3 className="text-2xl font-black text-green-700 uppercase tracking-tight">DISETUJUI</h3>
-                                    <p className="text-xs text-slate-400 font-bold mt-1 uppercase tracking-tighter">Terverifikasi Sistem SI-SOTO</p>
+                                    <p className="text-xs text-slate-400 font-bold mt-1 uppercase tracking-tighter">Terverifikasi Sistem Surajaya Corpu</p>
                                 </div>
                             ) : proposal.status === 'ditolak' ? (
                                 <div className="flex flex-col items-center animate-in fade-in zoom-in duration-500">

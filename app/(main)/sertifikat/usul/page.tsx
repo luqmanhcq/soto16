@@ -149,7 +149,7 @@ export default function NewProposalPage() {
                             {loading ? <Loader2 className="h-6 w-6 animate-spin" /> : <Send className="h-6 w-6" />}
                             AJUKAN USULAN SEKARANG
                         </button>
-                        <p className="text-[10px] font-black text-slate-300 uppercase tracking-tighter">KEBIJAKAN SI-SOTO Ver 1.0</p>
+                        <p className="text-[10px] font-black text-slate-300 uppercase tracking-tighter">KEBIJAKAN SURAJAYA CORPU Ver 1.0</p>
                     </div>
                 </form>
             </section>
