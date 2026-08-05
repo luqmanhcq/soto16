@@ -25568,3 +25568,685 @@
 [2026-07-22T03:28:42.033Z] ALLOW (public path): /
 [2026-07-22T03:30:32.887Z] REQ: /tentang | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
 [2026-07-22T03:30:32.888Z] ALLOW (has token): /tentang
+[2026-07-22T03:49:55.126Z] REQ: /profil | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:49:55.126Z] ALLOW (has token): /profil
+[2026-07-22T03:49:58.759Z] REQ: /api/auth/me | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:49:58.760Z] ALLOW (has token): /api/auth/me
+[2026-07-22T03:49:58.862Z] REQ: /surajaya_corpu.webp | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:49:58.863Z] ALLOW (has token): /surajaya_corpu.webp
+[2026-07-22T03:50:02.353Z] REQ: /surajaya_corpu.webp | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:50:02.354Z] ALLOW (has token): /surajaya_corpu.webp
+[2026-07-22T03:53:16.999Z] REQ: / | hasToken: false | tokenVal: none
+[2026-07-22T03:53:17.000Z] REDIRECT /?token=...&role=user -> /api/auth/sso-callback (SiMEGILAN SSO)
+[2026-07-22T03:53:17.090Z] REQ: /api/auth/sso-callback | hasToken: false | tokenVal: none
+[2026-07-22T03:53:17.091Z] ALLOW (public path): /api/auth/sso-callback
+[2026-07-22T03:53:20.399Z] REQ: /api/auth/me | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:20.400Z] ALLOW (has token): /api/auth/me
+[2026-07-22T03:53:20.520Z] REQ: /surajaya_corpu.webp | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:20.521Z] ALLOW (has token): /surajaya_corpu.webp
+[2026-07-22T03:53:20.526Z] REQ: /api/dashboard/stats | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:20.527Z] ALLOW (has token): /api/dashboard/stats
+[2026-07-22T03:53:24.081Z] REQ: /surajaya_corpu.webp | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:24.081Z] ALLOW (has token): /surajaya_corpu.webp
+[2026-07-22T03:53:24.316Z] REQ: /api/auth/me | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:24.316Z] ALLOW (has token): /api/auth/me
+[2026-07-22T03:53:24.321Z] REQ: /login | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:24.322Z] REDIRECT /login -> /dashboard (already logged in)
+[2026-07-22T03:53:24.325Z] REQ: /api/webinar | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:24.325Z] ALLOW (has token): /api/webinar
+[2026-07-22T03:53:24.500Z] REQ: /webinar/3 | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:24.501Z] ALLOW (has token): /webinar/3
+[2026-07-22T03:53:26.627Z] REQ: /api/webinar | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:26.628Z] ALLOW (has token): /api/webinar
+[2026-07-22T03:53:26.635Z] REQ: /api/carousel | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:26.636Z] ALLOW (has token): /api/carousel
+[2026-07-22T03:53:26.641Z] REQ: /api/pembelajaran | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:26.641Z] ALLOW (has token): /api/pembelajaran
+[2026-07-22T03:53:30.917Z] REQ: /api/dashboard/stats | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:30.918Z] ALLOW (has token): /api/dashboard/stats
+[2026-07-22T03:53:32.838Z] REQ: /sertifikat/baru | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:32.839Z] ALLOW (has token): /sertifikat/baru
+[2026-07-22T03:53:32.845Z] REQ: /api/sertifikat | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:32.845Z] ALLOW (has token): /api/sertifikat
+[2026-07-22T03:53:34.417Z] REQ: /sertifikat/baru | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:34.418Z] ALLOW (has token): /sertifikat/baru
+[2026-07-22T03:53:34.530Z] REQ: /sertifikat/baru | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:34.531Z] ALLOW (has token): /sertifikat/baru
+[2026-07-22T03:53:35.010Z] REQ: /api/auth/me | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:35.011Z] ALLOW (has token): /api/auth/me
+[2026-07-22T03:53:35.099Z] REQ: /surajaya_corpu.webp | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:35.099Z] ALLOW (has token): /surajaya_corpu.webp
+[2026-07-22T03:53:35.130Z] REQ: /api/sertifikat/baru | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:35.130Z] ALLOW (has token): /api/sertifikat/baru
+[2026-07-22T03:53:37.040Z] REQ: /profil | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:37.040Z] ALLOW (has token): /profil
+[2026-07-22T03:53:37.045Z] REQ: /sertifikat | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:37.046Z] ALLOW (has token): /sertifikat
+[2026-07-22T03:53:37.054Z] REQ: /webinar | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:37.055Z] ALLOW (has token): /webinar
+[2026-07-22T03:53:37.060Z] REQ: /pembelajaran | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:37.061Z] ALLOW (has token): /pembelajaran
+[2026-07-22T03:53:37.109Z] REQ: /dashboard | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:37.110Z] ALLOW (has token): /dashboard
+[2026-07-22T03:53:37.158Z] REQ: /profil | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:37.159Z] ALLOW (has token): /profil
+[2026-07-22T03:53:37.163Z] REQ: /profil | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:37.164Z] ALLOW (has token): /profil
+[2026-07-22T03:53:37.169Z] REQ: /profil | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:37.170Z] ALLOW (has token): /profil
+[2026-07-22T03:53:37.189Z] REQ: /profil | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:37.189Z] ALLOW (has token): /profil
+[2026-07-22T03:53:37.231Z] REQ: /profil | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:37.231Z] ALLOW (has token): /profil
+[2026-07-22T03:53:37.251Z] REQ: /sertifikat | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:37.252Z] ALLOW (has token): /sertifikat
+[2026-07-22T03:53:37.259Z] REQ: /sertifikat | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:37.259Z] ALLOW (has token): /sertifikat
+[2026-07-22T03:53:37.266Z] REQ: /sertifikat | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:37.267Z] ALLOW (has token): /sertifikat
+[2026-07-22T03:53:37.317Z] REQ: /pembelajaran | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:37.317Z] ALLOW (has token): /pembelajaran
+[2026-07-22T03:53:37.329Z] REQ: /pembelajaran | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:37.329Z] ALLOW (has token): /pembelajaran
+[2026-07-22T03:53:37.337Z] REQ: /pembelajaran | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:37.338Z] ALLOW (has token): /pembelajaran
+[2026-07-22T03:53:37.355Z] REQ: /webinar | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:37.356Z] ALLOW (has token): /webinar
+[2026-07-22T03:53:37.389Z] REQ: /webinar | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:37.389Z] ALLOW (has token): /webinar
+[2026-07-22T03:53:37.418Z] REQ: /webinar | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:37.418Z] ALLOW (has token): /webinar
+[2026-07-22T03:53:37.423Z] REQ: /dashboard | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:37.424Z] ALLOW (has token): /dashboard
+[2026-07-22T03:53:37.430Z] REQ: /dashboard | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:37.431Z] ALLOW (has token): /dashboard
+[2026-07-22T03:53:37.488Z] REQ: /dashboard | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:37.489Z] ALLOW (has token): /dashboard
+[2026-07-22T03:53:38.160Z] REQ: /sertifikat/baru | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:38.161Z] ALLOW (has token): /sertifikat/baru
+[2026-07-22T03:53:38.169Z] REQ: /api/sertifikat | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:38.169Z] ALLOW (has token): /api/sertifikat
+[2026-07-22T03:53:39.237Z] REQ: /sertifikat/baru | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:39.237Z] ALLOW (has token): /sertifikat/baru
+[2026-07-22T03:53:39.310Z] REQ: /api/sertifikat/baru | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:39.311Z] ALLOW (has token): /api/sertifikat/baru
+[2026-07-22T03:53:41.590Z] REQ: /api/sertifikat | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:41.590Z] ALLOW (has token): /api/sertifikat
+[2026-07-22T03:53:42.177Z] REQ: /sertifikat/baru | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:42.177Z] ALLOW (has token): /sertifikat/baru
+[2026-07-22T03:53:42.259Z] REQ: /api/sertifikat/baru | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:42.260Z] ALLOW (has token): /api/sertifikat/baru
+[2026-07-22T03:53:51.178Z] REQ: /api/dashboard/stats | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:51.179Z] ALLOW (has token): /api/dashboard/stats
+[2026-07-22T03:53:52.878Z] REQ: /api/webinar | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:52.879Z] ALLOW (has token): /api/webinar
+[2026-07-22T03:53:52.978Z] REQ: /webinar/3 | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:52.979Z] ALLOW (has token): /webinar/3
+[2026-07-22T03:53:53.058Z] REQ: /webinar/3 | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:53.058Z] ALLOW (has token): /webinar/3
+[2026-07-22T03:53:54.058Z] REQ: /api/auth/logout | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T03:53:54.059Z] ALLOW (has token): /api/auth/logout
+[2026-07-22T03:53:54.150Z] REQ: /api/auth/logout | hasToken: false | tokenVal: none
+[2026-07-22T03:53:54.151Z] ALLOW (public path): /api/auth/logout
+[2026-07-22T03:53:54.159Z] REQ: /login | hasToken: false | tokenVal: none
+[2026-07-22T03:53:54.160Z] ALLOW (public path): /login
+[2026-07-22T03:53:54.233Z] REQ: /login | hasToken: false | tokenVal: none
+[2026-07-22T03:53:54.234Z] ALLOW (public path): /login
+[2026-07-22T03:53:54.240Z] REQ: /login | hasToken: false | tokenVal: none
+[2026-07-22T03:53:54.241Z] ALLOW (public path): /login
+[2026-07-22T03:53:54.245Z] REQ: /login | hasToken: false | tokenVal: none
+[2026-07-22T03:53:54.246Z] ALLOW (public path): /login
+[2026-07-22T03:53:54.251Z] REQ: /login | hasToken: false | tokenVal: none
+[2026-07-22T03:53:54.251Z] ALLOW (public path): /login
+[2026-07-22T04:08:55.263Z] REQ: / | hasToken: false | tokenVal: none
+[2026-07-22T04:08:55.264Z] REDIRECT /?token=...&role=user -> /api/auth/sso-callback (SiMEGILAN SSO)
+[2026-07-22T04:08:55.312Z] REQ: /api/auth/sso-callback | hasToken: false | tokenVal: none
+[2026-07-22T04:08:55.313Z] ALLOW (public path): /api/auth/sso-callback
+[2026-07-22T04:08:57.559Z] REQ: /api/auth/me | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:08:57.559Z] ALLOW (has token): /api/auth/me
+[2026-07-22T04:08:57.581Z] REQ: /surajaya_corpu.webp | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:08:57.582Z] ALLOW (has token): /surajaya_corpu.webp
+[2026-07-22T04:08:57.605Z] REQ: /surajaya_corpu.webp | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:08:57.606Z] ALLOW (has token): /surajaya_corpu.webp
+[2026-07-22T04:08:57.664Z] REQ: /api/dashboard/stats | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:08:57.665Z] ALLOW (has token): /api/dashboard/stats
+[2026-07-22T04:10:28.279Z] REQ: /surajaya_corpu.webp | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:10:28.279Z] ALLOW (has token): /surajaya_corpu.webp
+[2026-07-22T04:10:28.981Z] REQ: /api/webinar | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:10:28.982Z] ALLOW (has token): /api/webinar
+[2026-07-22T04:10:28.986Z] REQ: /api/auth/me | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:10:28.986Z] ALLOW (has token): /api/auth/me
+[2026-07-22T04:10:29.118Z] REQ: /surajaya_corpu.webp | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:10:29.119Z] ALLOW (has token): /surajaya_corpu.webp
+[2026-07-22T04:10:29.215Z] REQ: /pengumuman | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:10:29.216Z] ALLOW (has token): /pengumuman
+[2026-07-22T04:10:35.494Z] REQ: /webinar/1 | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:10:35.494Z] ALLOW (has token): /webinar/1
+[2026-07-22T04:10:35.500Z] REQ: /webinar/3 | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:10:35.500Z] ALLOW (has token): /webinar/3
+[2026-07-22T04:10:35.506Z] REQ: /webinar/2 | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:10:35.507Z] ALLOW (has token): /webinar/2
+[2026-07-22T04:11:03.479Z] REQ: /webinar/1 | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:03.480Z] ALLOW (has token): /webinar/1
+[2026-07-22T04:11:04.952Z] REQ: /webinar/1 | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:04.952Z] ALLOW (has token): /webinar/1
+[2026-07-22T04:11:05.056Z] REQ: /webinar/1 | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:05.057Z] ALLOW (has token): /webinar/1
+[2026-07-22T04:11:06.656Z] REQ: /api/auth/me | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:06.656Z] ALLOW (has token): /api/auth/me
+[2026-07-22T04:11:06.661Z] REQ: /surajaya_corpu.webp | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:06.661Z] ALLOW (has token): /surajaya_corpu.webp
+[2026-07-22T04:11:06.711Z] REQ: /surajaya_corpu.webp | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:06.711Z] ALLOW (has token): /surajaya_corpu.webp
+[2026-07-22T04:11:06.720Z] REQ: /profil | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:06.720Z] ALLOW (has token): /profil
+[2026-07-22T04:11:06.724Z] REQ: /api/webinar/1 | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:06.725Z] ALLOW (has token): /api/webinar/1
+[2026-07-22T04:11:06.733Z] REQ: /pembelajaran | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:06.734Z] ALLOW (has token): /pembelajaran
+[2026-07-22T04:11:06.739Z] REQ: /sertifikat | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:06.740Z] ALLOW (has token): /sertifikat
+[2026-07-22T04:11:06.744Z] REQ: /webinar | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:06.745Z] ALLOW (has token): /webinar
+[2026-07-22T04:11:06.792Z] REQ: /dashboard | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:06.793Z] ALLOW (has token): /dashboard
+[2026-07-22T04:11:06.836Z] REQ: /profil | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:06.837Z] ALLOW (has token): /profil
+[2026-07-22T04:11:06.841Z] REQ: /api/webinar/1/attendance | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:06.841Z] ALLOW (has token): /api/webinar/1/attendance
+[2026-07-22T04:11:06.849Z] REQ: /profil | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:06.850Z] ALLOW (has token): /profil
+[2026-07-22T04:11:06.854Z] REQ: /profil | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:06.854Z] ALLOW (has token): /profil
+[2026-07-22T04:11:06.859Z] REQ: /profil | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:06.860Z] ALLOW (has token): /profil
+[2026-07-22T04:11:06.870Z] REQ: /profil | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:06.871Z] ALLOW (has token): /profil
+[2026-07-22T04:11:06.888Z] REQ: /sertifikat | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:06.889Z] ALLOW (has token): /sertifikat
+[2026-07-22T04:11:06.894Z] REQ: /sertifikat | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:06.894Z] ALLOW (has token): /sertifikat
+[2026-07-22T04:11:06.899Z] REQ: /sertifikat | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:06.900Z] ALLOW (has token): /sertifikat
+[2026-07-22T04:11:06.924Z] REQ: /webinar | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:06.925Z] ALLOW (has token): /webinar
+[2026-07-22T04:11:06.929Z] REQ: /webinar | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:06.929Z] ALLOW (has token): /webinar
+[2026-07-22T04:11:06.934Z] REQ: /webinar | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:06.935Z] ALLOW (has token): /webinar
+[2026-07-22T04:11:06.940Z] REQ: /pembelajaran | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:06.940Z] ALLOW (has token): /pembelajaran
+[2026-07-22T04:11:06.966Z] REQ: /pembelajaran | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:06.967Z] ALLOW (has token): /pembelajaran
+[2026-07-22T04:11:06.973Z] REQ: /pembelajaran | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:06.973Z] ALLOW (has token): /pembelajaran
+[2026-07-22T04:11:06.978Z] REQ: /dashboard | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:06.979Z] ALLOW (has token): /dashboard
+[2026-07-22T04:11:06.984Z] REQ: /dashboard | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:06.985Z] ALLOW (has token): /dashboard
+[2026-07-22T04:11:06.993Z] REQ: /dashboard | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:06.994Z] ALLOW (has token): /dashboard
+[2026-07-22T04:11:16.020Z] REQ: /api/webinar/1/join | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:16.021Z] ALLOW (has token): /api/webinar/1/join
+[2026-07-22T04:11:18.728Z] REQ: /webinar/1/test | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:18.729Z] ALLOW (has token): /webinar/1/test
+[2026-07-22T04:11:18.740Z] REQ: /webinar/1/test | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:18.741Z] ALLOW (has token): /webinar/1/test
+[2026-07-22T04:11:18.754Z] REQ: /webinar/1/test | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:18.755Z] ALLOW (has token): /webinar/1/test
+[2026-07-22T04:11:18.761Z] REQ: /webinar/1/test | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:18.762Z] ALLOW (has token): /webinar/1/test
+[2026-07-22T04:11:18.769Z] REQ: /webinar/1/test | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:18.770Z] ALLOW (has token): /webinar/1/test
+[2026-07-22T04:11:33.350Z] REQ: /api/webinar/1/attendance | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:33.351Z] ALLOW (has token): /api/webinar/1/attendance
+[2026-07-22T04:11:45.844Z] REQ: /webinar/1/test | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:45.844Z] ALLOW (has token): /webinar/1/test
+[2026-07-22T04:11:46.260Z] REQ: /api/webinar/1 | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:46.260Z] ALLOW (has token): /api/webinar/1
+[2026-07-22T04:11:46.266Z] REQ: /surajaya_corpu.webp | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:46.266Z] ALLOW (has token): /surajaya_corpu.webp
+[2026-07-22T04:11:46.303Z] REQ: /api/webinar/1/questions | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:46.304Z] ALLOW (has token): /api/webinar/1/questions
+[2026-07-22T04:11:46.363Z] REQ: /api/webinar/1/questions/submit | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:46.364Z] ALLOW (has token): /api/webinar/1/questions/submit
+[2026-07-22T04:11:46.427Z] REQ: /webinar/1 | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:46.428Z] ALLOW (has token): /webinar/1
+[2026-07-22T04:11:49.645Z] REQ: /webinar/1 | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:49.646Z] ALLOW (has token): /webinar/1
+[2026-07-22T04:11:49.696Z] REQ: /api/webinar/1 | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:49.697Z] ALLOW (has token): /api/webinar/1
+[2026-07-22T04:11:49.702Z] REQ: /surajaya_corpu.webp | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:49.702Z] ALLOW (has token): /surajaya_corpu.webp
+[2026-07-22T04:11:49.783Z] REQ: /api/webinar/1/attendance | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:49.784Z] ALLOW (has token): /api/webinar/1/attendance
+[2026-07-22T04:11:56.865Z] REQ: /api/dashboard/stats | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:56.865Z] ALLOW (has token): /api/dashboard/stats
+[2026-07-22T04:11:56.870Z] REQ: /surajaya_corpu.webp | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:56.871Z] ALLOW (has token): /surajaya_corpu.webp
+[2026-07-22T04:11:58.214Z] REQ: /surajaya_corpu.webp | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:58.215Z] ALLOW (has token): /surajaya_corpu.webp
+[2026-07-22T04:11:58.217Z] REQ: /sertifikat/baru | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:58.218Z] ALLOW (has token): /sertifikat/baru
+[2026-07-22T04:11:58.223Z] REQ: /api/sertifikat | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:58.224Z] ALLOW (has token): /api/sertifikat
+[2026-07-22T04:11:58.300Z] REQ: /sertifikat/baru | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:11:58.301Z] ALLOW (has token): /sertifikat/baru
+[2026-07-22T04:12:08.599Z] REQ: /surajaya_corpu.webp | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:12:08.599Z] ALLOW (has token): /surajaya_corpu.webp
+[2026-07-22T04:12:08.628Z] REQ: /api/pembelajaran | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:12:08.629Z] ALLOW (has token): /api/pembelajaran
+[2026-07-22T04:12:08.644Z] REQ: /surajaya_corpu.webp | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:12:08.645Z] ALLOW (has token): /surajaya_corpu.webp
+[2026-07-22T04:12:08.650Z] REQ: / | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:12:08.650Z] ALLOW (has token): /
+[2026-07-22T04:12:09.050Z] REQ: / | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:12:09.051Z] ALLOW (has token): /
+[2026-07-22T04:12:09.054Z] REQ: / | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:12:09.055Z] ALLOW (has token): /
+[2026-07-22T04:12:11.807Z] REQ: /pembelajaran/1 | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:12:11.807Z] ALLOW (has token): /pembelajaran/1
+[2026-07-22T04:12:11.818Z] REQ: /pembelajaran/2 | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:12:11.819Z] ALLOW (has token): /pembelajaran/2
+[2026-07-22T04:12:11.845Z] REQ: /pembelajaran/1 | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:12:11.845Z] ALLOW (has token): /pembelajaran/1
+[2026-07-22T04:12:11.852Z] REQ: /pembelajaran/2 | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:12:11.852Z] ALLOW (has token): /pembelajaran/2
+[2026-07-22T04:12:17.063Z] REQ: /pembelajaran/1 | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:12:17.064Z] ALLOW (has token): /pembelajaran/1
+[2026-07-22T04:12:17.093Z] REQ: /surajaya_corpu.webp | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:12:17.093Z] ALLOW (has token): /surajaya_corpu.webp
+[2026-07-22T04:12:17.421Z] REQ: /api/pembelajaran/1 | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:12:17.421Z] ALLOW (has token): /api/pembelajaran/1
+[2026-07-22T04:12:17.430Z] REQ: /surajaya_corpu.webp | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:12:17.430Z] ALLOW (has token): /surajaya_corpu.webp
+[2026-07-22T04:12:17.432Z] REQ: /api/dashboard/stats | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:12:17.433Z] ALLOW (has token): /api/dashboard/stats
+[2026-07-22T04:12:20.650Z] REQ: /api/pembelajaran | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:12:20.651Z] ALLOW (has token): /api/pembelajaran
+[2026-07-22T04:12:20.657Z] REQ: /surajaya_corpu.webp | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:12:20.658Z] ALLOW (has token): /surajaya_corpu.webp
+[2026-07-22T04:12:20.683Z] REQ: /surajaya_corpu.webp | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:12:20.684Z] ALLOW (has token): /surajaya_corpu.webp
+[2026-07-22T04:12:32.111Z] REQ: /pengumuman | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:12:32.112Z] ALLOW (has token): /pengumuman
+[2026-07-22T04:12:32.354Z] REQ: /surajaya_corpu.webp | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:12:32.354Z] ALLOW (has token): /surajaya_corpu.webp
+[2026-07-22T04:12:32.542Z] REQ: /api/pengumuman | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:12:32.543Z] ALLOW (has token): /api/pengumuman
+[2026-07-22T04:12:32.549Z] REQ: /api/auth/me | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:12:32.550Z] ALLOW (has token): /api/auth/me
+[2026-07-22T04:12:32.554Z] REQ: /api/webinar/eksternal | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:12:32.555Z] ALLOW (has token): /api/webinar/eksternal
+[2026-07-22T04:12:32.564Z] REQ: /login | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:12:32.565Z] REDIRECT /login -> /dashboard (already logged in)
+[2026-07-22T04:12:32.571Z] REQ: /tentang | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:12:32.571Z] ALLOW (has token): /tentang
+[2026-07-22T04:12:32.585Z] REQ: /surajaya_corpu.webp | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:12:32.586Z] ALLOW (has token): /surajaya_corpu.webp
+[2026-07-22T04:12:32.606Z] REQ: / | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:12:32.607Z] ALLOW (has token): /
+[2026-07-22T04:12:32.611Z] REQ: /webinar | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:12:32.612Z] ALLOW (has token): /webinar
+[2026-07-22T04:12:32.621Z] REQ: /tentang | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:12:32.622Z] ALLOW (has token): /tentang
+[2026-07-22T04:12:32.674Z] REQ: /dashboard | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:12:32.675Z] ALLOW (has token): /dashboard
+[2026-07-22T04:12:32.679Z] REQ: /pengumuman | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:12:32.679Z] ALLOW (has token): /pengumuman
+[2026-07-22T04:12:32.698Z] REQ: /pengumuman | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:12:32.699Z] ALLOW (has token): /pengumuman
+[2026-07-22T04:12:32.702Z] REQ: /pengumuman | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:12:32.703Z] ALLOW (has token): /pengumuman
+[2026-07-22T04:12:32.722Z] REQ: /dashboard | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:12:32.722Z] ALLOW (has token): /dashboard
+[2026-07-22T04:12:32.727Z] REQ: /dashboard | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:12:32.728Z] ALLOW (has token): /dashboard
+[2026-07-22T04:12:32.746Z] REQ: /dashboard | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:12:32.746Z] ALLOW (has token): /dashboard
+[2026-07-22T04:12:32.752Z] REQ: /dashboard | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:12:32.752Z] ALLOW (has token): /dashboard
+[2026-07-22T04:12:32.766Z] REQ: /webinar | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:12:32.767Z] ALLOW (has token): /webinar
+[2026-07-22T04:12:32.771Z] REQ: /webinar | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:12:32.772Z] ALLOW (has token): /webinar
+[2026-07-22T04:12:32.780Z] REQ: /webinar | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T04:12:32.781Z] ALLOW (has token): /webinar
+[2026-07-22T04:37:51.053Z] REQ: /.git/config | hasToken: false | tokenVal: none
+[2026-07-22T04:37:51.054Z] REDIRECT /.git/config -> /login (no token, protected)
+[2026-07-22T04:37:51.060Z] REQ: /.env | hasToken: false | tokenVal: none
+[2026-07-22T04:37:51.060Z] REDIRECT /.env -> /login (no token, protected)
+[2026-07-22T04:37:51.064Z] REQ: /ecosystem.config.js | hasToken: false | tokenVal: none
+[2026-07-22T04:37:51.065Z] REDIRECT /ecosystem.config.js -> /login (no token, protected)
+[2026-07-22T04:37:51.068Z] REQ: /pm2.config.js | hasToken: false | tokenVal: none
+[2026-07-22T04:37:51.069Z] REDIRECT /pm2.config.js -> /login (no token, protected)
+[2026-07-22T04:58:46.853Z] REQ: /files/editor/plugins/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:46.853Z] REDIRECT /files/editor/plugins/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:46.969Z] REQ: /login | hasToken: false | tokenVal: none
+[2026-07-22T04:58:46.970Z] ALLOW (public path): /login
+[2026-07-22T04:58:47.031Z] REQ: /js/tinymce2/plugins/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:47.032Z] REDIRECT /js/tinymce2/plugins/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:47.239Z] REQ: /sw-admin/thumbs/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:47.240Z] REDIRECT /sw-admin/thumbs/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:47.438Z] REQ: /assets/tinymce/js/tinymce/plugins/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:47.438Z] REDIRECT /assets/tinymce/js/tinymce/plugins/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:47.563Z] REQ: /content/plugins/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:47.564Z] REDIRECT /content/plugins/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:47.737Z] REQ: /sw-admin/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:47.738Z] REDIRECT /sw-admin/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:47.858Z] REQ: /assets/tinymce/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:47.859Z] REDIRECT /assets/tinymce/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:47.967Z] REQ: /asset/responsivefilemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:47.968Z] REDIRECT /asset/responsivefilemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:48.236Z] REQ: /assets/tinymce/js/tinymce/plugins/table/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:48.237Z] REDIRECT /assets/tinymce/js/tinymce/plugins/table/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:48.454Z] REQ: /mobile/assets/js/tinymce/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:48.455Z] REDIRECT /mobile/assets/js/tinymce/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:48.631Z] REQ: /assets/plugin/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:48.631Z] REDIRECT /assets/plugin/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:48.833Z] REQ: /website/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:48.834Z] REDIRECT /website/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:48.954Z] REQ: /po-content/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:48.955Z] REDIRECT /po-content/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:49.252Z] REQ: /po-includes/js/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:49.253Z] REDIRECT /po-includes/js/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:49.438Z] REQ: /public/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:49.439Z] REDIRECT /public/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:49.642Z] REQ: /assets/bower_components/responsivefilemanager/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:49.642Z] REDIRECT /assets/bower_components/responsivefilemanager/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:49.835Z] REQ: /assets/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:49.836Z] REDIRECT /assets/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:49.966Z] REQ: /tinymce/tiny_img_flugin/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:49.966Z] REDIRECT /tinymce/tiny_img_flugin/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:50.065Z] REQ: /opd/tinymce2/plugins/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:50.065Z] REDIRECT /opd/tinymce2/plugins/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:50.162Z] REQ: /tinymce2/plugins/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:50.163Z] REDIRECT /tinymce2/plugins/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:50.263Z] REQ: /filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:50.263Z] REDIRECT /filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:50.450Z] REQ: /beta/assets/data/tinymce/plugins/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:50.450Z] REDIRECT /beta/assets/data/tinymce/plugins/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:50.629Z] REQ: /assets/data/tinymce/plugins/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:50.630Z] REDIRECT /assets/data/tinymce/plugins/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:50.841Z] REQ: /assets/ckeditor/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:50.842Z] REDIRECT /assets/ckeditor/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:51.027Z] REQ: /assets/responsive_filemanager/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:51.027Z] REDIRECT /assets/responsive_filemanager/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:51.132Z] REQ: /aset/plugins/_notes/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:51.133Z] REDIRECT /aset/plugins/_notes/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:51.244Z] REQ: /assets/ckeditor/plugins/filemanager/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:51.245Z] REDIRECT /assets/ckeditor/plugins/filemanager/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:51.530Z] REQ: /public/bn/vendor/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:51.531Z] REDIRECT /public/bn/vendor/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:51.635Z] REQ: /sw-admin/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:51.636Z] REDIRECT /sw-admin/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:51.841Z] REQ: /asset/tinymce/plugins/responsivefilemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:51.842Z] REDIRECT /asset/tinymce/plugins/responsivefilemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:52.034Z] REQ: /asset/tinymce/_master/plugins/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:52.035Z] REDIRECT /asset/tinymce/_master/plugins/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:52.137Z] REQ: /assets/thirdyparty/filemanager/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:52.138Z] REDIRECT /assets/thirdyparty/filemanager/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:52.562Z] REQ: /tinymce/plugins/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:52.563Z] REDIRECT /tinymce/plugins/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:52.661Z] REQ: /tpl_admin/tinymce/plugins/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:52.662Z] REDIRECT /tpl_admin/tinymce/plugins/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:52.839Z] REQ: /plugins/tinymce/js/tinymce/plugins/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:52.840Z] REDIRECT /plugins/tinymce/js/tinymce/plugins/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:53.043Z] REQ: /po-content/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:53.044Z] REDIRECT /po-content/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:53.140Z] REQ: /login | hasToken: false | tokenVal: none
+[2026-07-22T04:58:53.141Z] ALLOW (public path): /login
+[2026-07-22T04:58:53.231Z] REQ: /po-includes/js/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:53.231Z] REDIRECT /po-includes/js/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:53.365Z] REQ: /asset/tinymce/plugins/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:53.366Z] REDIRECT /asset/tinymce/plugins/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:53.464Z] REQ: /plugins/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:53.465Z] REDIRECT /plugins/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:53.631Z] REQ: /filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:53.632Z] REDIRECT /filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:53.728Z] REQ: /filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:53.729Z] REDIRECT /filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:53.760Z] REQ: /login | hasToken: false | tokenVal: none
+[2026-07-22T04:58:53.761Z] ALLOW (public path): /login
+[2026-07-22T04:58:53.830Z] REQ: /assets/bower_components/responsivefilemanager/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:53.831Z] REDIRECT /assets/bower_components/responsivefilemanager/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:53.939Z] REQ: /login | hasToken: false | tokenVal: none
+[2026-07-22T04:58:53.940Z] ALLOW (public path): /login
+[2026-07-22T04:58:54.057Z] REQ: /filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:54.058Z] REDIRECT /filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:54.328Z] REQ: /login | hasToken: false | tokenVal: none
+[2026-07-22T04:58:54.329Z] ALLOW (public path): /login
+[2026-07-22T04:58:54.453Z] REQ: /assets/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:54.454Z] REDIRECT /assets/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:54.529Z] REQ: /login | hasToken: false | tokenVal: none
+[2026-07-22T04:58:54.530Z] ALLOW (public path): /login
+[2026-07-22T04:58:54.644Z] REQ: /tinymce_filemanager/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:54.645Z] REDIRECT /tinymce_filemanager/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:54.929Z] REQ: /admin/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:54.930Z] REDIRECT /admin/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:55.232Z] REQ: /responsive_filemanager/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:55.232Z] REDIRECT /responsive_filemanager/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:55.432Z] REQ: /assets/app/plugins/responsive_filemanager/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:55.433Z] REDIRECT /assets/app/plugins/responsive_filemanager/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:55.564Z] REQ: /plugins/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:55.565Z] REDIRECT /plugins/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:55.659Z] REQ: /login | hasToken: false | tokenVal: none
+[2026-07-22T04:58:55.660Z] ALLOW (public path): /login
+[2026-07-22T04:58:55.746Z] REQ: /assets/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:55.747Z] REDIRECT /assets/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:55.847Z] REQ: /login | hasToken: false | tokenVal: none
+[2026-07-22T04:58:55.847Z] ALLOW (public path): /login
+[2026-07-22T04:58:56.029Z] REQ: /po-content/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:56.030Z] REDIRECT /po-content/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:56.064Z] REQ: /login | hasToken: false | tokenVal: none
+[2026-07-22T04:58:56.065Z] ALLOW (public path): /login
+[2026-07-22T04:58:56.228Z] REQ: /assets/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:56.229Z] REDIRECT /assets/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:56.460Z] REQ: /login | hasToken: false | tokenVal: none
+[2026-07-22T04:58:56.461Z] ALLOW (public path): /login
+[2026-07-22T04:58:56.561Z] REQ: /filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:56.562Z] REDIRECT /filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:56.629Z] REQ: /login | hasToken: false | tokenVal: none
+[2026-07-22T04:58:56.630Z] ALLOW (public path): /login
+[2026-07-22T04:58:56.740Z] REQ: /po-content/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:56.740Z] REDIRECT /po-content/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:56.839Z] REQ: /login | hasToken: false | tokenVal: none
+[2026-07-22T04:58:56.840Z] ALLOW (public path): /login
+[2026-07-22T04:58:56.957Z] REQ: /documentcontrol/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:56.957Z] REDIRECT /documentcontrol/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:57.223Z] REQ: /analismutu/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:57.223Z] REDIRECT /analismutu/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:57.338Z] REQ: /pengembanganmutu/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:57.338Z] REDIRECT /pengembanganmutu/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:57.526Z] REQ: /kabag/filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:57.527Z] REDIRECT /kabag/filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:57.765Z] REQ: /filemanager/dialog.php | hasToken: false | tokenVal: none
+[2026-07-22T04:58:57.766Z] REDIRECT /filemanager/dialog.php -> /login (no token, protected)
+[2026-07-22T04:58:57.836Z] REQ: /login | hasToken: false | tokenVal: none
+[2026-07-22T04:58:57.836Z] ALLOW (public path): /login
+[2026-07-22T05:05:45.433Z] REQ: /surajaya_corpu.webp | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T05:05:45.434Z] ALLOW (has token): /surajaya_corpu.webp
+[2026-07-22T05:05:46.650Z] REQ: /api/auth/me | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T05:05:46.651Z] ALLOW (has token): /api/auth/me
+[2026-07-22T05:07:13.235Z] REQ: /surajaya_corpu.webp | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T05:07:13.236Z] ALLOW (has token): /surajaya_corpu.webp
+[2026-07-22T05:07:13.532Z] REQ: /api/auth/me | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T05:07:13.532Z] ALLOW (has token): /api/auth/me
+[2026-07-22T05:07:13.586Z] REQ: / | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T05:07:13.586Z] ALLOW (has token): /
+[2026-07-22T05:07:13.662Z] REQ: / | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T05:07:13.663Z] ALLOW (has token): /
+[2026-07-22T05:07:13.672Z] REQ: / | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T05:07:13.673Z] ALLOW (has token): /
+[2026-07-22T05:07:13.680Z] REQ: / | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T05:07:13.681Z] ALLOW (has token): /
+[2026-07-22T05:07:13.718Z] REQ: /dashboard | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T05:07:13.719Z] ALLOW (has token): /dashboard
+[2026-07-22T05:07:13.748Z] REQ: /dashboard | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T05:07:13.749Z] ALLOW (has token): /dashboard
+[2026-07-22T05:07:13.765Z] REQ: /dashboard | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T05:07:13.766Z] ALLOW (has token): /dashboard
+[2026-07-22T05:07:13.773Z] REQ: /dashboard | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T05:07:13.774Z] ALLOW (has token): /dashboard
+[2026-07-22T05:10:38.863Z] REQ: /plugins/jQuery-File-Upload/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:38.864Z] REDIRECT /plugins/jQuery-File-Upload/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:39.037Z] REQ: /assets/plugins/jQuery-File-Upload/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:39.038Z] REDIRECT /assets/plugins/jQuery-File-Upload/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:39.143Z] REQ: /assets/plugins/jquery-file-upload/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:39.144Z] REDIRECT /assets/plugins/jquery-file-upload/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:39.336Z] REQ: /asset/backend/assets/fileupload/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:39.336Z] REDIRECT /asset/backend/assets/fileupload/index.php -> /login (no token, protected)
+[2026-07-22T05:10:39.459Z] REQ: /resources/plugin/jquery-file-upload/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:39.459Z] REDIRECT /resources/plugin/jquery-file-upload/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:39.636Z] REQ: /cppid/vendor/jquery-file-upload/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:39.637Z] REDIRECT /cppid/vendor/jquery-file-upload/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:39.750Z] REQ: /elibrary/visitor_counter/angular/assets/uploads/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:39.751Z] REDIRECT /elibrary/visitor_counter/angular/assets/uploads/index.php -> /login (no token, protected)
+[2026-07-22T05:10:39.956Z] REQ: /visitor_counter/angular/assets/uploads/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:39.957Z] REDIRECT /visitor_counter/angular/assets/uploads/index.php -> /login (no token, protected)
+[2026-07-22T05:10:40.153Z] REQ: /home/admin/assets/plugins/jQuery-File-Upload/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:40.154Z] REDIRECT /home/admin/assets/plugins/jQuery-File-Upload/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:40.273Z] REQ: /admin/assets/plugins/jQuery-File-Upload/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:40.274Z] REDIRECT /admin/assets/plugins/jQuery-File-Upload/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:40.452Z] REQ: /vendor/jquery-file-upload/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:40.452Z] REDIRECT /vendor/jquery-file-upload/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:40.658Z] REQ: /assets/global/plugins/jquery-file-upload/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:40.659Z] REDIRECT /assets/global/plugins/jquery-file-upload/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:40.845Z] REQ: /assets/comp/RichFilemanager/scripts/jQuery-File-Upload/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:40.846Z] REDIRECT /assets/comp/RichFilemanager/scripts/jQuery-File-Upload/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:40.969Z] REQ: /webuser/assets/plugins/jQuery-File-Upload/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:40.970Z] REDIRECT /webuser/assets/plugins/jQuery-File-Upload/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:41.260Z] REQ: /asset/js/plugins/fileupload/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:41.261Z] REDIRECT /asset/js/plugins/fileupload/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:41.378Z] REQ: /assets/admin/plugins/jquery-file-upload/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:41.379Z] REDIRECT /assets/admin/plugins/jquery-file-upload/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:41.567Z] REQ: /public/uploadmen/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:41.567Z] REDIRECT /public/uploadmen/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:41.752Z] REQ: /uploadmen/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:41.752Z] REDIRECT /uploadmen/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:41.966Z] REQ: /assets/plugins/bootstrap-switch/docs/js/lib/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:41.967Z] REDIRECT /assets/plugins/bootstrap-switch/docs/js/lib/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:42.148Z] REQ: /app-assets/data/jquery-file-upload/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:42.148Z] REDIRECT /app-assets/data/jquery-file-upload/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:42.445Z] REQ: /plugins/jQueryFileUpload/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:42.446Z] REDIRECT /plugins/jQueryFileUpload/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:42.644Z] REQ: /public/plugins/jQueryFileUpload/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:42.645Z] REDIRECT /public/plugins/jQueryFileUpload/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:42.837Z] REQ: /main/assets/jquery-file-upload/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:42.838Z] REDIRECT /main/assets/jquery-file-upload/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:43.036Z] REQ: /assets/jquery-file-upload/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:43.037Z] REDIRECT /assets/jquery-file-upload/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:43.167Z] REQ: /assets/adminhome/plugins/file-uploader/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:43.167Z] REDIRECT /assets/adminhome/plugins/file-uploader/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:43.445Z] REQ: /v1/main/assets/FlatLab/assets/jquery-file-upload/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:43.446Z] REDIRECT /v1/main/assets/FlatLab/assets/jquery-file-upload/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:43.663Z] REQ: /main/assets/FlatLab/assets/jquery-file-upload/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:43.663Z] REDIRECT /main/assets/FlatLab/assets/jquery-file-upload/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:43.848Z] REQ: /assets/FlatLab/assets/jquery-file-upload/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:43.849Z] REDIRECT /assets/FlatLab/assets/jquery-file-upload/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:43.973Z] REQ: /v1/main/assets/FlatLab/assets/file-uploader/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:43.974Z] REDIRECT /v1/main/assets/FlatLab/assets/file-uploader/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:44.257Z] REQ: /main/assets/FlatLab/assets/file-uploader/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:44.257Z] REDIRECT /main/assets/FlatLab/assets/file-uploader/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:44.463Z] REQ: /assets/FlatLab/assets/file-uploader/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:44.463Z] REDIRECT /assets/FlatLab/assets/file-uploader/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:44.739Z] REQ: /v1/main/assets2/FlatLab/assets/file-uploader/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:44.739Z] REDIRECT /v1/main/assets2/FlatLab/assets/file-uploader/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:44.836Z] REQ: /main/assets2/FlatLab/assets/file-uploader/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:44.836Z] REDIRECT /main/assets2/FlatLab/assets/file-uploader/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:44.938Z] REQ: /assets2/FlatLab/assets/file-uploader/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:44.939Z] REDIRECT /assets2/FlatLab/assets/file-uploader/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:45.037Z] REQ: /v1/main/assets2/FlatLab/assets/jquery-file-upload/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:45.037Z] REDIRECT /v1/main/assets2/FlatLab/assets/jquery-file-upload/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:45.152Z] REQ: /main/assets2/FlatLab/assets/jquery-file-upload/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:45.153Z] REDIRECT /main/assets2/FlatLab/assets/jquery-file-upload/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:45.279Z] REQ: /assets2/FlatLab/assets/jquery-file-upload/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:45.280Z] REDIRECT /assets2/FlatLab/assets/jquery-file-upload/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:45.455Z] REQ: /v1/main/assets/assets/jquery.fixport/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:45.455Z] REDIRECT /v1/main/assets/assets/jquery.fixport/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:45.654Z] REQ: /main/assets/assets/jquery.fixport/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:45.655Z] REDIRECT /main/assets/assets/jquery.fixport/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:45.867Z] REQ: /assets/assets/jquery.fixport/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:45.867Z] REDIRECT /assets/assets/jquery.fixport/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:46.037Z] REQ: /registrasi/assets/back/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:46.038Z] REDIRECT /registrasi/assets/back/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:46.166Z] REQ: /assets/back/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:46.167Z] REDIRECT /assets/back/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:46.436Z] REQ: /assets/assets/fileupload/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:46.437Z] REDIRECT /assets/assets/fileupload/index.php -> /login (no token, protected)
+[2026-07-22T05:10:46.539Z] REQ: /upload/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:46.540Z] REDIRECT /upload/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:46.840Z] REQ: /admin/assets/file-uploader/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:46.841Z] REDIRECT /admin/assets/file-uploader/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:47.043Z] REQ: /public/admin/assets/file-uploader/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:47.044Z] REDIRECT /public/admin/assets/file-uploader/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:47.250Z] REQ: /web/public/admin/assets/file-uploader/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:47.251Z] REDIRECT /web/public/admin/assets/file-uploader/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:47.541Z] REQ: /web/public/admin/assets/jquery-file-upload/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:47.542Z] REDIRECT /web/public/admin/assets/jquery-file-upload/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:47.671Z] REQ: /public/admin/assets/jquery-file-upload/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:47.672Z] REDIRECT /public/admin/assets/jquery-file-upload/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:47.870Z] REQ: /admin/assets/jquery-file-upload/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:47.870Z] REDIRECT /admin/assets/jquery-file-upload/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:48.064Z] REQ: /assets/library/jfu/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:48.065Z] REDIRECT /assets/library/jfu/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:48.239Z] REQ: /public/assets/FlatLab/assets/file-uploader/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:48.240Z] REDIRECT /public/assets/FlatLab/assets/file-uploader/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:48.447Z] REQ: /public/assets/FlatLab/assets/jquery-file-upload/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:48.448Z] REDIRECT /public/assets/FlatLab/assets/jquery-file-upload/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:48.642Z] REQ: /back/assets/js/vendor/file-upload/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:48.642Z] REDIRECT /back/assets/js/vendor/file-upload/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:48.866Z] REQ: /assets/js/vendor/file-upload/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:48.867Z] REDIRECT /assets/js/vendor/file-upload/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:49.049Z] REQ: /public/assetsIsi/assets/file-uploader/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:49.050Z] REDIRECT /public/assetsIsi/assets/file-uploader/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:49.172Z] REQ: /public/assetsIsi/assets/jquery-file-upload/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:49.172Z] REDIRECT /public/assetsIsi/assets/jquery-file-upload/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:49.641Z] REQ: /lib/jquery-upload-file/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:49.642Z] REDIRECT /lib/jquery-upload-file/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:49.763Z] REQ: /dokumen/upload_dok.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:49.764Z] REDIRECT /dokumen/upload_dok.php -> /login (no token, protected)
+[2026-07-22T05:10:49.870Z] REQ: /assets/pendaftaran/back/plugins/jQuery-File-Upload/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:49.871Z] REDIRECT /assets/pendaftaran/back/plugins/jQuery-File-Upload/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:50.033Z] REQ: /plugins/jquery-file-upload/server/php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:50.034Z] REDIRECT /plugins/jquery-file-upload/server/php -> /login (no token, protected)
+[2026-07-22T05:10:50.364Z] REQ: /gocak/plugins/jquery-file-upload/server/php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:50.364Z] REDIRECT /gocak/plugins/jquery-file-upload/server/php -> /login (no token, protected)
+[2026-07-22T05:10:50.570Z] REQ: /include/blueimp/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:50.570Z] REDIRECT /include/blueimp/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:50.856Z] REQ: /theme/assets/plugins/jquery-fileupload/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:50.856Z] REDIRECT /theme/assets/plugins/jquery-fileupload/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:10:51.150Z] REQ: /theme/assets/plugins/jquery-fileupload/server/php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:51.151Z] REDIRECT /theme/assets/plugins/jquery-fileupload/server/php -> /login (no token, protected)
+[2026-07-22T05:10:51.346Z] REQ: /assets/php-excel/jQuery-File-Upload-9.12.3/jQuery-File-Upload-9.12.3/server/php/index.php | hasToken: false | tokenVal: none
+[2026-07-22T05:10:51.347Z] REDIRECT /assets/php-excel/jQuery-File-Upload-9.12.3/jQuery-File-Upload-9.12.3/server/php/index.php -> /login (no token, protected)
+[2026-07-22T05:35:41.186Z] REQ: /dashboard | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T05:35:41.187Z] ALLOW (has token): /dashboard
+[2026-07-22T05:35:41.243Z] REQ: /tentang | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T05:35:41.244Z] ALLOW (has token): /tentang
+[2026-07-22T05:35:41.271Z] REQ: /tentang | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T05:35:41.272Z] ALLOW (has token): /tentang
+[2026-07-22T05:35:41.277Z] REQ: /tentang | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T05:35:41.278Z] ALLOW (has token): /tentang
+[2026-07-22T05:35:41.283Z] REQ: /pengumuman | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T05:35:41.284Z] ALLOW (has token): /pengumuman
+[2026-07-22T05:35:41.296Z] REQ: /pengumuman | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T05:35:41.296Z] ALLOW (has token): /pengumuman
+[2026-07-22T05:35:41.326Z] REQ: /pengumuman | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T05:35:41.327Z] ALLOW (has token): /pengumuman
+[2026-07-22T05:35:41.343Z] REQ: /webinar | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T05:35:41.344Z] ALLOW (has token): /webinar
+[2026-07-22T05:35:41.349Z] REQ: /webinar | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T05:35:41.349Z] ALLOW (has token): /webinar
+[2026-07-22T05:35:41.354Z] REQ: /webinar | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T05:35:41.355Z] ALLOW (has token): /webinar
+[2026-07-22T05:35:45.662Z] REQ: /api/dashboard/stats | hasToken: true | tokenVal: eyJhbGciOiJIUzI...
+[2026-07-22T05:35:45.663Z] ALLOW (has token): /api/dashboard/stats
+[2026-07-22T05:50:11.676Z] REQ: /test | hasToken: false | tokenVal: none
+[2026-07-22T05:50:11.677Z] REDIRECT /test -> /login (no token, protected)
+[2026-07-22T05:50:11.859Z] REQ: /login | hasToken: false | tokenVal: none
+[2026-07-22T05:50:11.859Z] ALLOW (public path): /login
+[2026-07-22T05:50:12.370Z] REQ: /test | hasToken: false | tokenVal: none
+[2026-07-22T05:50:12.371Z] REDIRECT /test -> /login (no token, protected)
+[2026-07-22T05:50:12.549Z] REQ: /login | hasToken: false | tokenVal: none
+[2026-07-22T05:50:12.550Z] ALLOW (public path): /login
