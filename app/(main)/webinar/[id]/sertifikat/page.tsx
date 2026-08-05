@@ -19,7 +19,7 @@ export default function SertifikatPage({ params }: { params: Promise<{ id: strin
     useEffect(() => {
         async function fetchMeta() {
             try {
-                const res    = await fetch(`/api/webinar/${id}/sertifikat`)
+                const res    = await fetch(`/api/webinar/${id}/sertifikat`, { credentials: 'include' })
                 const result = await res.json()
                 if (res.ok) {
                     setData(result.data)
@@ -49,7 +49,7 @@ export default function SertifikatPage({ params }: { params: Promise<{ id: strin
 
         try {
             const url = `/api/webinar/${id}/sertifikat/pdf${refresh ? '?refresh=1' : ''}`
-            const res = await fetch(url)
+            const res = await fetch(url, { credentials: 'include' })
 
             if (res.ok && res.headers.get('Content-Type')?.includes('application/pdf')) {
                 // PDF berhasil dihasilkan / sudah ada → tampilkan iframe

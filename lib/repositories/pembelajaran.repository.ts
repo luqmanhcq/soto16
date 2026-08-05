@@ -1,9 +1,11 @@
 import { db } from '@/lib/db'
-import { pembelajaranTable } from '@/lib/db/schema'
-import { eq, desc } from 'drizzle-orm'
+import { pembelajaranTable, materiTable } from '@/lib/db/schema'
+import { eq, desc, asc } from 'drizzle-orm'
 import { CreatePembelajaranDto, UpdatePembelajaranDto } from '@/lib/validations/pembelajaran.validation'
 
 export type Pembelajaran = typeof pembelajaranTable.$inferSelect
+export type Materi = typeof materiTable.$inferSelect
+export type PembelajaranWithMaterials = Pembelajaran & { materials: Materi[] }
 
 export class PembelajaranRepository {
     async getAll(filters?: { kategori?: string }, limit?: number) {
@@ -16,24 +18,38 @@ export class PembelajaranRepository {
         })
     }
 
-    async findById(id: number): Promise<Pembelajaran | null> {
+    async findById(id: number): Promise<PembelajaranWithMaterials | null> {
         const result = await db.query.pembelajaranTable.findFirst({
             where: eq(pembelajaranTable.id, id),
-            with: {
-                materials: true,
-            } as any,
         })
-        return result || null
+        if (!result) return null
+
+        const materials = await db.query.materiTable.findMany({
+            where: eq(materiTable.pembelajaran_id, id),
+            orderBy: [asc(materiTable.urutan)],
+        })
+
+        return {
+            ...result,
+            materials,
+        }
     }
 
-    async findBySlug(slug: string): Promise<Pembelajaran | null> {
+    async findBySlug(slug: string): Promise<PembelajaranWithMaterials | null> {
         const result = await db.query.pembelajaranTable.findFirst({
             where: eq(pembelajaranTable.slug, slug),
-            with: {
-                materials: true,
-            } as any,
         })
-        return result || null
+        if (!result) return null
+
+        const materials = await db.query.materiTable.findMany({
+            where: eq(materiTable.pembelajaran_id, result.id),
+            orderBy: [asc(materiTable.urutan)],
+        })
+
+        return {
+            ...result,
+            materials,
+        }
     }
 
     async create(data: CreatePembelajaranDto): Promise<Pembelajaran> {
