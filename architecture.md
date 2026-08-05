@@ -1,4 +1,4 @@
-
+tes
 ARCHITECTURE.md
 
 SI-SOTO — Sistem Informasi Strategi Optimalisasi Talenta Organisasi
