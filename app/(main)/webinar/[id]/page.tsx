@@ -62,7 +62,7 @@ export default function WebinarDetailPage({ params }: { params: Promise<{ id: st
             setWebinarLoading(true)
             setWebinarError(null)
             
-            const res = await fetch(`/api/webinar/${id}`)
+            const res = await fetch(`/api/webinar/${id}`, { credentials: 'include' })
             if (!res.ok) {
                 throw new Error('Gagal mengambil data webinar')
             }
@@ -75,7 +75,7 @@ export default function WebinarDetailPage({ params }: { params: Promise<{ id: st
 
             // Fetch attendance status (hanya jika user sudah login)
             if (user) {
-                const attRes = await fetch(`/api/webinar/${id}/attendance`)
+                const attRes = await fetch(`/api/webinar/${id}/attendance`, { credentials: 'include' })
                 if (attRes.ok) {
                     const attData = await attRes.json()
                     setIsAttended(attData.data.isAttended)
@@ -107,6 +107,7 @@ export default function WebinarDetailPage({ params }: { params: Promise<{ id: st
         try {
             const res = await fetch(`/api/webinar/${id}/attendance`, {
                 method: 'POST',
+                credentials: 'include',
                 headers: { 'Content-Type': 'application/json' }
             })
             
@@ -140,6 +141,7 @@ export default function WebinarDetailPage({ params }: { params: Promise<{ id: st
         try {
             const res = await fetch(`/api/webinar/${id}/join`, { 
                 method: 'POST',
+                credentials: 'include',
                 headers: { 'Content-Type': 'application/json' }
             })
             

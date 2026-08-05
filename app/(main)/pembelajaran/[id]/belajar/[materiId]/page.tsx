@@ -16,7 +16,8 @@ import {
     CheckCircle,
     PlayCircle,
     Loader2,
-    GraduationCap
+    GraduationCap,
+    ListVideo
 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -68,14 +69,13 @@ export default function BelajarPage({ params }: { params: Promise<{ id: string; 
             })
 
             if (res.ok) {
-                // Find next materi
                 const currentIndex = course.materials.findIndex((m: any) => m.id === parseInt(materiId))
                 const nextMateri = course.materials[currentIndex + 1]
 
                 if (nextMateri) {
                     router.push(`/pembelajaran/${id}/belajar/${nextMateri.id}`)
                 } else {
-                    alert('Selamat! Anda telah menyelesaikan kursus ini.')
+                    alert('Selamat! Anda telah menyelesaikan seluruh materi kursus ini.')
                     router.push(`/pembelajaran/${id}`)
                 }
             }
@@ -89,6 +89,37 @@ export default function BelajarPage({ params }: { params: Promise<{ id: string; 
     if (loading) return <div className="flex min-h-screen items-center justify-center bg-slate-900 text-white animate-pulse">Menyiapkan Ruang Belajar...</div>
     if (!course || !materi) return <div className="p-20 text-center font-black text-red-500">Materi tidak ditemukan</div>
 
+    const tipe = materi.tipe || 'video'
+
+    const tipeBadge = (t: string) => {
+        const map: Record<string, string> = {
+            video: 'bg-blue-100 text-blue-700',
+            pdf: 'bg-red-100 text-red-700',
+            playlist: 'bg-purple-100 text-purple-700',
+        }
+        return map[t] || map.video
+    }
+
+    const tipeIcon = (t: string) => {
+        switch (t) {
+            case 'pdf': return <FileText className="h-3.5 w-3.5" />
+            case 'playlist': return <ListVideo className="h-3.5 w-3.5" />
+            default: return <Video className="h-3.5 w-3.5" />
+        }
+    }
+
+    const getVideoEmbedUrl = (url: string) => {
+        if (!url) return ''
+        // YouTube watch URL
+        if (url.includes('watch?v=')) return url.replace('watch?v=', 'embed/')
+        // YouTube embed already
+        if (url.includes('/embed/')) return url
+        // YouTube short
+        if (url.includes('youtu.be/')) return url.replace('youtu.be/', 'www.youtube.com/embed/')
+        // Playlist or other embeddable URL
+        return url
+    }
+
     return (
         <div className="flex h-screen bg-white">
             {/* Sidebar Navigation */}
@@ -98,13 +129,14 @@ export default function BelajarPage({ params }: { params: Promise<{ id: string; 
                         <Link href={`/pembelajaran/${id}`} className="flex items-center gap-2 text-slate-500 hover:text-indigo-600 font-bold text-sm mb-4">
                             <ArrowLeft className="h-4 w-4" /> Kembali
                         </Link>
-                        <h2 className="text-xl font-black text-slate-900 tracking-tight leading-[1.2]">{course.nama_pembelajaran}</h2>
+                        <h2 className="text-xl font-black text-slate-900 tracking-tight leading-[1.2]">{course.nama}</h2>
                     </header>
 
                     <nav className="flex-1 overflow-y-auto p-4 space-y-2">
                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-4 mb-4 mt-2">Daftar Kurikulum</p>
                         {course.materials.map((m: any, idx: number) => {
                             const isCurrent = m.id === parseInt(materiId)
+                            const mTipe = m.tipe || 'video'
                             return (
                                 <Link
                                     key={m.id}
@@ -114,19 +146,27 @@ export default function BelajarPage({ params }: { params: Promise<{ id: string; 
                                     <div className={`h-8 w-8 flex items-center justify-center rounded-lg font-bold text-xs ${isCurrent ? 'bg-white/20' : 'bg-slate-100'}`}>
                                         {idx + 1}
                                     </div>
-                                    <div className="flex-1">
+                                    <div className="flex-1 min-w-0">
                                         <p className="text-sm font-bold truncate line-clamp-1">{m.nama}</p>
-                                        <p className={`text-[10px] font-bold uppercase tracking-widest ${isCurrent ? 'text-indigo-200' : 'text-slate-400'}`}>
-                                            {m.link_video ? 'VIDEO' : 'DOKUMEN'}
-                                        </p>
+                                        <div className="flex items-center gap-1.5 mt-0.5">
+                                            <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-black uppercase ${isCurrent ? 'bg-white/20 text-white' : tipeBadge(mTipe)}`}>
+                                                {tipeIcon(mTipe)}
+                                                {mTipe === 'playlist' ? 'PLAYLIST' : mTipe === 'pdf' ? 'PDF' : 'VIDEO'}
+                                            </span>
+                                        </div>
                                     </div>
-                                    {isCurrent && <PlayCircle className="h-4 w-4" />}
+                                    {isCurrent && <PlayCircle className="h-4 w-4 flex-shrink-0" />}
                                 </Link>
                             )
                         })}
                     </nav>
                 </div>
             </aside>
+
+            {/* Mobile sidebar overlay */}
+            {sidebarOpen && (
+                <div className="fixed inset-0 z-40 bg-black/50 lg:hidden" onClick={() => setSidebarOpen(false)} />
+            )}
 
             {/* Main Content Area */}
             <main className="flex-1 flex flex-col min-w-0 bg-white">
@@ -150,26 +190,62 @@ export default function BelajarPage({ params }: { params: Promise<{ id: string; 
 
                 <div className="flex-1 overflow-y-auto">
                     <div className="max-w-5xl mx-auto p-6 lg:p-12 space-y-12">
-                        {materi.link_video ? (
+                        {/* Content Area based on tipe */}
+                        {tipe === 'video' && materi.link_video && (
                             <div className="aspect-video w-full rounded-[2.5rem] bg-slate-900 shadow-2xl overflow-hidden ring-1 ring-slate-100">
                                 <iframe
-                                    src={materi.link_video.replace('watch?v=', 'embed/')}
+                                    src={getVideoEmbedUrl(materi.link_video)}
                                     className="w-full h-full border-none"
                                     allowFullScreen
                                 />
                             </div>
-                        ) : (
+                        )}
+
+                        {tipe === 'playlist' && materi.link_video && (
+                            <div className="aspect-video w-full rounded-[2.5rem] bg-slate-900 shadow-2xl overflow-hidden ring-1 ring-slate-100">
+                                <iframe
+                                    src={getVideoEmbedUrl(materi.link_video)}
+                                    className="w-full h-full border-none"
+                                    allowFullScreen
+                                />
+                            </div>
+                        )}
+
+                        {tipe === 'pdf' && materi.link_file && (
+                            <div className="w-full rounded-[2.5rem] bg-white shadow-2xl overflow-hidden ring-1 ring-slate-100">
+                                <iframe
+                                    src={materi.link_file}
+                                    className="w-full h-[80vh] border-none"
+                                    title={materi.nama}
+                                />
+                            </div>
+                        )}
+
+                        {/* Fallback for missing content */}
+                        {tipe === 'video' && !materi.link_video && (
                             <div className="p-12 text-center bg-indigo-50 rounded-[2.5rem] border-2 border-dashed border-indigo-200">
-                                <FileText className="h-16 w-16 text-indigo-300 mx-auto mb-4" />
-                                <p className="text-xl font-bold text-indigo-900">Materi Dokumen</p>
-                                <p className="text-indigo-600 mb-6 font-medium">Bahan bacaan telah disematkan di bawah ini.</p>
-                                {materi.link_file && (
-                                    <a href={materi.link_file} target="_blank" className="font-black text-indigo-600 underline">Unduh File Materi</a>
+                                <Video className="h-16 w-16 text-indigo-300 mx-auto mb-4" />
+                                <p className="text-xl font-bold text-indigo-900">Video belum tersedia</p>
+                            </div>
+                        )}
+
+                        {tipe === 'pdf' && !materi.link_file && (
+                            <div className="p-12 text-center bg-red-50 rounded-[2.5rem] border-2 border-dashed border-red-200">
+                                <FileText className="h-16 w-16 text-red-300 mx-auto mb-4" />
+                                <p className="text-xl font-bold text-red-900">File PDF belum tersedia</p>
+                                {materi.link_video && (
+                                    <a href={materi.link_video} target="_blank" className="font-black text-red-600 underline mt-4 inline-block">Unduh File Materi</a>
                                 )}
                             </div>
                         )}
 
                         <div className="space-y-4">
+                            <div className="flex items-center gap-3">
+                                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-black uppercase ${tipeBadge(tipe)}`}>
+                                    {tipeIcon(tipe)}
+                                    {tipe === 'playlist' ? 'PLAYLIST' : tipe === 'pdf' ? 'PDF' : 'VIDEO'}
+                                </span>
+                            </div>
                             <h1 className="text-3xl lg:text-4xl font-black text-slate-900 tracking-tight">{materi.nama}</h1>
                             <div className="h-1 w-20 bg-indigo-600 rounded-full" />
                             <p className="text-slate-500 font-medium py-4">Pastikan Anda membaca/menonton seluruh materi sebelum menandai modul ini sebagai selesai.</p>

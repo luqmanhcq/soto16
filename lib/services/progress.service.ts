@@ -7,8 +7,8 @@ export class ProgressService {
             userId,
             data.pembelajaran_id,
             data.current_materi_id || null,
-            data.progress,
-            data.status
+            data.progress ?? 0,
+            data.status ?? 'belum_mulai'
         )
     }
 

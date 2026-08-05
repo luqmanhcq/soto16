@@ -8,6 +8,7 @@ export const webinarStatusEnum = pgEnum('webinar_status', ['draft', 'publish', '
 export const sertifikatStatusEnum = pgEnum('sertifikat_status', ['diajukan', 'disetujui', 'ditolak'])
 export const pembelajaranStatusEnum = pgEnum('pembelajaran_status', ['belum_mulai', 'proses', 'selesai'])
 export const webinarQuestionTypeEnum = pgEnum('webinar_question_type', ['post_test', 'monev'])
+export const pembelajaranQuestionTypeEnum = pgEnum('pembelajaran_question_type', ['pre_test', 'post_test', 'monev'])
 
 // ============ TABLES ============
 
@@ -108,6 +109,7 @@ export const materiTable = pgTable(
     pembelajaran_id: integer('pembelajaran_id').notNull(),
     nama: varchar('nama', { length: 255 }).notNull(),
     urutan: integer('urutan').notNull(),
+    tipe: varchar('tipe', { length: 20 }).default('video'),
     link_file: text('link_file'),
     link_video: text('link_video'),
     created_at: timestamp('created_at').defaultNow().notNull(),
@@ -318,4 +320,76 @@ export const pembelajaranProgressRelations = relations(pembelajaranProgressTable
 
 export const sertifikatUsulanRelations = relations(sertifikatUsulanTable, ({ one }) => ({
   user: one(usersTable, { fields: [sertifikatUsulanTable.user_id], references: [usersTable.id] }),
+}))
+
+// ============ PEMBELAJARAN QUESTIONS ============
+
+export const pembelajaranQuestionsTable = pgTable(
+  'pembelajaran_questions',
+  {
+    id: serial('id').primaryKey(),
+    pembelajaran_id: integer('pembelajaran_id').notNull(),
+    type: pembelajaranQuestionTypeEnum('type').notNull(),
+    question_text: text('question_text').notNull(),
+    order: integer('order').default(0).notNull(),
+    created_at: timestamp('created_at').defaultNow().notNull(),
+    updated_at: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    pembelajaranFk: foreignKey({ columns: [table.pembelajaran_id], foreignColumns: [pembelajaranTable.id] }).onDelete('cascade'),
+    pembelajaranIdIdx: index('pembelajaran_questions_pembelajaran_id_idx').on(table.pembelajaran_id),
+  })
+)
+
+export const pembelajaranOptionsTable = pgTable(
+  'pembelajaran_options',
+  {
+    id: serial('id').primaryKey(),
+    question_id: integer('question_id').notNull(),
+    option_text: text('option_text').notNull(),
+    is_correct: boolean('is_correct').default(false).notNull(),
+    order: integer('order').default(0).notNull(),
+  },
+  (table) => ({
+    questionFk: foreignKey({ columns: [table.question_id], foreignColumns: [pembelajaranQuestionsTable.id] }).onDelete('cascade'),
+    questionIdIdx: index('pembelajaran_options_question_id_idx').on(table.question_id),
+  })
+)
+
+export const pembelajaranUserAnswersTable = pgTable(
+  'pembelajaran_user_answers',
+  {
+    id: serial('id').primaryKey(),
+    user_id: integer('user_id').notNull(),
+    pembelajaran_id: integer('pembelajaran_id').notNull(),
+    question_id: integer('question_id').notNull(),
+    option_id: integer('option_id').notNull(),
+    type: pembelajaranQuestionTypeEnum('type').notNull(),
+    created_at: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    userFk: foreignKey({ columns: [table.user_id], foreignColumns: [usersTable.id] }).onDelete('cascade'),
+    pembelajaranFk: foreignKey({ columns: [table.pembelajaran_id], foreignColumns: [pembelajaranTable.id] }).onDelete('cascade'),
+    questionFk: foreignKey({ columns: [table.question_id], foreignColumns: [pembelajaranQuestionsTable.id] }).onDelete('cascade'),
+    optionFk: foreignKey({ columns: [table.option_id], foreignColumns: [pembelajaranOptionsTable.id] }).onDelete('cascade'),
+    userPembelajaranIdx: index('pembelajaran_user_answers_user_pembelajaran_idx').on(table.user_id, table.pembelajaran_id),
+  })
+)
+
+// ============ PEMBELAJARAN QUESTION RELATIONS ============
+
+export const pembelajaranQuestionsRelations = relations(pembelajaranQuestionsTable, ({ one, many }) => ({
+  pembelajaran: one(pembelajaranTable, { fields: [pembelajaranQuestionsTable.pembelajaran_id], references: [pembelajaranTable.id] }),
+  options: many(pembelajaranOptionsTable),
+}))
+
+export const pembelajaranOptionsRelations = relations(pembelajaranOptionsTable, ({ one }) => ({
+  question: one(pembelajaranQuestionsTable, { fields: [pembelajaranOptionsTable.question_id], references: [pembelajaranQuestionsTable.id] }),
+}))
+
+export const pembelajaranUserAnswersRelations = relations(pembelajaranUserAnswersTable, ({ one }) => ({
+  user: one(usersTable, { fields: [pembelajaranUserAnswersTable.user_id], references: [usersTable.id] }),
+  pembelajaran: one(pembelajaranTable, { fields: [pembelajaranUserAnswersTable.pembelajaran_id], references: [pembelajaranTable.id] }),
+  question: one(pembelajaranQuestionsTable, { fields: [pembelajaranUserAnswersTable.question_id], references: [pembelajaranQuestionsTable.id] }),
+  option: one(pembelajaranOptionsTable, { fields: [pembelajaranUserAnswersTable.option_id], references: [pembelajaranOptionsTable.id] }),
 }))

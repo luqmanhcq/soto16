@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server'
 import { pembelajaranService } from '@/lib/services/pembelajaran.service'
 import { updatePembelajaranSchema } from '@/lib/validations/pembelajaran.validation'
-import { withRole } from '@/lib/middleware/auth'
+import { withRole, withAuth, type AuthenticatedRequest } from '@/lib/middleware/auth'
 import {
     successResponse,
     errorResponse,
@@ -21,12 +21,22 @@ export async function GET(
         const { id } = await params
         const idNum = parseInt(id)
 
+        // Try to get userId from auth token (optional - for completion status)
+        let userId: number | undefined
+        try {
+            const authError = await withAuth(request)
+            if (!authError) {
+                const user = (request as AuthenticatedRequest).user
+                if (user) userId = user.id
+            }
+        } catch {}
+
         if (isNaN(idNum)) {
-            const course = await pembelajaranService.getBySlug(id)
+            const course = await pembelajaranService.getBySlug(id, userId)
             return successResponse(course, 'Detail pembelajaran mandiri berhasil diambil')
         }
 
-        const course = await pembelajaranService.getById(idNum)
+        const course = await pembelajaranService.getById(idNum, userId)
         return successResponse(course, 'Detail pembelajaran mandiri berhasil diambil')
     } catch (error) {
         if (error instanceof Error) {

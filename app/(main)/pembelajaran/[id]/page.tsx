@@ -6,13 +6,18 @@ import {
     ArrowLeft,
     Play,
     Clock,
-    BarChart,
     Lock,
     CheckCircle2,
     FileText,
     PlaySquare,
     ChevronRight,
-    GraduationCap
+    GraduationCap,
+    ClipboardCheck,
+    Award,
+    BookOpen,
+    Video,
+    ListVideo,
+    ShieldCheck
 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -20,20 +25,15 @@ export default function PembelajaranDetailPage({ params }: { params: Promise<{ i
     const { id } = use(params)
     const { user } = useAuth()
     const [course, setCourse] = useState<any>(null)
-    const [progress, setProgress] = useState<any>(null)
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         async function fetchData() {
             try {
-                const [courseRes, progressRes] = await Promise.all([
-                    fetch(`/api/pembelajaran/${id}`),
-                    fetch(`/api/dashboard/stats`) // Reuse or specific progress endpoint
-                ])
-
-                if (courseRes.ok) {
-                    const res = await courseRes.json()
-                    setCourse(res.data)
+                const res = await fetch(`/api/pembelajaran/${id}`)
+                if (res.ok) {
+                    const data = await res.json()
+                    setCourse(data.data)
                 }
             } catch (error) {
                 console.error('Failed to fetch detail', error)
@@ -49,6 +49,34 @@ export default function PembelajaranDetailPage({ params }: { params: Promise<{ i
 
     const firstMateriId = course.materials?.[0]?.id
 
+    // Completion checklist
+    const checklist = [
+        { key: 'materials', label: 'Materi Pembelajaran', done: course.allMaterialsCompleted, href: firstMateriId ? `/pembelajaran/${id}/belajar/${firstMateriId}` : null },
+        { key: 'pre_test', label: 'Pre-Test', done: course.hasPreTest, href: `/pembelajaran/${id}/test/pre_test` },
+        { key: 'post_test', label: 'Post-Test', done: course.hasPostTest, href: `/pembelajaran/${id}/test/post_test` },
+        { key: 'monev', label: 'Evaluasi (Monev)', done: course.hasMonev, href: `/pembelajaran/${id}/test/monev` },
+        { key: 'certificate', label: 'Sertifikat', done: false, href: `/pembelajaran/${id}/sertifikat` },
+    ]
+
+    const allDone = course.hasPreTest && course.hasPostTest && course.hasMonev && course.allMaterialsCompleted
+
+    const tipeIcon = (tipe: string) => {
+        switch (tipe) {
+            case 'pdf': return <FileText className="h-3.5 w-3.5" />
+            case 'playlist': return <ListVideo className="h-3.5 w-3.5" />
+            default: return <Video className="h-3.5 w-3.5" />
+        }
+    }
+
+    const tipeBadge = (tipe: string) => {
+        const map: Record<string, string> = {
+            video: 'bg-blue-100 text-blue-700',
+            pdf: 'bg-red-100 text-red-700',
+            playlist: 'bg-purple-100 text-purple-700',
+        }
+        return map[tipe] || map.video
+    }
+
     return (
         <div className="p-6 lg:p-12 max-w-7xl mx-auto space-y-12">
             <Link
@@ -63,13 +91,21 @@ export default function PembelajaranDetailPage({ params }: { params: Promise<{ i
                 {/* Left Column */}
                 <div className="lg:col-span-2 space-y-12">
                     <header className="space-y-6">
-                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-50 text-indigo-600 text-xs font-black tracking-widest uppercase border border-indigo-100">
-                            {course.kategori || 'UMUM'}
+                        <div className="flex items-center gap-3">
+                            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-50 text-indigo-600 text-xs font-black tracking-widest uppercase border border-indigo-100">
+                                {course.kategori || 'UMUM'}
+                            </div>
+                            {course.jumlah_jp && (
+                                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 text-amber-600 text-xs font-black tracking-widest uppercase border border-amber-100">
+                                    <Clock className="h-3 w-3" /> {course.jumlah_jp} JP
+                                </div>
+                            )}
                         </div>
-                        <h1 className="text-5xl font-black text-slate-900 tracking-tight leading-[1.1]">{course.nama_pembelajaran}</h1>
+                        <h1 className="text-5xl font-black text-slate-900 tracking-tight leading-[1.1]">{course.nama}</h1>
                         <p className="text-xl text-slate-500 leading-relaxed font-semibold">{course.deskripsi}</p>
                     </header>
 
+                    {/* Materials List */}
                     <div className="space-y-8 bg-white p-10 rounded-[3rem] shadow-xl shadow-slate-100 border border-slate-100">
                         <h2 className="text-2xl font-bold text-slate-900 border-l-4 border-indigo-600 pl-4">Kurikulum Pembelajaran</h2>
                         <div className="divide-y divide-slate-100">
@@ -82,14 +118,20 @@ export default function PembelajaranDetailPage({ params }: { params: Promise<{ i
                                             </div>
                                             <div>
                                                 <p className="font-bold text-slate-800">{materi.nama}</p>
-                                                <p className="text-xs text-slate-400 uppercase tracking-widest">{materi.link_video ? 'Video Materi' : 'Bahan Bacaan'}</p>
+                                                <div className="flex items-center gap-2 mt-1">
+                                                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-black uppercase ${tipeBadge(materi.tipe || 'video')}`}>
+                                                        {tipeIcon(materi.tipe || 'video')}
+                                                        {materi.tipe === 'playlist' ? 'PLAYLIST' : materi.tipe === 'pdf' ? 'PDF' : 'VIDEO'}
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
-                                        {firstMateriId && (
-                                            <div className="h-5 w-5 text-slate-200">
-                                                <Lock className="h-4 w-4" />
-                                            </div>
-                                        )}
+                                        <Link
+                                            href={`/pembelajaran/${id}/belajar/${materi.id}`}
+                                            className="text-slate-300 hover:text-indigo-600 transition-colors"
+                                        >
+                                            <ChevronRight className="h-5 w-5" />
+                                        </Link>
                                     </div>
                                 ))
                             ) : (
@@ -102,12 +144,28 @@ export default function PembelajaranDetailPage({ params }: { params: Promise<{ i
                 {/* Action Sidebar */}
                 <div className="sticky top-12 space-y-8">
                     <div className="bg-slate-900 p-10 rounded-[3rem] shadow-2xl text-white">
-                        <div className="mb-10 flex flex-col items-center">
+                        <div className="mb-8 flex flex-col items-center">
                             <div className="h-20 w-20 rounded-3xl bg-indigo-500 flex items-center justify-center mb-6 shadow-xl shadow-indigo-500/20">
                                 <GraduationCap className="h-10 w-10" />
                             </div>
                             <h3 className="text-center text-xl font-bold mb-2">Program Sertifikasi Surajaya Corpu</h3>
                             <p className="text-center text-indigo-200 text-sm opacity-60">Selesaikan seluruh kurikulum untuk mendapatkan sertifikat kompetensi.</p>
+                        </div>
+
+                        {/* Completion Checklist */}
+                        <div className="space-y-3 mb-8">
+                            {checklist.map(item => (
+                                <div key={item.key} className="flex items-center gap-3">
+                                    {item.done ? (
+                                        <CheckCircle2 className="h-5 w-5 text-emerald-400 flex-shrink-0" />
+                                    ) : (
+                                        <Lock className="h-5 w-5 text-slate-500 flex-shrink-0" />
+                                    )}
+                                    <span className={`text-sm font-bold ${item.done ? 'text-white' : 'text-slate-500'}`}>
+                                        {item.label}
+                                    </span>
+                                </div>
+                            ))}
                         </div>
 
                         {firstMateriId ? (
@@ -123,18 +181,42 @@ export default function PembelajaranDetailPage({ params }: { params: Promise<{ i
                             </button>
                         )}
 
+                        {/* Quick Navigation */}
+                        <div className="mt-6 space-y-2">
+                            <Link href={`/pembelajaran/${id}/test/pre_test`} className={`block w-full text-center py-3 rounded-xl font-bold text-sm transition-all ${course.hasPreTest ? 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}>
+                                <ClipboardCheck className="h-4 w-4 inline mr-2" />
+                                Pre-Test {course.hasPreTest ? '✓' : ''}
+                            </Link>
+                            <Link href={`/pembelajaran/${id}/test/post_test`} className={`block w-full text-center py-3 rounded-xl font-bold text-sm transition-all ${course.hasPostTest ? 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}>
+                                <ClipboardCheck className="h-4 w-4 inline mr-2" />
+                                Post-Test {course.hasPostTest ? '✓' : ''}
+                            </Link>
+                            <Link href={`/pembelajaran/${id}/test/monev`} className={`block w-full text-center py-3 rounded-xl font-bold text-sm transition-all ${course.hasMonev ? 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}>
+                                <ClipboardCheck className="h-4 w-4 inline mr-2" />
+                                Evaluasi {course.hasMonev ? '✓' : ''}
+                            </Link>
+                            {allDone && (
+                                <Link href={`/pembelajaran/${id}/sertifikat`} className="block w-full text-center py-3 rounded-xl font-bold text-sm bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 transition-all">
+                                    <Award className="h-4 w-4 inline mr-2" />
+                                    Unduh Sertifikat
+                                </Link>
+                            )}
+                        </div>
+
                         <div className="mt-8 space-y-4">
                             <div className="flex items-center justify-between text-sm py-3 border-b border-white/5">
                                 <span className="text-indigo-200">Total Materi</span>
                                 <span className="font-black text-white">{course.materials?.length || 0}</span>
                             </div>
-                            <div className="flex items-center justify-between text-sm py-3 border-b border-white/5">
-                                <span className="text-indigo-200">Akses Mandiri</span>
-                                <span className="font-black text-white uppercase">Selamanya</span>
-                            </div>
+                            {course.jumlah_jp && (
+                                <div className="flex items-center justify-between text-sm py-3 border-b border-white/5">
+                                    <span className="text-indigo-200">Jam Pelajaran</span>
+                                    <span className="font-black text-white">{course.jumlah_jp} JP</span>
+                                </div>
+                            )}
                             <div className="flex items-center justify-between text-sm py-3">
                                 <span className="text-indigo-200">Sertifikat</span>
-                                <span className="font-black text-indigo-400 uppercase">Tersedia</span>
+                                <span className={`font-black uppercase ${allDone ? 'text-amber-400' : 'text-slate-500'}`}>{allDone ? 'Tersedia' : 'Terkunci'}</span>
                             </div>
                         </div>
                     </div>

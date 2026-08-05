@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Save, Loader2, Type, LayoutDashboard, Globe, FileImage, Upload, X } from 'lucide-react'
+import { ArrowLeft, Save, Loader2, Type, LayoutDashboard, Globe, FileImage, Upload, X, Clock } from 'lucide-react'
 import Link from 'next/link'
 import FullPageLoader from '@/components/FullPageLoader'
 
@@ -15,9 +15,10 @@ export default function PembelajaranForm({ id, initialData }: PembelajaranFormPr
     const router = useRouter()
     const [loading, setLoading] = useState(false)
     const [formData, setFormData] = useState({
-        nama_pembelajaran: '',
+        nama: '',
         slug: '',
         kategori: '',
+        jumlah_jp: '' as string | number,
         deskripsi: '',
         gambar: '',
         status: 'draft'
@@ -25,14 +26,22 @@ export default function PembelajaranForm({ id, initialData }: PembelajaranFormPr
 
     useEffect(() => {
         if (initialData) {
-            setFormData(initialData)
+            setFormData({
+                nama: initialData.nama || '',
+                slug: initialData.slug || '',
+                kategori: initialData.kategori || '',
+                jumlah_jp: initialData.jumlah_jp || '',
+                deskripsi: initialData.deskripsi || '',
+                gambar: initialData.gambar || '',
+                status: initialData.status || 'draft'
+            })
         }
     }, [initialData])
 
-    // Auto-generate slug from nama_pembelajaran
+    // Auto-generate slug from nama
     useEffect(() => {
         if (!id) {
-            const slug = formData.nama_pembelajaran
+            const slug = formData.nama
                 .toLowerCase()
                 .trim()
                 .replace(/[^\w\s-]/g, '')
@@ -40,7 +49,7 @@ export default function PembelajaranForm({ id, initialData }: PembelajaranFormPr
                 .replace(/^-+|-+$/g, '')
             setFormData(prev => ({ ...prev, slug }))
         }
-    }, [formData.nama_pembelajaran, id])
+    }, [formData.nama, id])
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target
@@ -82,10 +91,15 @@ export default function PembelajaranForm({ id, initialData }: PembelajaranFormPr
             const url = id ? `/api/pembelajaran/${id}` : '/api/pembelajaran'
             const method = id ? 'PUT' : 'POST'
 
+            const payload = {
+                ...formData,
+                jumlah_jp: formData.jumlah_jp ? Number(formData.jumlah_jp) : null,
+            }
+
             const res = await fetch(url, {
                 method,
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData)
+                body: JSON.stringify(payload)
             })
 
             if (res.ok) {
@@ -135,11 +149,11 @@ export default function PembelajaranForm({ id, initialData }: PembelajaranFormPr
                         <div className="grid gap-6 sm:grid-cols-2">
                             <div className="sm:col-span-2">
                                 <input
-                                    name="nama_pembelajaran"
+                                    name="nama"
                                     required
                                     placeholder="Judul Pembelajaran Mandiri..."
                                     className="w-full bg-slate-50 rounded-2xl px-6 py-4 outline-none ring-1 ring-slate-100 focus:ring-2 focus:ring-indigo-500/20 focus:bg-white transition-all text-lg font-black text-slate-900 placeholder:text-slate-300"
-                                    value={formData.nama_pembelajaran}
+                                    value={formData.nama}
                                     onChange={handleChange}
                                 />
                             </div>
@@ -150,6 +164,22 @@ export default function PembelajaranForm({ id, initialData }: PembelajaranFormPr
                                     placeholder="URL-SLUG (otomatis)"
                                     className="w-full bg-slate-100 rounded-2xl px-6 py-4 outline-none ring-1 ring-slate-200 font-bold text-slate-500 cursor-not-allowed italic"
                                     value={formData.slug}
+                                />
+                            </div>
+                        </div>
+                        <div className="grid gap-6 sm:grid-cols-2 mt-6">
+                            <div>
+                                <label className="flex items-center gap-2 text-xs font-black text-slate-500 uppercase tracking-widest mb-2">
+                                    <Clock className="h-3 w-3 text-indigo-400" /> Jumlah Jam Pelajaran (JP)
+                                </label>
+                                <input
+                                    type="number"
+                                    name="jumlah_jp"
+                                    min={1}
+                                    placeholder="Contoh: 24"
+                                    className="w-full bg-slate-50 rounded-2xl px-6 py-4 outline-none ring-1 ring-slate-100 focus:ring-2 focus:ring-indigo-500/20 focus:bg-white transition-all text-lg font-black text-slate-900 placeholder:text-slate-300"
+                                    value={formData.jumlah_jp}
+                                    onChange={handleChange}
                                 />
                             </div>
                             <div>
