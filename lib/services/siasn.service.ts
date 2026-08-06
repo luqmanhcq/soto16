@@ -17,9 +17,12 @@ type OauthTokenCache = {
 }
 
 type SiasnDataUtamaResponse = {
-  response: {
-    status: string
-    data: Record<string, unknown>
+  code?: number | string
+  data?: Record<string, unknown>
+  message?: string
+  response?: {
+    status?: string
+    data?: Record<string, unknown>
     message?: string
   }
 }
@@ -119,17 +122,32 @@ export class SiasnService {
 
     const result: SiasnDataUtamaResponse = await res.json()
 
-    // Log the response structure for debugging field mapping
-    if (result.response?.data) {
-      console.log('[SIASN] Data utama response keys:', Object.keys(result.response.data))
-    }
+    // The BKN SIASN data-utama endpoint returns:
+    //   { "code": 1, "data": { ... }, "message": ... }
+    // where code === 1 means success. Some variants use response.status === '01'.
+    const success =
+      result.code === 1 ||
+      result.code === '1' ||
+      result.code === 200 ||
+      result.response?.status === '01' ||
+      result.response?.status === '200'
 
-    if (result.response?.status !== '01' && result.response?.status !== '200') {
-      const msg = result.response?.message || 'Unknown error'
+    if (!success) {
+      const msg =
+        result.message ||
+        result.response?.message ||
+        `SIASN API returned code: ${result.code ?? result.response?.status ?? 'unknown'}`
       throw new Error(`SIASN API returned error: ${msg}`)
     }
 
-    return result.response?.data || {}
+    const rawData = result.data || result.response?.data || {}
+
+    // Log the response structure for debugging field mapping
+    if (rawData) {
+      console.log('[SIASN] Data utama response keys:', Object.keys(rawData))
+    }
+
+    return rawData
   }
 
   /**
@@ -164,15 +182,62 @@ export class SiasnService {
       const data = await this.fetchDataUtama(nip)
 
       // Map SIASN response to user fields
-      // Common SIASN field names for data-utama endpoint:
-      // - nama_jabatan / jabatan / jabatan_nama
-      // - nama_pangkat / pangkat / golongan_nama
-      // - nama_unit_kerja / unit_kerja / satuan_kerja_nama
-      const jabatan = (data.nama_jabatan || data.jabatan || data.jabatan_nama || '') as string
-      const golongan = (data.nama_pangkat || data.pangkat || data.golongan_nama || data.tingkat_pendidikan || '') as string
-      const unitKerja = (data.nama_unit_kerja || data.unit_kerja || data.satuan_kerja_nama || data.instansi_nama || '') as string
+      // The BKN SIASN data-utama endpoint returns camelCase fields:
+      // - jabatan:    jabatanNama, jabatanStrukturalNama, jabatanFungsionalNama, jabatanFungsionalUmumNama
+      // - golongan:   golRuangAkhir, golRuangAwal (e.g. "II/c", "IV/b")
+      // - unit_kerja: unorNama, unorIndukNama, satuanKerjaKerjaNama, satuanKerjaIndukNama
+      // (snake_case fallbacks kept for compatibility with other SIASN variants)
+      const jabatan = String(
+        data.jabatanNama ||
+          data.jabatanStrukturalNama ||
+          data.jabatanFungsionalNama ||
+          data.jabatanFungsionalUmumNama ||
+          data.nama_jabatan ||
+          data.jabatan ||
+          data.jabatan_nama ||
+          ''
+      ).trim()
+      const golongan = String(
+        data.golRuangAkhir ||
+          data.golRuangAwal ||
+          data.nama_pangkat ||
+          data.pangkat ||
+          data.golongan_nama ||
+          data.tingkat_pendidikan ||
+          ''
+      ).trim()
 
-      console.log('[SIASN] Mapped data:', { jabatan, golongan, unitKerja })
+      const unorNama = String(
+        data.unorNama ||
+          data.nama_unit_kerja ||
+          data.unit_kerja ||
+          data.satuan_kerja_nama ||
+          ''
+      ).trim()
+      const unorIndukNama = String(data.unorIndukNama || '').trim()
+      const instansiNama = String(
+        data.instansiIndukNama ||
+          data.satuanKerjaIndukNama ||
+          data.instansiKerjaNama ||
+          data.satuanKerjaKerjaNama ||
+          data.instansi_nama ||
+          ''
+      ).trim()
+
+      const normalizeNama = (s: string) =>
+        s.toLowerCase().replace(/\./g, '').replace(/\s+/g, ' ').trim()
+
+      const isUnorIndukKabupatenLamongan =
+        !unorIndukNama ||
+        (instansiNama && normalizeNama(unorIndukNama) === normalizeNama(instansiNama)) ||
+        /pemerintah\s+kab(\.|upaten)?\s*\.?\s*lamongan/i.test(unorIndukNama)
+
+      let unitKerja = unorNama
+      if (unorNama && unorIndukNama && !isUnorIndukKabupatenLamongan) {
+        unitKerja = `${unorNama} - ${unorIndukNama}`
+      }
+
+      console.log('[SIASN] Mapped data:', { jabatan, golongan, unitKerja, unorNama, unorIndukNama, instansiNama })
 
       // Only update fields that have values
       const updateData: Record<string, string> = {}
