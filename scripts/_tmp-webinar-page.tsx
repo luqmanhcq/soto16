@@ -455,19 +455,18 @@ export default function WebinarDetailPage({ params }: { params: Promise<{ id: st
                                 </div>
 
                                 {/* Certificate Section */}
-                                {(() => {
+                                {webinar.template_sertifikat && (() => {
                                     const now = new Date()
                                     const endDate = new Date(webinar.tanggal_selesai)
                                     const isFinished = now > endDate
                                     const isTimeElapsed = isFinished && (now.getTime() - endDate.getTime()) >= 24 * 60 * 60 * 1000
+                                    const canGetCertificate = isFinished && isAttended && hasPostTest && hasMonev && isTimeElapsed
                                     const getNotReadyReason = () => {
-                                        if (!webinar.template_sertifikat) return 'Template sertifikat belum diatur untuk webinar ini'
-                                        if (!isJoined) return 'Anda belum mendaftar webinar'
                                         if (!isFinished) return 'Webinar belum selesai'
                                         if (!isAttended) return 'Anda belum melakukan absen'
                                         if (!hasPostTest) return 'Anda belum mengerjakan post-test'
                                         if (!hasMonev) return 'Anda belum mengerjakan MONEV'
-                                        if (!isTimeElapsed) return 'Sertifikat hanya tersedia 1x24 jam setelah webinar selesai'
+                                        if (!isTimeElapsed) return 'Sertifikat dapat diunduh 1x24 jam setelah webinar selesai'
                                         return null
                                     }
                                     const notReadyReason = getNotReadyReason()

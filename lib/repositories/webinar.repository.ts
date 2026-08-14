@@ -150,6 +150,26 @@ export class WebinarRepository {
             hasMonev: !hasMonevQuestions || monevAnswers.length > 0,
         }
     }
+
+    /**
+     * Update webinar status to 'selesai' for webinars that have passed their end date.
+     * Only updates webinars with status 'publish' that have passed their end date.
+     */
+    async updateStatusToSelesai(): Promise<number> {
+        const now = new Date()
+        const result = await db
+            .update(webinarsTable)
+            .set({ status: 'selesai', updated_at: new Date() })
+            .where(
+                and(
+                    eq(webinarsTable.status, 'publish'),
+                    sql`${webinarsTable.tanggal_selesai} < ${now}`
+                )
+            )
+            .returning({ id: webinarsTable.id })
+
+        return result.length
+    }
 }
 
 export const webinarRepository = new WebinarRepository()

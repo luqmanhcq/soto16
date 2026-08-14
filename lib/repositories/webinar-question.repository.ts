@@ -72,6 +72,16 @@ export class WebinarQuestionRepository {
         })
     }
 
+    async deleteUserAnswers(webinarId: number, userId: number, type: 'post_test' | 'monev') {
+        return await db.delete(webinarUserAnswersTable)
+            .where(and(
+                eq(webinarUserAnswersTable.webinar_id, webinarId),
+                eq(webinarUserAnswersTable.user_id, userId),
+                eq(webinarUserAnswersTable.type, type)
+            ))
+            .returning()
+    }
+
     async getResults(webinarId: number, type: 'post_test' | 'monev') {
         const rows = await db
             .select()

@@ -1,15 +1,43 @@
 'use client'
 
 import { useState, useEffect, use } from 'react'
-import { ArrowLeft, Loader2, Download, AlertTriangle, RefreshCw, FileText } from 'lucide-react'
+import { ArrowLeft, Loader2, Download, AlertTriangle, RefreshCw, FileText, Info } from 'lucide-react'
 import Link from 'next/link'
+
+type CertData = {
+    webinar?: {
+        nama_webinar?: string
+        nama?: string
+        tanggal_mulai?: string | null
+        template_sertifikat?: string | null
+        jumlah_jp?: number | null
+    }
+    user?: {
+        nama?: string
+        nip?: string
+        unit_kerja?: string | null
+    }
+    sertifikat?: {
+        nomor?: string
+        tanggal_cetak?: string
+    }
+}
+
+type CertAvailability = {
+    status: string
+    selesaiAt: string | null
+    tersediaAt: string | null
+    berakhirAt: string | null
+    tersediaSetelahJam: number
+}
 
 export default function SertifikatPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params)
 
-    const [data, setData]               = useState<any>(null)
+    const [data, setData]               = useState<CertData | null>(null)
     const [loading, setLoading]         = useState(true)
     const [error, setError]             = useState('')
+    const [availability, setAvailability] = useState<CertAvailability | null>(null)
     const [generating, setGenerating]   = useState(false)
     const [pdfReady, setPdfReady]       = useState(false)
     const [pdfError, setPdfError]       = useState('')
@@ -23,8 +51,10 @@ export default function SertifikatPage({ params }: { params: Promise<{ id: strin
                 const result = await res.json()
                 if (res.ok) {
                     setData(result.data)
+                    setAvailability(null)
                 } else {
                     setError(result.message || 'Gagal memuat sertifikat')
+                    setAvailability(result.availability || null)
                 }
             } catch {
                 setError('Kesalahan koneksi saat memuat sertifikat')
@@ -81,14 +111,29 @@ export default function SertifikatPage({ params }: { params: Promise<{ id: strin
 
     // ── State: error syarat ─────────────────────────────────────────────────
     if (error) {
+        const isAvailability = !!availability
         return (
             <div className="flex flex-col items-center justify-center min-h-[60vh] max-w-lg mx-auto text-center space-y-6">
                 <div className="h-24 w-24 bg-red-50 text-red-600 rounded-[2rem] flex items-center justify-center">
                     <AlertTriangle className="h-12 w-12" />
                 </div>
                 <div>
-                    <h2 className="text-2xl font-black text-slate-900 mb-2">Sertifikat Belum Tersedia</h2>
+                    <h2 className="text-2xl font-black text-slate-900 mb-2">
+                        {isAvailability ? 'Sertifikat Belum Dapat Diunduh' : 'Sertifikat Belum Tersedia'}
+                    </h2>
                     <p className="text-slate-600 font-medium">{error}</p>
+                    {isAvailability && (
+                        <div className="mt-4 bg-amber-50 border border-amber-100 rounded-2xl p-4 text-left space-y-1.5">
+                            <p className="text-sm font-bold text-amber-700">Informasi Unduhan Sertifikat</p>
+                            <ul className="text-xs text-slate-600 font-medium space-y-1">
+                                <li>• Sertifikat dapat diunduh mulai <b>24 jam (1x24 jam)</b> setelah webinar selesai.</li>
+                                <li>• Sertifikat tersedia untuk diunduh selama <b>24 jam</b> setelah tersedia.</li>
+                                {availability?.tersediaAt && (
+                                    <li>• Buka halaman ini kembali pada {new Date(availability.tersediaAt).toLocaleString('id-ID')}.</li>
+                                )}
+                            </ul>
+                        </div>
+                    )}
                 </div>
                 <Link
                     href={`/webinar/${id}`}
@@ -158,6 +203,17 @@ export default function SertifikatPage({ params }: { params: Promise<{ id: strin
                     <div className="flex-1 min-w-0">
                         <span className="text-slate-400 font-medium block text-xs mb-0.5">Nomor Sertifikat</span>
                         <span className="truncate block">{data?.sertifikat?.nomor || '-'}</span>
+                    </div>
+                </div>
+
+                {/* Info banner: window unduhan 24 jam */}
+                <div className="bg-blue-50 border border-blue-100 rounded-2xl px-5 py-3.5 flex items-start gap-3 text-sm text-blue-700">
+                    <Info className="h-5 w-5 shrink-0 mt-0.5" />
+                    <div className="space-y-0.5">
+                        <p className="font-bold">Masa Unduh Sertifikat</p>
+                        <p className="text-xs font-medium text-blue-600">
+                            Sertifikat dapat diunduh selama <b>24 jam</b>, mulai tersedia <b>24 jam (1x24 jam)</b> setelah webinar selesai.
+                        </p>
                     </div>
                 </div>
 

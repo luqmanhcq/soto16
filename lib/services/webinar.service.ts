@@ -70,6 +70,13 @@ export class WebinarService {
         return deleted
     }
 
+    /**
+     * Update status of webinars that have passed their end date to 'selesai'
+     */
+    async updateOverdueWebinars(): Promise<number> {
+        return await webinarRepository.updateStatusToSelesai()
+    }
+
     async join(webinarId: number, userId: number) {
         console.log(`[Service] Joining webinar ${webinarId} for user ${userId}`)
         const webinar = await webinarRepository.findById(webinarId)

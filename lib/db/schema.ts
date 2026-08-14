@@ -393,3 +393,34 @@ export const pembelajaranUserAnswersRelations = relations(pembelajaranUserAnswer
   question: one(pembelajaranQuestionsTable, { fields: [pembelajaranUserAnswersTable.question_id], references: [pembelajaranQuestionsTable.id] }),
   option: one(pembelajaranOptionsTable, { fields: [pembelajaranUserAnswersTable.option_id], references: [pembelajaranOptionsTable.id] }),
 }))
+
+export const sertifikatWebinarTable = pgTable(
+  'sertifikat_webinar',
+  {
+    id: serial('id').primaryKey(),
+    user_id: integer('user_id').notNull(),
+    webinar_id: integer('webinar_id').notNull(),
+    nip: varchar('nip', { length: 18 }).notNull(),
+    nama: varchar('nama', { length: 255 }).notNull(),
+    jabatan: varchar('jabatan', { length: 100 }),
+    unit_kerja: varchar('unit_kerja', { length: 255 }),
+    nama_webinar: varchar('nama_webinar', { length: 255 }).notNull(),
+    tanggal_mulai: timestamp('tanggal_mulai'),
+    tanggal_selesai: timestamp('tanggal_selesai'),
+    jumlah_jp: integer('jumlah_jp'),
+    penyelenggara: varchar('penyelenggara', { length: 255 }),
+    nomor_sertifikat: varchar('nomor_sertifikat', { length: 255 }).notNull(),
+    created_at: timestamp('created_at').defaultNow().notNull(),
+    updated_at: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    userFk: foreignKey({ columns: [table.user_id], foreignColumns: [usersTable.id] }).onDelete('cascade'),
+    webinarFk: foreignKey({ columns: [table.webinar_id], foreignColumns: [webinarsTable.id] }).onDelete('cascade'),
+    userWebinarIdx: uniqueIndex('sertifikat_webinar_user_webinar_idx').on(table.user_id, table.webinar_id),
+  })
+)
+
+export const sertifikatWebinarRelations = relations(sertifikatWebinarTable, ({ one }) => ({
+  user: one(usersTable, { fields: [sertifikatWebinarTable.user_id], references: [usersTable.id] }),
+  webinar: one(webinarsTable, { fields: [sertifikatWebinarTable.webinar_id], references: [webinarsTable.id] }),
+}))

@@ -171,6 +171,26 @@ async function main() {
   `
 
   await sql`
+    CREATE TABLE "sertifikat_webinar" (
+      "id" serial PRIMARY KEY NOT NULL,
+      "user_id" integer NOT NULL,
+      "webinar_id" integer NOT NULL,
+      "nip" varchar(18) NOT NULL,
+      "nama" varchar(255) NOT NULL,
+      "jabatan" varchar(100),
+      "unit_kerja" varchar(255),
+      "nama_webinar" varchar(255) NOT NULL,
+      "tanggal_mulai" timestamp,
+      "tanggal_selesai" timestamp,
+      "jumlah_jp" integer,
+      "penyelenggara" varchar(255),
+      "nomor_sertifikat" varchar(255) NOT NULL,
+      "created_at" timestamp DEFAULT now() NOT NULL,
+      "updated_at" timestamp DEFAULT now() NOT NULL
+    )
+  `
+
+  await sql`
     CREATE TABLE "pengumuman" (
       "id" serial PRIMARY KEY NOT NULL,
       "judul" varchar(255) NOT NULL,
@@ -253,6 +273,8 @@ async function main() {
   await sql`ALTER TABLE "pembelajaran_progress" ADD CONSTRAINT "pembelajaran_progress_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE cascade ON UPDATE no action`
   await sql`ALTER TABLE "pembelajaran_progress" ADD CONSTRAINT "pembelajaran_progress_pembelajaran_id_pembelajaran_id_fk" FOREIGN KEY ("pembelajaran_id") REFERENCES "pembelajaran"("id") ON DELETE cascade ON UPDATE no action`
   await sql`ALTER TABLE "sertifikat_usulan" ADD CONSTRAINT "sertifikat_usulan_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE cascade ON UPDATE no action`
+  await sql`ALTER TABLE "sertifikat_webinar" ADD CONSTRAINT "sertifikat_webinar_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE cascade ON UPDATE no action`
+  await sql`ALTER TABLE "sertifikat_webinar" ADD CONSTRAINT "sertifikat_webinar_webinar_id_webinars_id_fk" FOREIGN KEY ("webinar_id") REFERENCES "webinars"("id") ON DELETE cascade ON UPDATE no action`
   await sql`ALTER TABLE "webinar_participants" ADD CONSTRAINT "webinar_participants_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE cascade ON UPDATE no action`
   await sql`ALTER TABLE "webinar_participants" ADD CONSTRAINT "webinar_participants_webinar_id_webinars_id_fk" FOREIGN KEY ("webinar_id") REFERENCES "webinars"("id") ON DELETE cascade ON UPDATE no action`
   await sql`ALTER TABLE "webinar_attendances" ADD CONSTRAINT "webinar_attendances_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE cascade ON UPDATE no action`
@@ -275,6 +297,7 @@ async function main() {
   await sql`CREATE UNIQUE INDEX "pembelajaran_slug_idx" ON "pembelajaran" USING btree ("slug")`
   await sql`CREATE UNIQUE INDEX "pengumuman_slug_idx" ON "pengumuman" USING btree ("slug")`
   await sql`CREATE INDEX "sertifikat_usulan_user_id_idx" ON "sertifikat_usulan" USING btree ("user_id")`
+  await sql`CREATE UNIQUE INDEX "sertifikat_webinar_user_webinar_idx" ON "sertifikat_webinar" USING btree ("user_id","webinar_id")`
   await sql`CREATE UNIQUE INDEX "users_email_idx" ON "users" USING btree ("email")`
   await sql`CREATE UNIQUE INDEX "users_nip_idx" ON "users" USING btree ("nip")`
   await sql`CREATE UNIQUE INDEX "webinar_participants_user_webinar_idx" ON "webinar_participants" USING btree ("user_id","webinar_id")`

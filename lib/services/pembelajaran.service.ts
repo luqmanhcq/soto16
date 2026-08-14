@@ -111,13 +111,18 @@ export class PembelajaranService {
         const progress = await progressRepository.findByUserIdAndPembelajaranId(userId, pembelajaranId)
         const allMaterialsCompleted = progress?.status === 'selesai'
 
-        return { hasPreTest, hasPostTest, hasMonev, allMaterialsCompleted }
+        // Cek skor post-test (harus >= 50% untuk lulus)
+        const postTestScore = await pembelajaranQuestionRepository.calculateScore(userId, pembelajaranId, 'post_test')
+        const hasPostTestQuestions = await pembelajaranQuestionRepository.getByPembelajaranId(pembelajaranId, 'post_test')
+        const postTestLulus = hasPostTestQuestions.length === 0 || postTestScore.score >= 50
+
+        return { hasPreTest, hasPostTest, hasMonev, allMaterialsCompleted, postTestScore: postTestScore.score, postTestLulus }
     }
 
     // Certificate eligibility
     async isEligibleForCertificate(pembelajaranId: number, userId: number): Promise<boolean> {
         const status = await this.getCompletionStatus(pembelajaranId, userId)
-        return status.hasPreTest && status.hasPostTest && status.hasMonev && status.allMaterialsCompleted
+        return status.hasPreTest && status.hasPostTest && status.postTestLulus && status.hasMonev && status.allMaterialsCompleted
     }
 }
 

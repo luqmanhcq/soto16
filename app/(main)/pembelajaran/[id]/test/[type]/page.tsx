@@ -151,6 +151,15 @@ export default function TestPage({ params }: { params: Promise<{ id: string; typ
         }
     }
 
+    const handleRetake = () => {
+        if (!confirm('Yakin ingin mengulangi Post-Test? Jawaban sebelumnya akan diganti dengan jawaban baru.')) return
+        setCompleted(false)
+        setScore(null)
+        setAnswers({})
+        setExistingAnswers([])
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+
     if (loading) return <div className="p-20 text-center font-black text-indigo-600 animate-pulse">Menyiapkan soal...</div>
     if (!course) return <div className="p-20 text-center font-black text-red-500">Kursus tidak ditemukan</div>
 
@@ -177,15 +186,16 @@ export default function TestPage({ params }: { params: Promise<{ id: string; typ
                 </div>
 
                 {completed && score && (
-                    <div className={`p-6 rounded-2xl mt-6 ${score.score >= 70 ? 'bg-emerald-50 border border-emerald-200' : 'bg-amber-50 border border-amber-200'}`}>
+                    <div className={`p-6 rounded-2xl mt-6 ${score.score >= 50 ? 'bg-emerald-50 border border-emerald-200' : 'bg-amber-50 border border-amber-200'}`}>
                         <div className="flex items-center gap-4">
-                            <Award className={`h-10 w-10 ${score.score >= 70 ? 'text-emerald-600' : 'text-amber-600'}`} />
+                            <Award className={`h-10 w-10 ${score.score >= 50 ? 'text-emerald-600' : 'text-amber-600'}`} />
                             <div>
-                                <p className={`text-2xl font-black ${score.score >= 70 ? 'text-emerald-700' : 'text-amber-700'}`}>
+                                <p className={`text-2xl font-black ${score.score >= 50 ? 'text-emerald-700' : 'text-amber-700'}`}>
                                     Skor: {score.score}%
                                 </p>
-                                <p className={`text-sm font-bold ${score.score >= 70 ? 'text-emerald-600' : 'text-amber-600'}`}>
+                                <p className={`text-sm font-bold ${score.score >= 50 ? 'text-emerald-600' : 'text-amber-600'}`}>
                                     {score.correct} dari {score.total} jawaban benar
+                                    {type === 'post_test' && score.score < 50 && ' — belum mencapai nilai minimum (50%)'}
                                 </p>
                             </div>
                         </div>
@@ -272,13 +282,24 @@ export default function TestPage({ params }: { params: Promise<{ id: string; typ
 
             {/* Back to course button when completed */}
             {completed && (
-                <div className="text-center">
-                    <Link
-                        href={`/pembelajaran/${id}`}
-                        className="inline-flex items-center gap-2 px-8 py-4 bg-indigo-600 text-white rounded-xl font-black text-sm shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition-all"
-                    >
-                        Kembali ke Kursus
-                    </Link>
+                <div className="space-y-3">
+                    {type === 'post_test' && score && score.score < 50 && (
+                        <button
+                            onClick={handleRetake}
+                            className="inline-flex items-center gap-2 px-8 py-4 bg-amber-500 text-white rounded-xl font-black text-sm shadow-xl shadow-amber-100 hover:bg-amber-600 transition-all active:scale-95"
+                        >
+                            <RotateCcw className="h-5 w-5" />
+                            ULANGI POST-TEST
+                        </button>
+                    )}
+                    <div className="text-center">
+                        <Link
+                            href={`/pembelajaran/${id}`}
+                            className="inline-flex items-center gap-2 px-8 py-4 bg-indigo-600 text-white rounded-xl font-black text-sm shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition-all"
+                        >
+                            Kembali ke Kursus
+                        </Link>
+                    </div>
                 </div>
             )}
         </div>

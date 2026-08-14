@@ -53,12 +53,12 @@ export default function PembelajaranDetailPage({ params }: { params: Promise<{ i
     const checklist = [
         { key: 'materials', label: 'Materi Pembelajaran', done: course.allMaterialsCompleted, href: firstMateriId ? `/pembelajaran/${id}/belajar/${firstMateriId}` : null },
         { key: 'pre_test', label: 'Pre-Test', done: course.hasPreTest, href: `/pembelajaran/${id}/test/pre_test` },
-        { key: 'post_test', label: 'Post-Test', done: course.hasPostTest, href: `/pembelajaran/${id}/test/post_test` },
+        { key: 'post_test', label: 'Post-Test', done: course.hasPostTest && course.postTestLulus, href: `/pembelajaran/${id}/test/post_test` },
         { key: 'monev', label: 'Evaluasi (Monev)', done: course.hasMonev, href: `/pembelajaran/${id}/test/monev` },
         { key: 'certificate', label: 'Sertifikat', done: false, href: `/pembelajaran/${id}/sertifikat` },
     ]
 
-    const allDone = course.hasPreTest && course.hasPostTest && course.hasMonev && course.allMaterialsCompleted
+    const allDone = course.hasPreTest && course.hasPostTest && course.postTestLulus && course.hasMonev && course.allMaterialsCompleted
 
     const tipeIcon = (tipe: string) => {
         switch (tipe) {
@@ -187,9 +187,9 @@ export default function PembelajaranDetailPage({ params }: { params: Promise<{ i
                                 <ClipboardCheck className="h-4 w-4 inline mr-2" />
                                 Pre-Test {course.hasPreTest ? '✓' : ''}
                             </Link>
-                            <Link href={`/pembelajaran/${id}/test/post_test`} className={`block w-full text-center py-3 rounded-xl font-bold text-sm transition-all ${course.hasPostTest ? 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}>
+                            <Link href={`/pembelajaran/${id}/test/post_test`} className={`block w-full text-center py-3 rounded-xl font-bold text-sm transition-all ${course.hasPostTest && course.postTestLulus ? 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}>
                                 <ClipboardCheck className="h-4 w-4 inline mr-2" />
-                                Post-Test {course.hasPostTest ? '✓' : ''}
+                                Post-Test {course.hasPostTest && course.postTestLulus ? '✓' : course.hasPostTest && !course.postTestLulus ? `(${course.postTestScore ?? 0}% < 50%)` : ''}
                             </Link>
                             <Link href={`/pembelajaran/${id}/test/monev`} className={`block w-full text-center py-3 rounded-xl font-bold text-sm transition-all ${course.hasMonev ? 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}>
                                 <ClipboardCheck className="h-4 w-4 inline mr-2" />
