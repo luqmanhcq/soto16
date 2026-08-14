@@ -14,6 +14,7 @@ import {
     LayoutDashboard,
     LogOut,
     Menu,
+    Award,
     X,
     Users
 } from 'lucide-react'
@@ -43,6 +44,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     ]
 
     const adminNavigation = [
+        { name: 'Rekap Sertifikat Webinar', href: '/admin/sertifikat-webinar', icon: Award },
         { name: 'Data Webinar', href: '/admin/webinar', icon: Video },
         { name: 'Data E-Learning', href: '/admin/pembelajaran', icon: BookOpen },
         { name: 'Data Pengumuman', href: '/admin/pengumuman', icon: Home },

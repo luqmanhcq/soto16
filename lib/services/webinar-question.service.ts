@@ -86,6 +86,40 @@ export class WebinarQuestionService {
         return results
     }
 
+    /**
+     * Submit ulang jawaban post-test.
+     * Menghapus jawaban lama user lalu menyimpan jawaban baru (data terbaru).
+     */
+    async resubmitPostTest(webinarId: number, userId: number, answers: { question_id: number, option_id: number }[]) {
+        // Hapus jawaban post-test lama user terlebih dahulu
+        await webinarQuestionRepository.deleteUserAnswers(webinarId, userId, 'post_test')
+        // Simpan jawaban baru
+        return await this.submitAnswers(webinarId, userId, 'post_test', answers)
+    }
+
+    /**
+     * Hitung skor post-test user dalam persen (0-100).
+     * Return null jika user belum mengerjakan.
+     */
+    async getUserPostTestScore(webinarId: number, userId: number): Promise<number | null> {
+        const questions = await webinarQuestionRepository.getResults(webinarId, 'post_test')
+        if (questions.length === 0) return null
+
+        const userAnswers = await webinarQuestionRepository.getUserAnswers(webinarId, userId, 'post_test')
+        if (userAnswers.length === 0) return null
+
+        let correctCount = 0
+        questions.forEach(q => {
+            const userAns = userAnswers.find((a: any) => a.question_id === q.id)
+            const correctOpt = q.options.find((o: any) => o.is_correct)
+            if (userAns && correctOpt && userAns.option_id === correctOpt.id) {
+                correctCount++
+            }
+        })
+
+        return Math.round((correctCount / questions.length) * 100)
+    }
+
     async getUserAnswers(webinarId: number, userId: number, type: 'post_test' | 'monev') {
         return await webinarQuestionRepository.getUserAnswers(webinarId, userId, type)
     }

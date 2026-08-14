@@ -51,13 +51,20 @@ export default function WebinarTestPage({ params }: { params: Promise<{ id: stri
             const data = await res.json()
             if (res.ok) setQuestions(data.data || [])
 
-            // Check if already submitted
-            const checkRes = await fetch(`/api/webinar/${webinarId}/questions/submit?type=${type}`)
-            if (!checkRes.ok && checkRes.status === 400) {
+            // Check submission status (score & whether can retake)
+            try {
+                const checkRes = await fetch(`/api/webinar/${webinarId}/questions/submit?type=${type}`)
                 const checkData = await checkRes.json()
-                if (checkData.message.includes('sudah mengirimkan')) {
-                    setCompleted(true)
+                if (checkRes.ok && checkData.data) {
+                    if (checkData.data.submitted) {
+                        setCompleted(true)
+                        if (type === 'post_test') {
+                            setScore(checkData.data.score)
+                        }
+                    }
                 }
+            } catch (e) {
+                console.error('Gagal cek status submit:', e)
             }
         } catch (error) {
             console.error(error)
@@ -117,6 +124,14 @@ export default function WebinarTestPage({ params }: { params: Promise<{ id: stri
         }
     }
 
+    const handleRetake = () => {
+        if (!confirm('Yakin ingin mengulangi Post-test? Jawaban sebelumnya akan diganti dengan jawaban baru.')) return
+        setCompleted(false)
+        setScore(null)
+        setAnswers({})
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+
     if (loading) {
         return (
             <div className="min-h-screen bg-white flex flex-col items-center justify-center gap-6">
@@ -127,30 +142,40 @@ export default function WebinarTestPage({ params }: { params: Promise<{ id: stri
     }
 
     if (completed) {
+        const isPostTest = type === 'post_test'
+        const passed = isPostTest ? (score !== null && score >= 50) : true
         return (
             <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6 lg:p-24">
                 <div className="max-w-md w-full bg-indigo-50 rounded-[3rem] p-12 text-center space-y-8 border border-indigo-100 shadow-2xl shadow-indigo-100/50">
-                    <div className="h-24 w-24 bg-white rounded-[2rem] flex items-center justify-center mx-auto shadow-xl shadow-indigo-200/50">
-                        <CheckCircle2 className="h-12 w-12 text-emerald-500" />
+                    <div className={`h-24 w-24 rounded-[2rem] flex items-center justify-center mx-auto shadow-xl ${passed ? 'bg-white shadow-indigo-200/50' : 'bg-amber-50 shadow-amber-200/50'}`}>
+                        {passed ? (
+                            <CheckCircle2 className="h-12 w-12 text-emerald-500" />
+                        ) : (
+                            <AlertCircle className="h-12 w-12 text-amber-500" />
+                        )}
                     </div>
                     <div className="space-y-4">
                         <h2 className="text-3xl font-black text-slate-900 uppercase italic tracking-tighter leading-none">
-                            {type === 'post_test' ? 'Post-Test Selesai' : 'Monev Terkirim'}
+                            {isPostTest
+                                ? (passed ? 'Post-Test Selesai' : 'Post-Test Belum Lulus')
+                                : 'Monev Terkirim'}
                         </h2>
                         <p className="text-slate-500 font-bold italic leading-relaxed">
-                            {type === 'post_test' 
-                                ? `Terima kasih telah mengerjakan post-test untuk webinar "${webinar?.nama_webinar}".`
+                            {isPostTest
+                                ? passed
+                                    ? `Selamat! Anda telah lulus post-test untuk webinar "${webinar?.nama_webinar}".`
+                                    : 'Nilai Post-test Anda belum mencapai batas minimal. Silakan ulangi Post-test.'
                                 : `Terima kasih atas umpan balik Anda untuk webinar "${webinar?.nama_webinar}".`}
                         </p>
                     </div>
                     
                     {score !== null && (
-                        <div className="bg-white p-6 rounded-2xl border border-indigo-100">
+                        <div className={`bg-white p-6 rounded-2xl border ${passed ? 'border-emerald-100' : 'border-amber-100'}`}>
                             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Nilai Anda</p>
-                            <p className="text-5xl font-black text-indigo-600 italic tracking-tighter">{score}%</p>
-                            {score < (webinar?.nilai_min || 70) ? (
+                            <p className={`text-5xl font-black italic tracking-tighter ${passed ? 'text-emerald-600' : 'text-amber-600'}`}>{score}%</p>
+                            {!passed ? (
                                 <p className="text-[10px] font-bold text-red-500 uppercase mt-2 italic tracking-tight flex items-center justify-center gap-2">
-                                    <AlertCircle className="h-3 w-3" /> Belum mencapai nilai minimum ({webinar?.nilai_min || 70}%)
+                                    <AlertCircle className="h-3 w-3" /> Belum mencapai nilai minimum (50%)
                                 </p>
                             ) : (
                                 <p className="text-[10px] font-bold text-emerald-500 uppercase mt-2 italic tracking-tight flex items-center justify-center gap-2">
@@ -160,12 +185,23 @@ export default function WebinarTestPage({ params }: { params: Promise<{ id: stri
                         </div>
                     )}
 
-                    <Link
-                        href={`/webinar/${id}`}
-                        className="block w-full py-5 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-indigo-600 transition-all shadow-xl shadow-slate-200"
-                    >
-                        Kembali ke Detail Webinar
-                    </Link>
+                    <div className="space-y-3">
+                        {isPostTest && !passed && (
+                            <button
+                                onClick={handleRetake}
+                                className="block w-full py-5 bg-amber-500 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-amber-600 transition-all shadow-xl shadow-amber-200 active:scale-95"
+                            >
+                                ULANGI POST-TEST
+                            </button>
+                        )}
+
+                        <Link
+                            href={`/webinar/${id}`}
+                            className="block w-full py-5 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-indigo-600 transition-all shadow-xl shadow-slate-200"
+                        >
+                            Kembali ke Detail Webinar
+                        </Link>
+                    </div>
                 </div>
             </div>
         )

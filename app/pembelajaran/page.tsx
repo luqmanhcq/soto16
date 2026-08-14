@@ -41,7 +41,7 @@ export default function PublicPembelajaranPage() {
                         <span className="text-[10px] font-black uppercase tracking-widest italic">Core Competence Curriculum</span>
                     </div>
                     <h1 className="text-3xl lg:text-4xl font-black text-slate-900 tracking-tighter italic uppercase leading-none">
-                        PROGRAM PEMBELAJARAN MANDIRI “KOYA” <br /><span className="text-emerald-600">(Kolaboratif Online yang akseleratif).</span>
+                        PROGRAM PEMBELAJARAN MANDIRI <br /><span className="text-emerald-600">(Kolaboratif Online yang akseleratif).</span>
                     </h1>
                     <p className="max-w-2xl text-slate-400 font-bold text-lg leading-relaxed italic border-l-4 border-emerald-50 pl-10">Meracik Kompetensi, Membangun Lamongan MEGILAN.</p>
 

@@ -1,14 +1,9 @@
 import { NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { webinarsTable, webinarParticipantsTable, usersTable, webinarAttendancesTable, webinarUserAnswersTable, webinarQuestionsTable } from '@/lib/db/schema'
-import { eq, and, getTableColumns } from 'drizzle-orm'
+import { eq, and } from 'drizzle-orm'
 import { verifyToken } from '@/lib/jwt'
 import { cookies } from 'next/headers'
-
-function getRomanMonth() {
-    const months = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII']
-    return months[new Date().getMonth()]
-}
 
 export async function GET(
     request: Request,
@@ -26,7 +21,7 @@ export async function GET(
         
         const decoded = await verifyToken(token)
         if (!decoded) return NextResponse.json({ message: 'Invalid token' }, { status: 401 })
-        const userId = (decoded as any).id
+        const userId = decoded.id
 
         // 2. Fetch Webinar
         const [webinar] = await db.select().from(webinarsTable).where(eq(webinarsTable.id, webinarId))
@@ -36,13 +31,34 @@ export async function GET(
             return NextResponse.json({ message: 'Template sertifikat belum diatur untuk webinar ini' }, { status: 400 })
         }
 
-        // Check if event has ended
-        if (webinar.tanggal_selesai && new Date() < new Date(webinar.tanggal_selesai)) {
-            return NextResponse.json({ message: 'Sertifikat belum tersedia karena acara belum selesai' }, { status: 403 })
+        // Check ketersediaan sertifikat (1x24 jam setelah selesai, window 24 jam)
+        const { getSertifikatAvailability } = await import('@/lib/utils/sertifikat-availability')
+        const availability = getSertifikatAvailability(webinar.tanggal_selesai)
+        if (availability.status !== 'tersedia') {
+            return NextResponse.json({ message: availability.message, availability: {
+                status: availability.status,
+                selesaiAt: availability.selesaiAt?.toISOString() || null,
+                tersediaAt: availability.tersediaAt?.toISOString() || null,
+                berakhirAt: availability.berakhirAt?.toISOString() || null,
+                tersediaSetelahJam: availability.tersediaAt
+                    ? Math.max(1, Math.ceil((availability.tersediaAt.getTime() - Date.now()) / (60 * 60 * 1000)))
+                    : 1,
+            } }, { status: 403 })
         }
 
         // 3. Fetch User Info
-        const [user] = await db.select().from(usersTable).where(eq(usersTable.id, userId))
+        let [user] = await db.select().from(usersTable).where(eq(usersTable.id, userId))
+
+        // 3b. Jika golongan/jabatan/unit_kerja kosong, sync dari SIASN lalu simpan
+        if (user && (!user.jabatan || !user.golongan || !user.unit_kerja)) {
+            console.log(`[Sertifikat] User ${userId} memiliki data ASN tidak lengkap, sync dari SIASN...`)
+            const { siasnService } = await import('@/lib/services/siasn.service')
+            const synced = await siasnService.syncAsnData(userId, user.nip)
+            if (synced) {
+                const [updatedUser] = await db.select().from(usersTable).where(eq(usersTable.id, userId))
+                if (updatedUser) user = updatedUser
+            }
+        }
 
         // 4. Cek Syarat (Peserta, Absen, Monev, Post-test)
         const [participant] = await db.select().from(webinarParticipantsTable).where(
@@ -78,15 +94,12 @@ export async function GET(
         // 5. Generate atau ambil Nomor Sertifikat
         let nomor_sertifikat = participant.nomor_sertifikat
         if (!nomor_sertifikat) {
-            const randomDigits = Math.floor(100000 + Math.random() * 900000)
-            const year = new Date().getFullYear()
-            const romanMonth = getRomanMonth()
-            nomor_sertifikat = `${randomDigits}/ BPSDM - WASNB / 205.3 / ${webinarId} / ${romanMonth} / ${year}`
-            
-            // Update to db
+            const { sertifikatWebinarService } = await import('@/lib/services/sertifikat-webinar.service')
+            nomor_sertifikat = await sertifikatWebinarService.generateNomorSertifikat(webinarId)
             await db.update(webinarParticipantsTable)
                 .set({ nomor_sertifikat })
                 .where(eq(webinarParticipantsTable.id, participant.id))
+            await sertifikatWebinarService.createOrUpdate(userId, webinarId, nomor_sertifikat)
         }
 
         return NextResponse.json({
@@ -109,7 +122,8 @@ export async function GET(
             }
         })
 
-    } catch (error: any) {
-        return NextResponse.json({ message: 'Terjadi kesalahan sistem', error: error.message }, { status: 500 })
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : 'Terjadi kesalahan sistem'
+        return NextResponse.json({ message: 'Terjadi kesalahan sistem', error: message }, { status: 500 })
     }
 }

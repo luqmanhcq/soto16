@@ -49,6 +49,7 @@ export default function WebinarDetailPage({ params }: { params: Promise<{ id: st
     const [isJoined, setIsJoined] = useState(false)
     const [isAttended, setIsAttended] = useState(false)
     const [hasPostTest, setHasPostTest] = useState(false)
+
     const [hasMonev, setHasMonev] = useState(false)
     const [attending, setAttending] = useState(false)
     const [joining, setJoining] = useState(false)
@@ -71,6 +72,7 @@ export default function WebinarDetailPage({ params }: { params: Promise<{ id: st
             setWebinar(result.data)
             setIsJoined(result.data.isJoined || false)
             setHasPostTest(result.data.hasPostTest || false)
+
             setHasMonev(result.data.hasMonev || false)
 
             // Fetch attendance status (hanya jika user sudah login)
@@ -453,49 +455,58 @@ export default function WebinarDetailPage({ params }: { params: Promise<{ id: st
                                 </div>
 
                                 {/* Certificate Section */}
-                                {webinar.template_sertifikat && (() => {
+                                {(() => {
                                     const now = new Date()
                                     const endDate = new Date(webinar.tanggal_selesai)
                                     const isFinished = now > endDate
-                                    const canGetCertificate = isFinished && isAttended && hasPostTest && hasMonev
+                                    const isTimeElapsed = isFinished && (now.getTime() - endDate.getTime()) >= 24 * 60 * 60 * 1000
+                                    const getNotReadyReason = () => {
+                                        if (!webinar.template_sertifikat) return 'Template sertifikat belum diatur untuk webinar ini'
+                                        if (!isJoined) return 'Anda belum mendaftar webinar'
+                                        if (!isFinished) return 'Webinar belum selesai'
+                                        if (!isAttended) return 'Anda belum melakukan absen'
+                                        if (!hasPostTest) return 'Anda belum mengerjakan post-test'
+                                        if (!hasMonev) return 'Anda belum mengerjakan MONEV'
+                                        if (!isTimeElapsed) return 'Sertifikat hanya tersedia 1x24 jam setelah webinar selesai'
+                                        return null
+                                    }
+                                    const notReadyReason = getNotReadyReason()
+                                    const canGetCert = !notReadyReason
+
+                                    const handleCertificateClick = () => {
+                                        const reason = getNotReadyReason()
+                                        if (reason) {
+                                            alert(reason)
+                                            return
+                                        }
+                                        router.push(`/webinar/${id}/sertifikat`)
+                                    }
+
                                     return (
                                         <div className="mt-4">
-                                            {canGetCertificate ? (
-                                                <Link
-                                                    href={`/webinar/${id}/sertifikat`}
-                                                    className="w-full flex items-center justify-between p-6 rounded-[2rem] bg-blue-600 text-white font-black text-xs uppercase tracking-widest hover:bg-blue-700 transition-all shadow-xl shadow-blue-100"
-                                                >
-                                                    <div className="flex items-center gap-4">
-                                                        <Award className="h-5 w-5" />
-                                                        CETAK SERTIFIKAT OTOMATIS
+                                            <button
+                                                onClick={handleCertificateClick}
+                                                className={`w-full flex items-center justify-between p-6 rounded-[2rem] font-black text-xs uppercase tracking-widest transition-all shadow-xl ${
+                                                    canGetCert
+                                                        ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-xl shadow-blue-100'
+                                                        : 'bg-slate-100 text-slate-400 border border-slate-200'
+                                                }`}
+                                                title={notReadyReason || ''}
+                                            >
+                                                <div className="flex items-center gap-4">
+                                                    <Award className={`h-5 w-5 ${canGetCert ? 'text-white' : 'text-slate-300'}`} />
+                                                    <div>
+                                                        <p className={`font-black text-xs uppercase tracking-widest ${canGetCert ? 'text-white' : 'text-slate-300'}`}>
+                                                            CETAK SERTIFIKAT
+                                                        </p>
                                                     </div>
-                                                    <ArrowRight className="h-4 w-4" />
-                                                </Link>
-                                            ) : (
-                                                <button
-                                                    disabled
-                                                    className="w-full flex items-center justify-between p-6 rounded-[2rem] bg-slate-100 text-slate-400 font-black text-xs uppercase tracking-widest border border-slate-200 cursor-not-allowed"
-                                                    title={
-                                                        !isFinished
-                                                            ? 'Sertifikat tersedia setelah acara selesai'
-                                                            : !isAttended
-                                                            ? 'Sertifikat tersedia setelah mengisi absen'
-                                                            : !hasPostTest
-                                                            ? 'Sertifikat tersedia setelah mengerjakan post-test'
-                                                            : 'Sertifikat tersedia setelah mengisi monev'
-                                                    }
-                                                >
-                                                    <div className="flex items-center gap-4">
-                                                        <Award className="h-5 w-5 text-slate-300" />
-                                                        {!isFinished
-                                                            ? 'CETAK SERTIFIKAT (BELUM SELESAI)'
-                                                            : !isAttended
-                                                            ? 'CETAK SERTIFIKAT (ABSEN BELUM)'
-                                                            : !hasPostTest
-                                                            ? 'CETAK SERTIFIKAT (POST-TEST BELUM)'
-                                                            : 'CETAK SERTIFIKAT (MONEV BELUM)'}
-                                                    </div>
-                                                </button>
+                                                    {canGetCert && <ArrowRight className="h-4 w-4 text-white" />}
+                                                </div>
+                                            </button>
+                                            {!canGetCert && (
+                                                <p className="mt-3 text-center text-[11px] text-slate-500 bg-slate-50 rounded-xl px-4 py-3 border border-slate-100">
+                                                    {notReadyReason}
+                                                </p>
                                             )}
                                         </div>
                                     )

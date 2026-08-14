@@ -16,11 +16,6 @@ async function getPdfLib() {
     }
 }
 
-function getRomanMonth() {
-    const months = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII']
-    return months[new Date().getMonth()]
-}
-
 /**
  * Prepare DOCX XML for docxtemplater (default {tag} delimiters).
  * Handles 3 common template formats users write in Word:
@@ -53,12 +48,46 @@ function prepareXmlForTemplating(xmlText: string): string {
         return match
     })
 
-    // Step 3: Force all background images / drawing anchors to be Behind Text
-    // In Word XML, wp:anchor tags use behindDoc="0" for 'In Front of Text' and behindDoc="1" for 'Behind Text'.
-    cleaned = cleaned.replace(/behindDoc="0"/g, 'behindDoc="1"')
+// Step 2b: Merge split bracket-style placeholders [ tag ] -> [tag]
+    // Word often splits [ nomor ] across multiple <w:t> runs with proofErr markers:
+    // <w:t>[</w:t></w:r><w:proofErr.../><w:r><w:t>nomor</w:t></w:r><w:proofErr.../><w:r><w:t>]</w:t>
+    // This regex finds [ ... tag ... ] with XML tags in between and merges them.
+    cleaned = cleaned.replace(/(\[)\s*(<[^>]+>\s*)*([a-zA-Z_][a-zA-Z0-9_]*)\s*(<[^>]+>\s*)*(\])/g, (match, _open, _beforeTag, tag, _afterTag, _close) => {
+        // Check if there are XML tags between the parts (meaning split across runs)
+        if (match.includes('<') && match.includes('>')) {
+            return `[${tag}]`
+        }
+        return match
+    })
 
-    // Step 4: Force VML shapes with positive z-index to have negative z-index (behind text)
-    cleaned = cleaned.replace(/z-index:\s*(\d+)/g, 'z-index:-$1')
+    // Step 2.5: Convert bracket-style placeholders [nama] -> {nama}
+    // Word templates sering memakai [nama], [opd], [nip], [nomor] (bukan {nama}).
+    // Beberapa template pakai spasi: [ nomor ], [ jabatan ].
+    // docxtemplater default hanya mengenali {curly_brace}. Konversi hanya untuk tag yang dikenal.
+    const knownTemplateTags = [
+        'nama', 'opd', 'nip', 'nomor', 'nomer', 'name', 'jabatan',
+        'date', 'unit', 'unit_kerja', 'golongan', 'pangkat',
+    ]
+    cleaned = cleaned.replace(/\[\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*\]/g, (match, tag) => {
+        if (knownTemplateTags.includes(tag.toLowerCase())) {
+            return `{${tag}}`
+        }
+        return match
+    })
+
+    // Step 3: Pastikan gambar (pic:pic / a:blip) selalu berada di BELAKANG text.
+    // Hanya anchor yang berisi gambar yang diubah — text boxes (wps:wsp) tetap di depan.
+    // Word modern menulis behindDoc="false"/"true" (bukan "0"/"1").
+    cleaned = cleaned.replace(/<wp:anchor\b[^>]*behindDoc="false"[^>]*>[\s\S]*?<\/wp:anchor>/g, (anchor) => {
+        if (anchor.includes('<pic:pic') || anchor.includes('<a:blip')) {
+            return anchor.replace(/behindDoc="false"/, 'behindDoc="true"')
+        }
+        return anchor
+    })
+
+    // Step 4: DILARANG memaksa semua z-index menjadi negatif.
+    // Text boxes (berisi placeholder {nama} dll) memakai z-index positif agar tampil
+    // DI ATAS background. Jika dipaksa negatif, text akan tertutup gambar background.
 
     return cleaned
 }
@@ -176,7 +205,8 @@ export async function GET(
 
         const decoded = await verifyToken(token)
         if (!decoded) return NextResponse.json({ message: 'Invalid token' }, { status: 401 })
-        const userId = (decoded as any).id
+        const userId = decoded.id
+        const userRole = decoded.role
 
         // 2. Fetch Webinar
         const [webinar] = await db.select().from(webinarsTable).where(eq(webinarsTable.id, webinarId))
@@ -186,14 +216,53 @@ export async function GET(
             return NextResponse.json({ message: 'Template sertifikat belum diatur untuk webinar ini' }, { status: 400 })
         }
 
-        // Check if event is finished
-        const isFinished = webinar.tanggal_selesai ? new Date() > new Date(webinar.tanggal_selesai) : true
-        if (!isFinished) {
-            return NextResponse.json({ message: 'Sertifikat belum tersedia karena acara belum selesai' }, { status: 403 })
+        // Admin/Super Admin dapat mengakses sertifikat user tertentu via ?user_id=
+        const url = new URL(request.url)
+        const queryUserId = url.searchParams.get('user_id')
+        const isAdmin = userRole === 'admin' || userRole === 'super_admin'
+        if (isAdmin && queryUserId) {
+            const targetUserId = parseInt(queryUserId)
+            if (isNaN(targetUserId)) {
+                return NextResponse.json({ message: 'Invalid user_id' }, { status: 400 })
+            }
+
+            const adminPdfPath = path.join(process.cwd(), 'public', 'sertifikat', `${webinarId}-${targetUserId}.pdf`)
+            try {
+                await fs.access(adminPdfPath)
+                const existingPdf = await fs.readFile(adminPdfPath)
+                console.log(`[Sertifikat] Admin serving existing PDF for user ${targetUserId}: ${adminPdfPath}`)
+                return new NextResponse(new Uint8Array(existingPdf), {
+                    headers: {
+                        'Content-Type': 'application/pdf',
+                        'Content-Disposition': `inline; filename="sertifikat-${webinarId}-${targetUserId}.pdf"`,
+                        'Cache-Control': 'no-store, no-cache, must-revalidate',
+                    },
+                })
+            } catch {
+                return NextResponse.json({ message: 'Sertifikat untuk user tersebut belum di-generate' }, { status: 404 })
+            }
+        }
+
+        // Check ketersediaan sertifikat (1x24 jam setelah selesai, window 24 jam)
+        const { getSertifikatAvailability } = await import('@/lib/utils/sertifikat-availability')
+        const availability = getSertifikatAvailability(webinar.tanggal_selesai)
+        if (availability.status !== 'tersedia') {
+            return NextResponse.json({ message: availability.message }, { status: 403 })
         }
 
         // 3. Fetch User Info
-        const [user] = await db.select().from(usersTable).where(eq(usersTable.id, userId))
+        let [user] = await db.select().from(usersTable).where(eq(usersTable.id, userId))
+
+        // 3b. Jika golongan/jabatan/unit_kerja kosong, sync dari SIASN lalu simpan
+        if (user && (!user.jabatan || !user.golongan || !user.unit_kerja)) {
+            console.log(`[Sertifikat] User ${userId} memiliki data ASN tidak lengkap, sync dari SIASN...`)
+            const { siasnService } = await import('@/lib/services/siasn.service')
+            const synced = await siasnService.syncAsnData(userId, user.nip)
+            if (synced) {
+                const [updatedUser] = await db.select().from(usersTable).where(eq(usersTable.id, userId))
+                if (updatedUser) user = updatedUser
+            }
+        }
 
         // 4. Cek Syarat Peserta, Absen, Monev, Post-test
         const [participant] = await db.select().from(webinarParticipantsTable).where(
@@ -224,13 +293,12 @@ export async function GET(
         // 5. Generate atau ambil Nomor Sertifikat
         let nomor_sertifikat = participant.nomor_sertifikat
         if (!nomor_sertifikat) {
-            const randomDigits = Math.floor(100000 + Math.random() * 900000)
-            const year = new Date().getFullYear()
-            const romanMonth = getRomanMonth()
-            nomor_sertifikat = `${randomDigits}/ BPSDM - WASNB / 205.3 / ${webinarId} / ${romanMonth} / ${year}`
+            const { sertifikatWebinarService } = await import('@/lib/services/sertifikat-webinar.service')
+            nomor_sertifikat = await sertifikatWebinarService.generateNomorSertifikat(webinarId)
             await db.update(webinarParticipantsTable)
                 .set({ nomor_sertifikat })
                 .where(eq(webinarParticipantsTable.id, participant.id))
+            await sertifikatWebinarService.createOrUpdate(userId, webinarId, nomor_sertifikat)
         }
 
         // ─────────────────────────────────────────────────────────────────────
@@ -244,7 +312,6 @@ export async function GET(
         const savedPdfPath     = path.join(sertifikatDir, savedPdfFileName)
 
         // Check if we need force regenerate (via ?refresh=1)
-        const url = new URL(request.url)
         const forceRefresh = url.searchParams.get('refresh') === '1'
 
         // ─────────────────────────────────────────────────────────────────────
@@ -277,6 +344,7 @@ export async function GET(
         const valNomor = nomor_sertifikat
         const valNama  = user.nama
         const valNip   = `NIP. ${user.nip}`
+        const valJabatan = user.jabatan || ''
         const valOpd   = user.unit_kerja || 'Surajaya Corpu'
 
         const templatePath  = path.join(process.cwd(), 'public', webinar.template_sertifikat)
@@ -293,6 +361,7 @@ export async function GET(
             const templateData: Record<string, string> = {
                 nama: valNama,
                 nip: valNip,
+                jabatan: valJabatan,
                 opd: valOpd,
                 nomor: valNomor,
                 nomer: valNomor,
@@ -512,6 +581,18 @@ export async function GET(
             rgb(1, 1, 1), // White
             { shadowOffset: 0.5 }
         )
+
+        // Jabatan - supporting info
+        if (valJabatan) {
+            drawCentered(
+                valJabatan,
+                height * 0.42,
+                fontRegular,
+                12,
+                rgb(1, 1, 1), // White
+                { shadowOffset: 0.5 }
+            )
+        }
 
         // OPD - supporting info
         drawCentered(
