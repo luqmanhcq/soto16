@@ -12,7 +12,7 @@ export function successResponse<T>(
       message,
       data,
     },
-    { status: statusCode }
+    { status: statusCode, headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate' } }
   )
 }
 
@@ -34,7 +34,7 @@ export function errorResponse(
       message,
       errors: errors.length > 0 ? errors : undefined,
     },
-    { status: statusCode }
+    { status: statusCode, headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate' } }
   )
 }
 

@@ -1,4 +1,5 @@
 import { webinarRepository } from '@/lib/repositories/webinar.repository'
+import { webinarAttendanceRepository } from '@/lib/repositories/webinar-attendance.repository'
 import { CreateWebinarDto, UpdateWebinarDto } from '@/lib/validations/webinar.validation'
 
 export class WebinarService {
@@ -13,13 +14,15 @@ export class WebinarService {
         }
 
         let isJoined = false
+        let isAttended = false
         let completionStatus = { hasPostTest: false, hasMonev: false }
         if (userId) {
             isJoined = await webinarRepository.isJoined(id, userId)
+            isAttended = await webinarAttendanceRepository.getAttendance(userId, id).then(Boolean)
             completionStatus = await webinarRepository.getUserCompletionStatus(id, userId)
         }
 
-        return { ...webinar, isJoined, ...completionStatus }
+        return { ...webinar, isJoined, isAttended, ...completionStatus }
     }
 
     async getBySlug(slug: string, userId?: number) {
@@ -29,13 +32,15 @@ export class WebinarService {
         }
 
         let isJoined = false
+        let isAttended = false
         let completionStatus = { hasPostTest: false, hasMonev: false }
         if (userId && webinar.id) {
             isJoined = await webinarRepository.isJoined(webinar.id, userId)
+            isAttended = await webinarAttendanceRepository.getAttendance(userId, webinar.id).then(Boolean)
             completionStatus = await webinarRepository.getUserCompletionStatus(webinar.id, userId)
         }
 
-        return { ...webinar, isJoined, ...completionStatus }
+        return { ...webinar, isJoined, isAttended, ...completionStatus }
     }
 
     async create(data: CreateWebinarDto) {

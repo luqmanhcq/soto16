@@ -71,18 +71,10 @@ export default function WebinarDetailPage({ params }: { params: Promise<{ id: st
             const result = await res.json()
             setWebinar(result.data)
             setIsJoined(result.data.isJoined || false)
+            setIsAttended(result.data.isAttended || false)
             setHasPostTest(result.data.hasPostTest || false)
 
             setHasMonev(result.data.hasMonev || false)
-
-            // Fetch attendance status (hanya jika user sudah login)
-            if (user) {
-                const attRes = await fetch(`/api/webinar/${id}/attendance`, { credentials: 'include' })
-                if (attRes.ok) {
-                    const attData = await attRes.json()
-                    setIsAttended(attData.data.isAttended)
-                }
-            }
         } catch (error) {
             console.error('Failed to fetch webinar:', error)
             setWebinarError('Gagal memuat detail webinar. Silakan coba kembali.')

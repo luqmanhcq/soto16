@@ -27,8 +27,10 @@ export async function GET(
         const [webinar] = await db.select().from(webinarsTable).where(eq(webinarsTable.id, webinarId))
         if (!webinar) return NextResponse.json({ message: 'Webinar tidak ditemukan' }, { status: 404 })
 
+        const noStore = { 'Cache-Control': 'no-store, no-cache, must-revalidate' }
+
         if (!webinar.template_sertifikat) {
-            return NextResponse.json({ message: 'Template sertifikat belum diatur untuk webinar ini' }, { status: 400 })
+            return NextResponse.json({ message: 'Template sertifikat belum diatur untuk webinar ini' }, { status: 400, headers: noStore })
         }
 
         // Check ketersediaan sertifikat (1x24 jam setelah selesai, window 24 jam)
@@ -43,7 +45,7 @@ export async function GET(
                 tersediaSetelahJam: availability.tersediaAt
                     ? Math.max(1, Math.ceil((availability.tersediaAt.getTime() - Date.now()) / (60 * 60 * 1000)))
                     : 1,
-            } }, { status: 403 })
+            } }, { status: 403, headers: noStore })
         }
 
         // 3. Fetch User Info
@@ -64,12 +66,12 @@ export async function GET(
         const [participant] = await db.select().from(webinarParticipantsTable).where(
             and(eq(webinarParticipantsTable.user_id, userId), eq(webinarParticipantsTable.webinar_id, webinarId))
         )
-        if (!participant) return NextResponse.json({ message: 'Anda belum mendaftar webinar ini' }, { status: 403 })
+        if (!participant) return NextResponse.json({ message: 'Anda belum mendaftar webinar ini' }, { status: 403, headers: noStore })
 
         const [attendance] = await db.select().from(webinarAttendancesTable).where(
             and(eq(webinarAttendancesTable.user_id, userId), eq(webinarAttendancesTable.webinar_id, webinarId))
         )
-        if (!attendance) return NextResponse.json({ message: 'Anda belum mengisi absen' }, { status: 403 })
+        if (!attendance) return NextResponse.json({ message: 'Anda belum mengisi absen' }, { status: 403, headers: noStore })
 
         // Check if webinar has monev/post-test questions and if user answered them
         const questions = await db.select().from(webinarQuestionsTable).where(eq(webinarQuestionsTable.webinar_id, webinarId))
@@ -83,12 +85,12 @@ export async function GET(
 
         if (hasMonev) {
             const answeredMonev = userAnswers.some(a => a.type === 'monev')
-            if (!answeredMonev) return NextResponse.json({ message: 'Anda belum mengisi MONEV' }, { status: 403 })
+            if (!answeredMonev) return NextResponse.json({ message: 'Anda belum mengisi MONEV' }, { status: 403, headers: noStore })
         }
 
         if (hasPostTest) {
             const answeredPostTest = userAnswers.some(a => a.type === 'post_test')
-            if (!answeredPostTest) return NextResponse.json({ message: 'Anda belum menyelesaikan Post-test' }, { status: 403 })
+            if (!answeredPostTest) return NextResponse.json({ message: 'Anda belum menyelesaikan Post-test' }, { status: 403, headers: noStore })
         }
 
         // 5. Generate atau ambil Nomor Sertifikat
@@ -120,7 +122,7 @@ export async function GET(
                     tanggal_cetak: new Date().toISOString()
                 }
             }
-        })
+        }, { headers: noStore })
 
     } catch (error: unknown) {
         const message = error instanceof Error ? error.message : 'Terjadi kesalahan sistem'

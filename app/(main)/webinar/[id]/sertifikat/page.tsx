@@ -127,7 +127,7 @@ export default function SertifikatPage({ params }: { params: Promise<{ id: strin
                             <p className="text-sm font-bold text-amber-700">Informasi Unduhan Sertifikat</p>
                             <ul className="text-xs text-slate-600 font-medium space-y-1">
                                 <li>• Sertifikat dapat diunduh mulai <b>24 jam (1x24 jam)</b> setelah webinar selesai.</li>
-                                <li>• Sertifikat tersedia untuk diunduh selama <b>24 jam</b> setelah tersedia.</li>
+                                <li>• Sertifikat <b>tidak ada batas waktu</b> unduh setelah tersedia.</li>
                                 {availability?.tersediaAt && (
                                     <li>• Buka halaman ini kembali pada {new Date(availability.tersediaAt).toLocaleString('id-ID')}.</li>
                                 )}
@@ -212,7 +212,7 @@ export default function SertifikatPage({ params }: { params: Promise<{ id: strin
                     <div className="space-y-0.5">
                         <p className="font-bold">Masa Unduh Sertifikat</p>
                         <p className="text-xs font-medium text-blue-600">
-                            Sertifikat dapat diunduh selama <b>24 jam</b>, mulai tersedia <b>24 jam (1x24 jam)</b> setelah webinar selesai.
+                            Sertifikat dapat diunduh mulai <b>24 jam (1x24 jam)</b> setelah webinar selesai, <b>tanpa batas waktu</b> unduh.
                         </p>
                     </div>
                 </div>

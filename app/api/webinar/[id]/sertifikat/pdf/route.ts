@@ -243,7 +243,7 @@ export async function GET(
             }
         }
 
-        // Check ketersediaan sertifikat (1x24 jam setelah selesai, window 24 jam)
+        // Check ketersediaan sertifikat (1x24 jam setelah selesai, tanpa batas waktu unduh)
         const { getSertifikatAvailability } = await import('@/lib/utils/sertifikat-availability')
         const availability = getSertifikatAvailability(webinar.tanggal_selesai)
         if (availability.status !== 'tersedia') {
