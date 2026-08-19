@@ -6,6 +6,8 @@ import {
     sertifikatUsulanTable,
     webinarParticipantsTable,
     pembelajaranProgressTable,
+    sertifikatWebinarTable,
+    pembelajaranSertifikatTable,
 } from '@/lib/db/schema'
 import { eq, count, sql, and, desc } from 'drizzle-orm'
 
@@ -18,9 +20,9 @@ export class DashboardRepository {
         const [certificatesCount] = await db
             .select({
                 total: count(),
-                pending: sql`count(*) filter (where status = 'diajukan')`,
-                approved: sql`count(*) filter (where status = 'disetujui')`,
-                rejected: sql`count(*) filter (where status = 'ditolak')`
+                pending: sql`count(case when status = 'diajukan' then 1 end)`,
+                approved: sql`count(case when status = 'disetujui' then 1 end)`,
+                rejected: sql`count(case when status = 'ditolak' then 1 end)`
             })
             .from(sertifikatUsulanTable)
 
@@ -44,8 +46,8 @@ export class DashboardRepository {
         const lessonsProgress = await db
             .select({
                 total: count(),
-                completed: sql`count(*) filter (where status = 'selesai')`,
-                inProgress: sql`count(*) filter (where status = 'proses')`
+                completed: sql`count(case when status = 'selesai' then 1 end)`,
+                inProgress: sql`count(case when status = 'proses' then 1 end)`
             })
             .from(pembelajaranProgressTable)
             .where(eq(pembelajaranProgressTable.user_id, userId))
@@ -54,36 +56,56 @@ export class DashboardRepository {
         const [certificates] = await db
             .select({
                 total: count(),
-                approved: sql`count(*) filter (where status = 'disetujui')`
+                approved: sql`count(case when status = 'disetujui' then 1 end)`
             })
             .from(sertifikatUsulanTable)
             .where(eq(sertifikatUsulanTable.user_id, userId))
 
-        // Calculate total JP from approved certificates
-        const [totalJp] = await db
-            .select({ sum: sql<number>`sum(jumlah_jp)` })
-            .from(sertifikatUsulanTable)
+        // JP earned from webinar certificates (this year)
+        const year = new Date().getFullYear()
+        const [webinarJpRow] = await db
+            .select({ sum: sql`coalesce(sum(jumlah_jp), 0)` })
+            .from(sertifikatWebinarTable)
             .where(and(
-                eq(sertifikatUsulanTable.user_id, userId),
-                eq(sertifikatUsulanTable.status, 'disetujui')
+                eq(sertifikatWebinarTable.user_id, userId),
+                sql`extract(year from "created_at") = ${year}`
             ))
+
+        // JP earned from pembelajaran (e-learning) certificates (this year)
+        const [pembelajaranJpRow] = await db
+            .select({ sum: sql`coalesce(sum(jumlah_jp), 0)` })
+            .from(pembelajaranSertifikatTable)
+            .where(and(
+                eq(pembelajaranSertifikatTable.user_id, userId),
+                sql`extract(year from "created_at") = ${year}`
+            ))
+
+        const webinarJp = Number(webinarJpRow?.sum || 0)
+        const pembelajaranJp = Number(pembelajaranJpRow?.sum || 0)
+        const totalJp = webinarJp + pembelajaranJp
 
         return {
             webinarsJoined: webinarsJoined.count,
+            webinarJp,
+            pembelajaranJp,
             lessons: lessonsProgress[0] || { total: 0, completed: 0, inProgress: 0 },
             certificates: certificates || { total: 0, approved: 0 },
-            totalJp: totalJp.sum || 0
+            totalJp,
         }
     }
     async getUserWebinars(userId: number, limit: number = 5) {
-        return await db.query.webinarParticipantsTable.findMany({
-            where: eq(webinarParticipantsTable.user_id, userId),
-            with: {
-                webinar: true
-            } as any,
-            limit: limit,
-            orderBy: [desc(webinarParticipantsTable.created_at)]
-        })
+        const rows = await db
+            .select()
+            .from(webinarParticipantsTable)
+            .leftJoin(webinarsTable, eq(webinarParticipantsTable.webinar_id, webinarsTable.id))
+            .where(eq(webinarParticipantsTable.user_id, userId))
+            .limit(limit)
+            .orderBy(desc(webinarParticipantsTable.created_at))
+
+        return rows.map(row => ({
+            ...row.webinar_participants,
+            webinar: row.webinars,
+        }))
     }
 }
 

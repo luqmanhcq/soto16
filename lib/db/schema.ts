@@ -94,6 +94,8 @@ export const pembelajaranTable = pgTable(
     gambar: text('gambar'),
     link_pretest: text('link_pretest'),
     link_posttest: text('link_posttest'),
+    pre_test_duration: integer('pre_test_duration').default(30).notNull(),
+    post_test_duration: integer('post_test_duration').default(60).notNull(),
     created_at: timestamp('created_at').defaultNow().notNull(),
     updated_at: timestamp('updated_at').defaultNow().notNull(),
   },
@@ -138,6 +140,49 @@ export const pembelajaranProgressTable = pgTable(
     userFk: foreignKey({ columns: [table.user_id], foreignColumns: [usersTable.id] }).onDelete('cascade'),
     pembelajaranFk: foreignKey({ columns: [table.pembelajaran_id], foreignColumns: [pembelajaranTable.id] }).onDelete('cascade'),
     userPembelajaranIdx: uniqueIndex('pembelajaran_progress_user_pembelajaran_idx').on(table.user_id, table.pembelajaran_id),
+  })
+)
+
+export const pembelajaranParticipantsTable = pgTable(
+  'pembelajaran_participants',
+  {
+    id: serial('id').primaryKey(),
+    user_id: integer('user_id').notNull(),
+    pembelajaran_id: integer('pembelajaran_id').notNull(),
+    enrolled_at: timestamp('enrolled_at').defaultNow().notNull(),
+    status: varchar('status', { length: 20 }).default('aktif').notNull(),
+  },
+  (table) => ({
+    userFk: foreignKey({ columns: [table.user_id], foreignColumns: [usersTable.id] }).onDelete('cascade'),
+    pembelajaranFk: foreignKey({ columns: [table.pembelajaran_id], foreignColumns: [pembelajaranTable.id] }).onDelete('cascade'),
+    userPembelajaranIdx: uniqueIndex('pembelajaran_participants_user_pembelajaran_idx').on(table.user_id, table.pembelajaran_id),
+  })
+)
+
+export const pembelajaranSertifikatTable = pgTable(
+  'pembelajaran_sertifikat',
+  {
+    id: serial('id').primaryKey(),
+    user_id: integer('user_id').notNull(),
+    pembelajaran_id: integer('pembelajaran_id').notNull(),
+    nip: varchar('nip', { length: 18 }).notNull(),
+    nama: varchar('nama', { length: 255 }).notNull(),
+    jabatan: varchar('jabatan', { length: 100 }),
+    unit_kerja: varchar('unit_kerja', { length: 255 }),
+    nama_pembelajaran: varchar('nama_pembelajaran', { length: 255 }).notNull(),
+    jumlah_jp: integer('jumlah_jp'),
+    pre_test_score: integer('pre_test_score'),
+    post_test_score: integer('post_test_score'),
+    nomor_sertifikat: varchar('nomor_sertifikat', { length: 255 }).notNull(),
+    file_sertifikat: text('file_sertifikat'),
+    tanggal_kelulusan: timestamp('tanggal_kelulusan').defaultNow().notNull(),
+    created_at: timestamp('created_at').defaultNow().notNull(),
+    updated_at: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    userFk: foreignKey({ columns: [table.user_id], foreignColumns: [usersTable.id] }).onDelete('cascade'),
+    pembelajaranFk: foreignKey({ columns: [table.pembelajaran_id], foreignColumns: [pembelajaranTable.id] }).onDelete('cascade'),
+    userPembelajaranIdx: uniqueIndex('pembelajaran_sertifikat_user_pembelajaran_idx').on(table.user_id, table.pembelajaran_id),
   })
 )
 
@@ -316,6 +361,16 @@ export const materiRelations = relations(materiTable, ({ one }) => ({
 export const pembelajaranProgressRelations = relations(pembelajaranProgressTable, ({ one }) => ({
   user: one(usersTable, { fields: [pembelajaranProgressTable.user_id], references: [usersTable.id] }),
   pembelajaran: one(pembelajaranTable, { fields: [pembelajaranProgressTable.pembelajaran_id], references: [pembelajaranTable.id] }),
+}))
+
+export const pembelajaranParticipantsRelations = relations(pembelajaranParticipantsTable, ({ one }) => ({
+  user: one(usersTable, { fields: [pembelajaranParticipantsTable.user_id], references: [usersTable.id] }),
+  pembelajaran: one(pembelajaranTable, { fields: [pembelajaranParticipantsTable.pembelajaran_id], references: [pembelajaranTable.id] }),
+}))
+
+export const pembelajaranSertifikatRelations = relations(pembelajaranSertifikatTable, ({ one }) => ({
+  user: one(usersTable, { fields: [pembelajaranSertifikatTable.user_id], references: [usersTable.id] }),
+  pembelajaran: one(pembelajaranTable, { fields: [pembelajaranSertifikatTable.pembelajaran_id], references: [pembelajaranTable.id] }),
 }))
 
 export const sertifikatUsulanRelations = relations(sertifikatUsulanTable, ({ one }) => ({

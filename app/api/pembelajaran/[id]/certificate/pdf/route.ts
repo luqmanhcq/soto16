@@ -1,168 +1,274 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { db } from '@/lib/db'
-import { pembelajaranTable, usersTable } from '@/lib/db/schema'
-import { eq } from 'drizzle-orm'
+import { pembelajaranSertifikatTable, pembelajaranTable, usersTable } from '@/lib/db/schema'
+import { eq, and } from 'drizzle-orm'
 import { verifyToken } from '@/lib/jwt'
 import { cookies } from 'next/headers'
-import fs from 'fs/promises'
-import path from 'path'
-import { pembelajaranService } from '@/lib/services/pembelajaran.service'
 
 async function getPdfLib() {
     try {
         return await import('pdf-lib')
     } catch (e) {
-        throw new Error('pdf-lib not installed')
+        throw new Error('Pustaka pdf-lib belum terinstall. Jalankan: npm install pdf-lib')
     }
 }
 
-function getRomanMonth() {
-    const months = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII']
-    return months[new Date().getMonth()]
+async function getFs() {
+    return await import('fs/promises')
 }
 
-/**
- * GET /api/pembelajaran/[id]/certificate/pdf
- * Generate PDF certificate for eligible user
- */
+async function getPath() {
+    return await import('path')
+}
+
 export async function GET(
-    request: NextRequest,
+    request: Request,
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const { id } = await params
-        const idNum = parseInt(id)
-        if (isNaN(idNum)) return NextResponse.json({ error: 'ID tidak valid' }, { status: 400 })
+        const webinarId = parseInt(id)
+        if (isNaN(webinarId)) return NextResponse.json({ message: 'Invalid ID' }, { status: 400 })
 
-        // Auth check
         const cookieStore = await cookies()
         const token = cookieStore.get('token')?.value
-        if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+        if (!token) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
 
-        const decoded = verifyToken(token) as any
-        if (!decoded?.id) return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
-
+        const decoded = await verifyToken(token)
+        if (!decoded) return NextResponse.json({ message: 'Invalid token' }, { status: 401 })
         const userId = decoded.id
 
-        // Check eligibility
-        const eligible = await pembelajaranService.isEligibleForCertificate(idNum, userId)
-        if (!eligible) {
-            return NextResponse.json({ error: 'Belum memenuhi syarat sertifikat' }, { status: 403 })
+        const [sertifikatRecord] = await db.select().from(pembelajaranSertifikatTable).where(
+            and(
+                eq(pembelajaranSertifikatTable.user_id, userId),
+                eq(pembelajaranSertifikatTable.pembelajaran_id, webinarId)
+            )
+        ).limit(1)
+
+        if (!sertifikatRecord) {
+            return NextResponse.json({ message: 'Sertifikat belum dibuat' }, { status: 404 })
         }
 
-        // Get user and course data
-        const user = await db.query.usersTable.findFirst({ where: eq(usersTable.id, userId) })
-        const course = await db.query.pembelajaranTable.findFirst({ where: eq(pembelajaranTable.id, idNum) })
-
-        if (!user || !course) {
-            return NextResponse.json({ error: 'Data tidak ditemukan' }, { status: 404 })
+        const [course] = await db.select().from(pembelajaranTable).where(eq(pembelajaranTable.id, webinarId)).limit(1)
+        if (!course) {
+            return NextResponse.json({ message: 'Kursus tidak ditemukan' }, { status: 404 })
         }
 
-        // Look for template
-        const templatePath = path.join(process.cwd(), 'public', 'sertifikat', `${idNum}-p.pdf`)
-        let templateBytes: Uint8Array
+        const { PDFDocument, rgb, StandardFonts } = await getPdfLib()
 
-        try {
-            templateBytes = await fs.readFile(templatePath)
-        } catch {
-            // If no template, generate a simple certificate
-            return await generateSimpleCertificate(user, course)
-        }
+        const pdfDoc = await PDFDocument.create()
+        const page = pdfDoc.addPage([841.89, 595.28]) // A4 landscape
+        const { width, height } = page.getSize()
 
-        const { PDFDocument, StandardFonts, rgb } = await getPdfLib()
-        const pdfDoc = await PDFDocument.load(templateBytes)
-        const pages = pdfDoc.getPages()
-        const firstPage = pages[0]
         const font = await pdfDoc.embedFont(StandardFonts.Helvetica)
-        const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold)
+        const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold)
 
-        const { width, height } = firstPage.getSize()
-
-        // Overlay user data on template
-        const now = new Date()
-        const dateStr = `${now.getDate()} ${getRomanMonth()} ${now.getFullYear()}`
-
-        firstPage.drawText(user.nama || '', {
-            x: width / 2 - 150, y: height / 2 + 40,
-            size: 22, font: boldFont, color: rgb(0.1, 0.1, 0.3),
+        // Background color
+        page.drawRectangle({
+            x: 0,
+            y: 0,
+            width,
+            height,
+            color: rgb(0.98, 0.98, 0.98),
         })
 
-        firstPage.drawText(`NIP. ${user.nip}`, {
-            x: width / 2 - 100, y: height / 2 + 10,
-            size: 12, font, color: rgb(0.3, 0.3, 0.3),
+        // Border
+        page.drawRectangle({
+            x: 30,
+            y: 30,
+            width: width - 60,
+            height: height - 60,
+            borderColor: rgb(0.3, 0.4, 0.7),
+            borderWidth: 3,
         })
 
-        firstPage.drawText(course.nama || '', {
-            x: width / 2 - 150, y: height / 2 - 30,
-            size: 16, font: boldFont, color: rgb(0.1, 0.1, 0.3),
+        // Inner border
+        page.drawRectangle({
+            x: 40,
+            y: 40,
+            width: width - 80,
+            height: height - 80,
+            borderColor: rgb(0.3, 0.4, 0.7),
+            borderWidth: 1,
         })
 
-        firstPage.drawText(`${course.jumlah_jp || 0} JP`, {
-            x: width / 2 - 30, y: height / 2 - 60,
-            size: 12, font, color: rgb(0.3, 0.3, 0.3),
+        // Title
+        page.drawText('S E R T I F I K A T', {
+            x: width / 2 - 180,
+            y: height - 140,
+            size: 36,
+            font: fontBold,
+            color: rgb(0.1, 0.2, 0.5),
         })
 
-        firstPage.drawText(`Lamongan, ${dateStr}`, {
-            x: width / 2 - 60, y: height / 2 - 100,
-            size: 11, font, color: rgb(0.4, 0.4, 0.4),
+        // Subtitle
+        page.drawText('Kelulusan Pembelajaran', {
+            x: width / 2 - 100,
+            y: height - 180,
+            size: 20,
+            font: font,
+            color: rgb(0.3, 0.3, 0.3),
+        })
+
+        // Divider line
+        page.drawLine({
+            start: { x: width / 2 - 200, y: height - 200 },
+            end: { x: width / 2 + 200, y: height - 200 },
+            thickness: 2,
+            color: rgb(0.3, 0.4, 0.7),
+        })
+
+        // Recipient text
+        page.drawText('Diberikan kepada', {
+            x: width / 2 - 80,
+            y: height - 240,
+            size: 16,
+            font: font,
+            color: rgb(0.4, 0.4, 0.4),
+        })
+
+        // Name
+        page.drawText(sertifikatRecord.nama.toUpperCase(), {
+            x: width / 2 - 200,
+            y: height - 280,
+            size: 28,
+            font: fontBold,
+            color: rgb(0.1, 0.2, 0.5),
+            maxWidth: 400,
+        })
+
+        // NIP
+        if (sertifikatRecord.nip) {
+            page.drawText(`NIP: ${sertifikatRecord.nip}`, {
+                x: width / 2 - 100,
+                y: height - 320,
+                size: 14,
+                font: font,
+                color: rgb(0.4, 0.4, 0.4),
+            })
+        }
+
+        // Course info
+        page.drawText('Telah menyelesaikan program pembelajaran', {
+            x: width / 2 - 140,
+            y: height - 360,
+            size: 16,
+            font: font,
+            color: rgb(0.4, 0.4, 0.4),
+        })
+
+        page.drawText(`"${course.nama}"`, {
+            x: width / 2 - 250,
+            y: height - 395,
+            size: 20,
+            font: fontBold,
+            color: rgb(0.1, 0.2, 0.5),
+            maxWidth: 500,
+        })
+
+        // Details row
+        const detailY = height - 440
+        const colWidth = 200
+
+        // JP
+        if (course.jumlah_jp) {
+            page.drawText('Jumlah Jam Pelajaran:', {
+                x: width / 2 - colWidth,
+                y: detailY,
+                size: 12,
+                font: font,
+                color: rgb(0.4, 0.4, 0.4),
+            })
+            page.drawText(`${course.jumlah_jp} JP`, {
+                x: width / 2 + 20,
+                y: detailY,
+                size: 12,
+                font: fontBold,
+                color: rgb(0.1, 0.1, 0.1),
+            })
+        }
+
+        // Scores
+        if (sertifikatRecord.pre_test_score !== undefined && sertifikatRecord.pre_test_score !== null) {
+            page.drawText('Skor Pre-Test:', {
+                x: width / 2 - colWidth,
+                y: detailY - 25,
+                size: 12,
+                font: font,
+                color: rgb(0.4, 0.4, 0.4),
+            })
+            page.drawText(`${sertifikatRecord.pre_test_score}%`, {
+                x: width / 2 + 20,
+                y: detailY - 25,
+                size: 12,
+                font: fontBold,
+                color: rgb(0.1, 0.1, 0.1),
+            })
+        }
+
+        if (sertifikatRecord.post_test_score !== undefined && sertifikatRecord.post_test_score !== null) {
+            page.drawText('Skor Post-Test:', {
+                x: width / 2 - colWidth,
+                y: detailY - 50,
+                size: 12,
+                font: font,
+                color: rgb(0.4, 0.4, 0.4),
+            })
+            page.drawText(`${sertifikatRecord.post_test_score}%`, {
+                x: width / 2 + 20,
+                y: detailY - 50,
+                size: 12,
+                font: fontBold,
+                color: rgb(0.1, 0.1, 0.1),
+            })
+        }
+
+        // Certificate number and date
+        const date = new Date(sertifikatRecord.tanggal_kelulusan)
+        const dateStr = date.toLocaleDateString('id-ID', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+        })
+
+        page.drawText(`Nomor: ${sertifikatRecord.nomor_sertifikat}`, {
+            x: 60,
+            y: 100,
+            size: 11,
+            font: font,
+            color: rgb(0.4, 0.4, 0.4),
+        })
+
+        page.drawText(`Tanggal: ${dateStr}`, {
+            x: 60,
+            y: 80,
+            size: 11,
+            font: font,
+            color: rgb(0.4, 0.4, 0.4),
+        })
+
+        // Footer note
+        page.drawText('Sertifikat ini diterbitkan secara elektronik dan sah tanpa tanda tangan basah.', {
+            x: width / 2 - 180,
+            y: 50,
+            size: 10,
+            font: font,
+            color: rgb(0.6, 0.6, 0.6),
         })
 
         const pdfBytes = await pdfDoc.save()
+
         return new NextResponse(Buffer.from(pdfBytes), {
+            status: 200,
             headers: {
                 'Content-Type': 'application/pdf',
-                'Content-Disposition': `attachment; filename="sertifikat-${course.slug || idNum}.pdf"`,
+                'Content-Disposition': `inline; filename="sertifikat-${sertifikatRecord.nomor_sertifikat}.pdf"`,
+                'Cache-Control': 'no-store, no-cache, must-revalidate',
             },
         })
-    } catch (error) {
-        console.error('Certificate PDF error:', error)
-        return NextResponse.json({ error: 'Gagal membuat sertifikat' }, { status: 500 })
+    } catch (error: unknown) {
+        console.error('PDF Generation Error:', error)
+        const message = error instanceof Error ? error.message : 'Terjadi kesalahan saat generate PDF'
+        return NextResponse.json({ message: 'Terjadi kesalahan sistem', error: message }, { status: 500 })
     }
-}
-
-async function generateSimpleCertificate(user: any, course: any) {
-    const { PDFDocument, StandardFonts, rgb } = await getPdfLib()
-    const pdfDoc = await PDFDocument.create()
-    const page = pdfDoc.addPage([842, 595]) // A4 landscape
-    const font = await pdfDoc.embedFont(StandardFonts.Helvetica)
-    const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold)
-    const { width, height } = page.getSize()
-
-    const now = new Date()
-    const dateStr = `${now.getDate()} ${getRomanMonth()} ${now.getFullYear()}`
-
-    // Border
-    page.drawRectangle({ x: 30, y: 30, width: width - 60, height: height - 60, borderColor: rgb(0.2, 0.3, 0.6), borderWidth: 3 })
-    page.drawRectangle({ x: 40, y: 40, width: width - 80, height: height - 80, borderColor: rgb(0.6, 0.7, 0.9), borderWidth: 1 })
-
-    // Title
-    page.drawText('SERTIFIKAT', { x: width / 2 - 80, y: height - 120, size: 36, font: boldFont, color: rgb(0.15, 0.2, 0.5) })
-    page.drawText('SURAJAYA CORPU', { x: width / 2 - 100, y: height - 155, size: 16, font: boldFont, color: rgb(0.4, 0.4, 0.5) })
-
-    // Subtitle
-    page.drawText('Diberikan kepada:', { x: width / 2 - 70, y: height - 220, size: 14, font, color: rgb(0.4, 0.4, 0.4) })
-
-    // Name
-    page.drawText(user.nama || '', { x: width / 2 - 150, y: height - 270, size: 28, font: boldFont, color: rgb(0.1, 0.1, 0.3) })
-    page.drawText(`NIP. ${user.nip}`, { x: width / 2 - 80, y: height - 300, size: 12, font, color: rgb(0.3, 0.3, 0.3) })
-
-    // Course info
-    page.drawText('Telah menyelesaikan pembelajaran:', { x: width / 2 - 120, y: height - 350, size: 12, font, color: rgb(0.4, 0.4, 0.4) })
-    page.drawText(course.nama || '', { x: width / 2 - 150, y: height - 385, size: 20, font: boldFont, color: rgb(0.15, 0.2, 0.5) })
-    page.drawText(`Dengan total ${course.jumlah_jp || 0} Jam Pelajaran`, { x: width / 2 - 110, y: height - 415, size: 12, font, color: rgb(0.4, 0.4, 0.4) })
-
-    // Date
-    page.drawText(`Lamongan, ${dateStr}`, { x: width / 2 - 60, y: 120, size: 11, font, color: rgb(0.4, 0.4, 0.4) })
-    page.drawText('Kepala BKPSDM Kabupaten Lamongan', { x: width / 2 - 110, y: 95, size: 11, font, color: rgb(0.3, 0.3, 0.3) })
-
-    // Footer
-    page.drawText('SURAJAYA CORPU - Kawah Candradimuka Pengembangan Kompetensi ASN', { x: width / 2 - 200, y: 50, size: 8, font, color: rgb(0.6, 0.6, 0.6) })
-
-    const pdfBytes = await pdfDoc.save()
-    return new NextResponse(Buffer.from(pdfBytes), {
-        headers: {
-            'Content-Type': 'application/pdf',
-            'Content-Disposition': `attachment; filename="sertifikat-${course.slug || course.id}.pdf"`,
-        },
-    })
 }

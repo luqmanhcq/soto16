@@ -2,7 +2,12 @@ import { pembelajaranRepository } from '@/lib/repositories/pembelajaran.reposito
 import { materiRepository } from '@/lib/repositories/materi.repository'
 import { progressRepository } from '@/lib/repositories/progress.repository'
 import { pembelajaranQuestionRepository } from '@/lib/repositories/pembelajaran-question.repository'
+import { pembelajaranParticipantsRepository } from '@/lib/repositories/pembelajaran-participants.repository'
+import { pembelajaranSertifikatRepository } from '@/lib/repositories/pembelajaran-sertifikat.repository'
 import { CreatePembelajaranDto, UpdatePembelajaranDto, CreateMateriDto, UpdateMateriDto } from '@/lib/validations/pembelajaran.validation'
+import { db } from '@/lib/db'
+import { usersTable } from '@/lib/db/schema'
+import { eq } from 'drizzle-orm'
 
 export class PembelajaranService {
     // Course logic
@@ -15,11 +20,13 @@ export class PembelajaranService {
         if (!p) throw new Error('Pembelajaran tidak ditemukan')
 
         let completionStatus = { hasPreTest: false, hasPostTest: false, hasMonev: false, allMaterialsCompleted: false }
+        let enrolled = false
         if (userId) {
             completionStatus = await this.getCompletionStatus(id, userId)
+            enrolled = await pembelajaranParticipantsRepository.isEnrolled(userId, id)
         }
 
-        return { ...p, ...completionStatus }
+        return { ...p, ...completionStatus, enrolled }
     }
 
     async getBySlug(slug: string, userId?: number) {
@@ -27,11 +34,13 @@ export class PembelajaranService {
         if (!p) throw new Error('Pembelajaran tidak ditemukan')
 
         let completionStatus = { hasPreTest: false, hasPostTest: false, hasMonev: false, allMaterialsCompleted: false }
+        let enrolled = false
         if (userId) {
             completionStatus = await this.getCompletionStatus(p.id, userId)
+            enrolled = await pembelajaranParticipantsRepository.isEnrolled(userId, p.id)
         }
 
-        return { ...p, ...completionStatus }
+        return { ...p, ...completionStatus, enrolled }
     }
 
     async create(data: CreatePembelajaranDto) {
@@ -55,6 +64,15 @@ export class PembelajaranService {
         const deleted = await pembelajaranRepository.delete(id)
         if (!deleted) throw new Error('Pembelajaran tidak ditemukan untuk dihapus')
         return deleted
+    }
+
+    // Enrollment logic
+    async enroll(userId: number, pembelajaranId: number) {
+        return await pembelajaranParticipantsRepository.enroll(userId, pembelajaranId)
+    }
+
+    async isEnrolled(userId: number, pembelajaranId: number): Promise<boolean> {
+        return await pembelajaranParticipantsRepository.isEnrolled(userId, pembelajaranId)
     }
 
     // Materials logic
@@ -82,6 +100,10 @@ export class PembelajaranService {
 
     // Progress logic
     async updateProgress(userId: number, pembelajaranId: number, currentMateriId: number, status: 'proses' | 'selesai') {
+        // Check enrollment first
+        const enrolled = await this.isEnrolled(userId, pembelajaranId)
+        if (!enrolled) throw new Error('Anda belum mendaftar di kursus ini')
+
         const materials = await materiRepository.getByPembelajaranId(pembelajaranId)
         if (!materials.length) throw new Error('Belum ada materi di pembelajaran ini')
 
@@ -99,6 +121,15 @@ export class PembelajaranService {
         return await progressRepository.findByUserIdAndPembelajaranId(userId, pembelajaranId)
     }
 
+    // Test time limits
+    getPreTestDuration(pembelajaranId: number): Promise<number> {
+        return pembelajaranRepository.findById(pembelajaranId).then(p => p?.pre_test_duration || 30)
+    }
+
+    getPostTestDuration(pembelajaranId: number): Promise<number> {
+        return pembelajaranRepository.findById(pembelajaranId).then(p => p?.post_test_duration || 60)
+    }
+
     // Completion status
     async getCompletionStatus(pembelajaranId: number, userId: number) {
         const [hasPreTest, hasPostTest, hasMonev] = await Promise.all([
@@ -107,22 +138,70 @@ export class PembelajaranService {
             pembelajaranQuestionRepository.hasCompletedTest(userId, pembelajaranId, 'monev'),
         ])
 
-        // Check if all materials are completed
         const progress = await progressRepository.findByUserIdAndPembelajaranId(userId, pembelajaranId)
         const allMaterialsCompleted = progress?.status === 'selesai'
 
-        // Cek skor post-test (harus >= 50% untuk lulus)
         const postTestScore = await pembelajaranQuestionRepository.calculateScore(userId, pembelajaranId, 'post_test')
         const hasPostTestQuestions = await pembelajaranQuestionRepository.getByPembelajaranId(pembelajaranId, 'post_test')
         const postTestLulus = hasPostTestQuestions.length === 0 || postTestScore.score >= 50
 
-        return { hasPreTest, hasPostTest, hasMonev, allMaterialsCompleted, postTestScore: postTestScore.score, postTestLulus }
+        const preTestScore = await pembelajaranQuestionRepository.calculateScore(userId, pembelajaranId, 'pre_test')
+
+        return { hasPreTest, hasPostTest, hasMonev, allMaterialsCompleted, postTestScore: postTestScore.score, postTestLulus, preTestScore: preTestScore.score }
     }
 
     // Certificate eligibility
     async isEligibleForCertificate(pembelajaranId: number, userId: number): Promise<boolean> {
         const status = await this.getCompletionStatus(pembelajaranId, userId)
         return status.hasPreTest && status.hasPostTest && status.postTestLulus && status.hasMonev && status.allMaterialsCompleted
+    }
+
+    // Certificate generation
+    async generateCertificate(userId: number, pembelajaranId: number) {
+        const eligible = await this.isEligibleForCertificate(pembelajaranId, userId)
+        if (!eligible) throw new Error('Belum memenuhi syarat untuk mendapatkan sertifikat')
+
+        const existing = await pembelajaranSertifikatRepository.getByUserAndPembelajaran(userId, pembelajaranId)
+        if (existing) return existing
+
+        const [course, user, completionStatus] = await Promise.all([
+            pembelajaranRepository.findById(pembelajaranId),
+            db.select().from(usersTable).where(eq(usersTable.id, userId)).limit(1),
+            this.getCompletionStatus(pembelajaranId, userId)
+        ])
+
+        if (!course) throw new Error('Pembelajaran tidak ditemukan')
+        if (!user.length) throw new Error('User tidak ditemukan')
+
+        const u = user[0]
+        const nomor = await this.generateNomorSertifikat(pembelajaranId)
+
+        const sertifikat = await pembelajaranSertifikatRepository.create({
+            user_id: userId,
+            pembelajaran_id: pembelajaranId,
+            nip: u.nip,
+            nama: u.nama,
+            jabatan: u.jabatan || undefined,
+            unit_kerja: u.unit_kerja || undefined,
+            nama_pembelajaran: course.nama,
+            jumlah_jp: course.jumlah_jp || undefined,
+            pre_test_score: completionStatus.preTestScore,
+            post_test_score: completionStatus.postTestScore,
+            nomor_sertifikat: nomor,
+        })
+
+        return sertifikat
+    }
+
+    async generateNomorSertifikat(pembelajaranId: number): Promise<string> {
+        const year = new Date().getFullYear()
+        const count = await pembelajaranSertifikatRepository.getByPembelajaran(pembelajaranId)
+        const sequence = count.length + 1
+        return `SERT-PBL-${year}-${String(pembelajaranId).padStart(3, '0')}-${String(sequence).padStart(4, '0')}`
+    }
+
+    async getCertificate(userId: number, pembelajaranId: number) {
+        return await pembelajaranSertifikatRepository.getByUserAndPembelajaran(userId, pembelajaranId)
     }
 }
 

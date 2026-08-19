@@ -1,5 +1,5 @@
 import { db } from '@/lib/db'
-import { webinarsTable, webinarParticipantsTable, webinarUserAnswersTable, webinarQuestionsTable } from '@/lib/db/schema'
+import { webinarsTable, webinarParticipantsTable, webinarUserAnswersTable, webinarQuestionsTable, usersTable } from '@/lib/db/schema'
 import { eq, desc, and, sql } from 'drizzle-orm'
 import { CreateWebinarDto, UpdateWebinarDto } from '@/lib/validations/webinar.validation'
 
@@ -110,12 +110,16 @@ export class WebinarRepository {
     }
 
     async getParticipants(webinarId: number) {
-        return await db.query.webinarParticipantsTable.findMany({
-            where: eq(webinarParticipantsTable.webinar_id, webinarId),
-            with: {
-                user: true,
-            } as any,
-        })
+        const rows = await db
+            .select()
+            .from(webinarParticipantsTable)
+            .leftJoin(usersTable, eq(webinarParticipantsTable.user_id, usersTable.id))
+            .where(eq(webinarParticipantsTable.webinar_id, webinarId))
+
+        return rows.map(row => ({
+            ...row.webinar_participants,
+            user: row.users,
+        }))
     }
 
     async getUserCompletionStatus(webinarId: number, userId: number) {

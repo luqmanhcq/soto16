@@ -17,7 +17,9 @@ import {
     PlayCircle,
     Loader2,
     GraduationCap,
-    ListVideo
+    ListVideo,
+    Lock,
+    AlertCircle,
 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -31,6 +33,7 @@ export default function BelajarPage({ params }: { params: Promise<{ id: string; 
     const [loading, setLoading] = useState(true)
     const [completing, setCompleting] = useState(false)
     const [sidebarOpen, setSidebarOpen] = useState(false)
+    const [enrolled, setEnrolled] = useState(false)
 
     useEffect(() => {
         async function fetchData() {
@@ -45,6 +48,7 @@ export default function BelajarPage({ params }: { params: Promise<{ id: string; 
                     const materiData = await materiRes.json()
                     setCourse(courseData.data)
                     setMateri(materiData.data)
+                    setEnrolled(courseData.data.enrolled || false)
                 }
             } catch (error) {
                 console.error('Failed to fetch learning content', error)
@@ -54,6 +58,13 @@ export default function BelajarPage({ params }: { params: Promise<{ id: string; 
         }
         fetchData()
     }, [id, materiId])
+
+    // Redirect if not enrolled
+    useEffect(() => {
+        if (!loading && user && !enrolled) {
+            router.push(`/pembelajaran/${id}`)
+        }
+    }, [loading, user, enrolled, router, id])
 
     const handleComplete = async () => {
         setCompleting(true)
@@ -78,9 +89,13 @@ export default function BelajarPage({ params }: { params: Promise<{ id: string; 
                     alert('Selamat! Anda telah menyelesaikan seluruh materi kursus ini.')
                     router.push(`/pembelajaran/${id}`)
                 }
+            } else {
+                const err = await res.json()
+                alert(err.message || 'Gagal menandai selesai')
             }
         } catch (error) {
             console.error('Failed to complete materi', error)
+            alert('Terjadi kesalahan')
         } finally {
             setCompleting(false)
         }
@@ -88,6 +103,25 @@ export default function BelajarPage({ params }: { params: Promise<{ id: string; 
 
     if (loading) return <div className="flex min-h-screen items-center justify-center bg-slate-900 text-white animate-pulse">Menyiapkan Ruang Belajar...</div>
     if (!course || !materi) return <div className="p-20 text-center font-black text-red-500">Materi tidak ditemukan</div>
+
+    if (user && !enrolled) {
+        return (
+            <div className="flex min-h-screen items-center justify-center bg-slate-50">
+                <div className="text-center p-12 max-w-md mx-auto">
+                    <Lock className="h-20 w-20 text-slate-300 mx-auto mb-6" />
+                    <h1 className="text-3xl font-black text-slate-900 mb-4">Akses Dibutuhkan</h1>
+                    <p className="text-slate-500 mb-8">Anda harus mendaftar ke kursus ini terlebih dahulu untuk mengakses materi pembelajaran.</p>
+                    <Link
+                        href={`/pembelajaran/${id}`}
+                        className="inline-flex items-center gap-2 px-8 py-4 bg-indigo-600 text-white rounded-xl font-black text-lg shadow-xl hover:bg-indigo-700 transition-all"
+                    >
+                        <ArrowLeft className="h-5 w-5" />
+                        Kembali & Daftar
+                    </Link>
+                </div>
+            </div>
+        )
+    }
 
     const tipe = materi.tipe || 'video'
 
@@ -110,13 +144,9 @@ export default function BelajarPage({ params }: { params: Promise<{ id: string; 
 
     const getVideoEmbedUrl = (url: string) => {
         if (!url) return ''
-        // YouTube watch URL
         if (url.includes('watch?v=')) return url.replace('watch?v=', 'embed/')
-        // YouTube embed already
         if (url.includes('/embed/')) return url
-        // YouTube short
         if (url.includes('youtu.be/')) return url.replace('youtu.be/', 'www.youtube.com/embed/')
-        // Playlist or other embeddable URL
         return url
     }
 

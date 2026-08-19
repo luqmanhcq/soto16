@@ -1,33 +1,40 @@
 import { db } from '@/lib/db'
-import { sertifikatUsulanTable } from '@/lib/db/schema'
+import { sertifikatUsulanTable, usersTable } from '@/lib/db/schema'
 import { eq, desc, and } from 'drizzle-orm'
 
 export type SertifikatUsulan = typeof sertifikatUsulanTable.$inferSelect
 
 export class SertifikatRepository {
     async getAll(filters?: { user_id?: number; status?: 'diajukan' | 'disetujui' | 'ditolak' }) {
-        return await db.query.sertifikatUsulanTable.findMany({
-            where: (sertifikat, { eq, and }) => {
-                const conditions = []
-                if (filters?.user_id) conditions.push(eq(sertifikat.user_id, filters.user_id))
-                if (filters?.status) conditions.push(eq(sertifikat.status, filters.status))
-                return conditions.length > 0 ? and(...conditions) : undefined
-            },
-            orderBy: [desc(sertifikatUsulanTable.created_at)],
-            with: {
-                user: true,
-            } as any,
-        })
+        const rows = await db
+            .select()
+            .from(sertifikatUsulanTable)
+            .leftJoin(usersTable, eq(sertifikatUsulanTable.user_id, usersTable.id))
+            .where(
+                and(
+                    filters?.user_id ? eq(sertifikatUsulanTable.user_id, filters.user_id) : undefined,
+                    filters?.status ? eq(sertifikatUsulanTable.status, filters.status) : undefined
+                )
+            )
+            .orderBy(desc(sertifikatUsulanTable.created_at))
+
+        return rows.map(row => ({
+            ...row.sertifikat_usulan,
+            user: row.users,
+        }))
     }
 
     async findById(id: number): Promise<SertifikatUsulan | null> {
-        const result = await db.query.sertifikatUsulanTable.findFirst({
-            where: eq(sertifikatUsulanTable.id, id),
-            with: {
-                user: true,
-            } as any,
-        })
-        return result || null
+        const rows = await db
+            .select()
+            .from(sertifikatUsulanTable)
+            .leftJoin(usersTable, eq(sertifikatUsulanTable.user_id, usersTable.id))
+            .where(eq(sertifikatUsulanTable.id, id))
+
+        const row = rows[0]
+        return row
+            ? ({ ...row.sertifikat_usulan, user: row.users } as any)
+            : null
     }
 
     async create(userId: number, data: any): Promise<SertifikatUsulan> {

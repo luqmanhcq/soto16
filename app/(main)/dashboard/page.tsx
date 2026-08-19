@@ -114,6 +114,22 @@ export default function DashboardPage() {
                                         </div>
                                     </div>
 
+                                    {/* JP Breakdown */}
+                                    <div className="grid gap-4 sm:grid-cols-3">
+                                        <div className="p-5 rounded-2xl bg-blue-50 border border-blue-100">
+                                            <p className="text-[10px] font-black text-blue-500 uppercase tracking-widest mb-1">JP Webinar</p>
+                                            <p className="text-2xl font-black text-blue-700">{stats?.webinarJp || 0} JP</p>
+                                        </div>
+                                        <div className="p-5 rounded-2xl bg-purple-50 border border-purple-100">
+                                            <p className="text-[10px] font-black text-purple-500 uppercase tracking-widest mb-1">JP Pembelajaran</p>
+                                            <p className="text-2xl font-black text-purple-700">{stats?.pembelajaranJp || 0} JP</p>
+                                        </div>
+                                        <div className="p-5 rounded-2xl bg-emerald-50 border border-emerald-100">
+                                            <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-1">Total JP Terkumpul</p>
+                                            <p className="text-2xl font-black text-emerald-700">{stats?.totalJp || 0} JP</p>
+                                        </div>
+                                    </div>
+
                                     {/* Joined Webinars List */}
                                     <div className="space-y-6">
                                         <div className="flex items-center justify-between border-b border-slate-100 pb-4">
@@ -138,9 +154,16 @@ export default function DashboardPage() {
                                                                 </p>
                                                             </div>
                                                         </div>
-                                                        <Link href={`/webinar/${webinar.id}`} className="h-10 w-10 flex items-center justify-center rounded-xl bg-white text-slate-400 border border-slate-200 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-all shadow-sm">
-                                                            <ArrowRight className="h-4 w-4" />
-                                                        </Link>
+                                                        <div className="flex items-center gap-3 shrink-0">
+                                                            {webinar.jumlah_jp && (
+                                                                <span className="px-3 py-1.5 rounded-xl bg-indigo-50 text-indigo-600 text-xs font-black border border-indigo-100">
+                                                                    {webinar.jumlah_jp} JP
+                                                                </span>
+                                                            )}
+                                                            <Link href={`/webinar/${webinar.id}`} className="h-10 w-10 flex items-center justify-center rounded-xl bg-white text-slate-400 border border-slate-200 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-all shadow-sm">
+                                                                <ArrowRight className="h-4 w-4" />
+                                                            </Link>
+                                                        </div>
                                                     </div>
                                                 ))
                                             ) : (

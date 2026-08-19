@@ -10,38 +10,54 @@ import type { CreatePembelajaranQuestionDto, UpdatePembelajaranQuestionDto } fro
 export class PembelajaranQuestionRepository {
     /**
      * Get all questions for a pembelajaran, with options, optionally filtered by type.
+     * Uses explicit joins (PostgreSQL 9.3 compatible - no json_build_array).
      */
     async getByPembelajaranId(pembelajaranId: number, type?: string) {
-        const questions = await db.query.pembelajaranQuestionsTable.findMany({
-            where: type
-                ? and(
+        const rows = await db
+            .select()
+            .from(pembelajaranQuestionsTable)
+            .leftJoin(pembelajaranOptionsTable, eq(pembelajaranQuestionsTable.id, pembelajaranOptionsTable.question_id))
+            .where(
+                and(
                     eq(pembelajaranQuestionsTable.pembelajaran_id, pembelajaranId),
-                    eq(pembelajaranQuestionsTable.type, type as any)
+                    type ? eq(pembelajaranQuestionsTable.type, type as any) : undefined
                 )
-                : eq(pembelajaranQuestionsTable.pembelajaran_id, pembelajaranId),
-            with: {
-                options: {
-                    orderBy: [asc(pembelajaranOptionsTable.order)],
-                },
-            },
-            orderBy: [asc(pembelajaranQuestionsTable.order)],
-        })
-        return questions
+            )
+            .orderBy(asc(pembelajaranQuestionsTable.order), asc(pembelajaranOptionsTable.order))
+
+        return this.groupQuestionsWithOptions(rows)
     }
 
     /**
      * Get a single question with its options.
      */
     async findById(id: number) {
-        const result = await db.query.pembelajaranQuestionsTable.findFirst({
-            where: eq(pembelajaranQuestionsTable.id, id),
-            with: {
-                options: {
-                    orderBy: [asc(pembelajaranOptionsTable.order)],
-                },
-            },
+        const rows = await db
+            .select()
+            .from(pembelajaranQuestionsTable)
+            .leftJoin(pembelajaranOptionsTable, eq(pembelajaranQuestionsTable.id, pembelajaranOptionsTable.question_id))
+            .where(eq(pembelajaranQuestionsTable.id, id))
+            .orderBy(asc(pembelajaranOptionsTable.order))
+
+        return this.groupQuestionsWithOptions(rows)[0] || null
+    }
+
+    private groupQuestionsWithOptions(rows: any[]): any[] {
+        const result: any[] = []
+        rows.forEach(row => {
+            const question = row.pembelajaran_questions
+            const option = row.pembelajaran_options
+
+            let q = result.find(r => r.id === question.id)
+            if (!q) {
+                q = { ...question, options: [] }
+                result.push(q)
+            }
+            if (option) {
+                q.options.push(option)
+            }
         })
-        return result || null
+        return result
     }
 
     /**
@@ -183,7 +199,7 @@ export class PembelajaranQuestionRepository {
         for (const q of questions) {
             const answer = answers.find(a => a.question_id === q.id)
             if (answer) {
-                const correctOption = q.options.find(o => o.is_correct)
+                const correctOption = q.options.find((o: any) => o.is_correct)
                 if (correctOption && answer.option_id === correctOption.id) {
                     correct++
                 }

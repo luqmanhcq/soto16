@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, use } from 'react'
+import { useState, useEffect, useRef, use } from 'react'
 import { useAuth } from '@/lib/contexts/auth-context'
 import {
     ArrowLeft,
@@ -10,7 +10,10 @@ import {
     ClipboardCheck,
     Award,
     AlertCircle,
-    RotateCcw
+    RotateCcw,
+    Clock,
+    Play,
+    Pause,
 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -33,8 +36,21 @@ export default function TestPage({ params }: { params: Promise<{ id: string; typ
     const [submitting, setSubmitting] = useState(false)
     const [score, setScore] = useState<{ score: number; total: number; correct: number } | null>(null)
     const [completed, setCompleted] = useState(false)
+    const [timeRemaining, setTimeRemaining] = useState<number | null>(null)
+    const [testStarted, setTestStarted] = useState(false)
+    const [timerPaused, setTimerPaused] = useState(false)
+
+    const timerRef = useRef<NodeJS.Timeout | null>(null)
+    const startTimeRef = useRef<number | null>(null)
 
     const typeLabel = TYPE_LABELS[type] || 'Test'
+    const isTimedTest = type === 'pre_test' || type === 'post_test'
+
+    // Get test duration from course (in minutes)
+    const getTestDuration = (): number => {
+        if (!course) return type === 'pre_test' ? 30 : 60
+        return type === 'pre_test' ? (course.pre_test_duration || 30) : (course.post_test_duration || 60)
+    }
 
     useEffect(() => {
         async function fetchData() {
@@ -60,7 +76,6 @@ export default function TestPage({ params }: { params: Promise<{ id: string; typ
                     const existing = aData.data || []
                     setExistingAnswers(existing)
 
-                    // If user already answered all questions, mark as completed
                     if (existing.length > 0) {
                         const answeredMap: Record<number, number> = {}
                         existing.forEach((a: any) => {
@@ -82,15 +97,77 @@ export default function TestPage({ params }: { params: Promise<{ id: string; typ
     useEffect(() => {
         if (questions.length > 0 && existingAnswers.length >= questions.length) {
             setCompleted(true)
-            // Fetch score
             fetchScore()
         }
     }, [questions, existingAnswers])
 
+    // Initialize timer when test loads and user hasn't completed
+    useEffect(() => {
+        if (isTimedTest && !completed && course && questions.length > 0) {
+            const storageKey = `test_timer_${id}_${type}_${user?.id}`
+            const savedStartTime = localStorage.getItem(storageKey)
+            const durationMinutes = getTestDuration()
+            const durationSeconds = durationMinutes * 60
+
+            if (savedStartTime) {
+                const elapsed = Math.floor((Date.now() - parseInt(savedStartTime)) / 1000)
+                const remaining = durationSeconds - elapsed
+                if (remaining > 0) {
+                    setTimeRemaining(remaining)
+                    setTestStarted(true)
+                    startTimer(remaining)
+                } else {
+                    // Time expired, auto-submit
+                    handleAutoSubmit()
+                }
+            } else if (!existingAnswers.length) {
+                // First time loading, wait for user to start
+                setTimeRemaining(durationSeconds)
+            }
+        }
+    }, [course, questions, completed, existingAnswers.length])
+
+    // Cleanup timer on unmount
+    useEffect(() => {
+        return () => {
+            if (timerRef.current) clearInterval(timerRef.current)
+        }
+    }, [])
+
+    function startTimer(initialSeconds: number) {
+        if (timerRef.current) clearInterval(timerRef.current)
+        startTimeRef.current = Date.now() - (getTestDuration() * 60 - initialSeconds) * 1000
+
+        timerRef.current = setInterval(() => {
+            if (timerPaused) return
+            setTimeRemaining(prev => {
+                if (prev === null || prev <= 1) {
+                    if (timerRef.current) clearInterval(timerRef.current)
+                    handleAutoSubmit()
+                    return 0
+                }
+                return prev - 1
+            })
+        }, 1000)
+    }
+
+    function handleStartTest() {
+        const storageKey = `test_timer_${id}_${type}_${user?.id}`
+        localStorage.setItem(storageKey, Date.now().toString())
+        setTestStarted(true)
+        startTimer(getTestDuration() * 60)
+    }
+
+    async function handleAutoSubmit() {
+        if (completed || submitting) return
+        if (Object.keys(answers).length < questions.length) {
+            // Still submit whatever is answered
+        }
+        await handleSubmit(true)
+    }
+
     async function fetchScore() {
         try {
-            // Submit a dummy request to get score, or calculate from existing
-            // We'll calculate score by checking each answer
             let correct = 0
             for (const q of questions) {
                 const userAnswer = existingAnswers.find((a: any) => a.question_id === q.id)
@@ -116,15 +193,14 @@ export default function TestPage({ params }: { params: Promise<{ id: string; typ
         setAnswers(prev => ({ ...prev, [questionId]: optionId }))
     }
 
-    async function handleSubmit() {
-        if (Object.keys(answers).length < questions.length) {
-            alert('Jawab semua pertanyaan terlebih dahulu')
-            return
+    async function handleSubmit(autoOrEvent?: boolean | React.MouseEvent<HTMLButtonElement>) {
+        const auto = typeof autoOrEvent === 'boolean' ? autoOrEvent : false
+        if (!auto && Object.keys(answers).length < questions.length) {
+            if (!confirm('Beberapa pertanyaan belum dijawab. Yakin ingin mengirim?')) return
         }
 
         setSubmitting(true)
         try {
-            // Submit each answer
             for (const q of questions) {
                 const optionId = answers[q.id]
                 if (optionId) {
@@ -140,12 +216,15 @@ export default function TestPage({ params }: { params: Promise<{ id: string; typ
                 }
             }
 
+            const storageKey = `test_timer_${id}_${type}_${user?.id}`
+            localStorage.removeItem(storageKey)
+
             setCompleted(true)
             await fetchScore()
-            alert('Jawaban berhasil disimpan!')
+            if (!auto) alert('Jawaban berhasil disimpan!')
         } catch (error) {
             console.error('Failed to submit answers', error)
-            alert('Gagal menyimpan jawaban')
+            if (!auto) alert('Gagal menyimpan jawaban')
         } finally {
             setSubmitting(false)
         }
@@ -153,15 +232,28 @@ export default function TestPage({ params }: { params: Promise<{ id: string; typ
 
     const handleRetake = () => {
         if (!confirm('Yakin ingin mengulangi Post-Test? Jawaban sebelumnya akan diganti dengan jawaban baru.')) return
+        const storageKey = `test_timer_${id}_${type}_${user?.id}`
+        localStorage.removeItem(storageKey)
         setCompleted(false)
         setScore(null)
         setAnswers({})
         setExistingAnswers([])
+        setTestStarted(false)
+        setTimeRemaining(null)
+        if (timerRef.current) clearInterval(timerRef.current)
         window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+
+    const formatTime = (seconds: number) => {
+        const m = Math.floor(seconds / 60)
+        const s = seconds % 60
+        return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
     }
 
     if (loading) return <div className="p-20 text-center font-black text-indigo-600 animate-pulse">Menyiapkan soal...</div>
     if (!course) return <div className="p-20 text-center font-black text-red-500">Kursus tidak ditemukan</div>
+
+    const durationMinutes = getTestDuration()
 
     return (
         <div className="p-6 lg:p-12 max-w-4xl mx-auto space-y-10">
@@ -175,15 +267,61 @@ export default function TestPage({ params }: { params: Promise<{ id: string; typ
 
             {/* Header */}
             <div className="bg-white p-8 lg:p-10 rounded-[2.5rem] shadow-xl shadow-indigo-100/50 border border-slate-100">
-                <div className="flex items-center gap-4 mb-4">
-                    <div className="p-4 rounded-2xl bg-indigo-50 text-indigo-600">
-                        <ClipboardCheck className="h-8 w-8" />
+                <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-4">
+                        <div className="p-4 rounded-2xl bg-indigo-50 text-indigo-600">
+                            <ClipboardCheck className="h-8 w-8" />
+                        </div>
+                        <div>
+                            <h1 className="text-3xl font-black text-slate-900 tracking-tight">{typeLabel}</h1>
+                            <p className="text-slate-400 font-semibold text-sm mt-1">{course.nama}</p>
+                        </div>
                     </div>
-                    <div>
-                        <h1 className="text-3xl font-black text-slate-900 tracking-tight">{typeLabel}</h1>
-                        <p className="text-slate-400 font-semibold text-sm mt-1">{course.nama}</p>
-                    </div>
+
+                    {isTimedTest && !completed && (
+                        <div className={`flex items-center gap-3 px-4 py-2 rounded-xl font-bold text-lg ${
+                            timeRemaining !== null && timeRemaining <= 60 ? 'bg-red-50 text-red-700 border border-red-200 animate-pulse' : 'bg-indigo-50 text-indigo-700 border border-indigo-200'
+                        }`}>
+                            <Clock className="h-5 w-5" />
+                            <span className="font-mono tabular-nums">{timeRemaining !== null ? formatTime(timeRemaining) : `${durationMinutes}:00`}</span>
+                            {testStarted && !timerPaused && (
+                                <button
+                                    onClick={() => setTimerPaused(true)}
+                                    className="text-sm text-indigo-600 hover:underline"
+                                >
+                                    Jeda
+                                </button>
+                            )}
+                            {testStarted && timerPaused && (
+                                <button
+                                    onClick={() => setTimerPaused(false)}
+                                    className="text-sm text-indigo-600 hover:underline"
+                                >
+                                    Lanjutkan
+                                </button>
+                            )}
+                        </div>
+                    )}
                 </div>
+
+                {isTimedTest && !testStarted && !completed && questions.length > 0 && (
+                    <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+                        <div className="flex items-center gap-3">
+                            <AlertCircle className="h-6 w-6 text-amber-600" />
+                            <div>
+                                <p className="font-bold text-amber-800">Waktu Pengerjaan: {durationMinutes} menit</p>
+                                <p className="text-sm text-amber-700">Timer akan mulai berjalan saat Anda menekan tombol "Mulai Test". Pastikan Anda siap sebelum memulai.</p>
+                            </div>
+                        </div>
+                        <button
+                            onClick={handleStartTest}
+                            className="mt-4 w-full bg-amber-500 text-white py-3 rounded-xl font-black text-lg shadow-lg hover:bg-amber-600 transition-all"
+                        >
+                            <Play className="h-5 w-5 inline mr-2" />
+                            MULAI TEST
+                        </button>
+                    </div>
+                )}
 
                 {completed && score && (
                     <div className={`p-6 rounded-2xl mt-6 ${score.score >= 50 ? 'bg-emerald-50 border border-emerald-200' : 'bg-amber-50 border border-amber-200'}`}>
@@ -237,14 +375,14 @@ export default function TestPage({ params }: { params: Promise<{ id: string; typ
                                                     : isSelected
                                                         ? 'border-indigo-400 bg-indigo-50'
                                                         : 'border-slate-100 bg-slate-50 hover:border-indigo-200 hover:bg-indigo-50/50'
-                                            } ${completed ? 'cursor-default' : ''}`}
+                                            } ${completed || !testStarted ? 'cursor-default' : ''}`}
                                         >
                                             <input
                                                 type="radio"
                                                 name={`question-${q.id}`}
                                                 checked={isSelected}
                                                 onChange={() => handleAnswerChange(q.id, o.id)}
-                                                disabled={completed}
+                                                disabled={completed || !testStarted}
                                                 className="h-5 w-5 text-indigo-600"
                                             />
                                             <span className={`font-medium flex-1 ${showResult && isCorrect ? 'text-emerald-700 font-bold' : 'text-slate-700'}`}>
@@ -264,14 +402,14 @@ export default function TestPage({ params }: { params: Promise<{ id: string; typ
             )}
 
             {/* Submit Button */}
-            {questions.length > 0 && !completed && (
+            {questions.length > 0 && !completed && testStarted && (
                 <div className="sticky bottom-6 bg-white p-4 rounded-2xl shadow-xl border border-slate-100 flex items-center justify-between">
                     <p className="text-sm font-bold text-slate-500">
                         Dijawab: <span className="text-indigo-600 font-black">{Object.keys(answers).length}</span> / {questions.length}
                     </p>
                     <button
                         onClick={handleSubmit}
-                        disabled={submitting || Object.keys(answers).length < questions.length}
+                        disabled={submitting}
                         className="flex items-center gap-3 px-8 py-4 bg-indigo-600 text-white rounded-xl font-black text-sm shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {submitting ? <Loader2 className="h-5 w-5 animate-spin" /> : <CheckCircle2 className="h-5 w-5" />}

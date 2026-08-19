@@ -1,5 +1,5 @@
 import { db } from '@/lib/db'
-import { pembelajaranProgressTable, materiTable } from '@/lib/db/schema'
+import { pembelajaranProgressTable, materiTable, pembelajaranTable } from '@/lib/db/schema'
 import { eq, and, sql } from 'drizzle-orm'
 
 export class ProgressRepository {
@@ -14,12 +14,16 @@ export class ProgressRepository {
     }
 
     async findByUserId(userId: number) {
-        return await db.query.pembelajaranProgressTable.findMany({
-            where: eq(pembelajaranProgressTable.user_id, userId),
-            with: {
-                pembelajaran: true
-            }
-        })
+        const rows = await db
+            .select()
+            .from(pembelajaranProgressTable)
+            .leftJoin(pembelajaranTable, eq(pembelajaranProgressTable.pembelajaran_id, pembelajaranTable.id))
+            .where(eq(pembelajaranProgressTable.user_id, userId))
+
+        return rows.map(row => ({
+            ...row.pembelajaran_progress,
+            pembelajaran: row.pembelajaran,
+        }))
     }
 
     async upsert(userId: number, pembelajaranId: number, currentMateriId: number | null, progressPercent: number, status: 'belum_mulai' | 'proses' | 'selesai') {
