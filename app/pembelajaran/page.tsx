@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import Navbar from '@/components/Navbar'
 import { BookOpen, Search, Layers, ArrowRight, Loader2, Filter, Zap, Layout } from 'lucide-react'
 
@@ -72,12 +73,15 @@ export default function PublicPembelajaranPage() {
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
                             {filtered.map((item) => (
                                 <div key={item.id} className="group flex flex-col bg-white rounded-[3rem] border border-slate-100 shadow-xl shadow-slate-50 hover:shadow-2xl hover:shadow-emerald-100 hover:-translate-y-3 transition-all duration-500 overflow-hidden">
-                                    <div className="relative aspect-video overflow-hidden">
-                                        <img
-                                            src={item.gambar || 'https://images.unsplash.com/photo-1497215728101-856f4ea42174?q=80&w=2070'}
-                                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
-                                            alt={item.nama}
-                                        />
+<div className="relative aspect-video overflow-hidden">
+                                         <Image
+                                             src={item.gambar || 'https://images.unsplash.com/photo-1497215728101-856f4ea42174?q=80&w=2070'}
+                                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
+                                             alt={item.nama}
+                                             width={800}
+                                             height={450}
+                                             loading="lazy"
+                                         />
                                         <div className="absolute top-6 left-6 px-4 py-2 bg-slate-900/90 backdrop-blur rounded-2xl shadow-xl border border-white/10">
                                             <span className="text-[10px] font-black text-white uppercase tracking-widest leading-none">{item.kategori || 'INTI'}</span>
                                         </div>

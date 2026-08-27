@@ -3,8 +3,16 @@ import { loginSchema } from '@/lib/validation'
 import { authService } from '@/lib/services/auth.service'
 import { successResponse, errorResponse, validationErrorResponse, internalErrorResponse } from '@/lib/response'
 import { ZodError } from 'zod'
+import { rateLimit, getClientIP } from '@/lib/rateLimiter'
 
 export async function POST(request: NextRequest) {
+  // Rate limiting by IP
+  const ip = getClientIP(request);
+  const rateLimitResponse = rateLimit(`login_${ip}`, 60 * 1000, 5); // 5 permintaan per menit
+  if (rateLimitResponse) {
+    return rateLimitResponse;
+  }
+
   try {
     const body = await request.json()
 
@@ -26,7 +34,7 @@ export async function POST(request: NextRequest) {
     response.cookies.set('token', result.token, {
       httpOnly: true,
       secure: isSecure, 
-      sameSite: isSecure ? 'none' : 'lax', // 'none' hanya boleh jika secure: true (HTTPS)
+      sameSite: 'lax', // Menggunakan SameSite=Lax untuk keamanan yang lebih baik
       path: '/',
       maxAge: 60 * 60 * 24 * 7, // 7 hari
     })
@@ -42,9 +50,11 @@ export async function POST(request: NextRequest) {
     }
 
     if (error instanceof Error) {
-      return errorResponse(error.message, 400)
+      // Generic error message to prevent enumeration
+      return errorResponse('NIP atau password salah', 400)
     }
 
     return internalErrorResponse()
   }
 }
+

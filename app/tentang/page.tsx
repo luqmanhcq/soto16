@@ -2,6 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import Navbar from '@/components/Navbar'
 import { ShieldCheck, Target, Users, Zap, Award, Globe, ArrowLeft, ArrowRight, Video, GraduationCap, FileCheck } from 'lucide-react'
 
@@ -27,9 +28,9 @@ export default function AboutPage() {
                         </p>
                     </div>
                     <div className="relative">
-                        <div className="aspect-square bg-slate-100 rounded-[4rem] overflow-hidden rotate-2 shadow-2xl shadow-indigo-100 border-8 border-white group">
-                            <img src="/surajaya_corpu.webp" className="w-full h-full object-contain p-12 group-hover:scale-105 transition-all duration-1000" alt="Logo Surajaya Corpu" />
-                        </div>
+<div className="aspect-square bg-slate-100 rounded-[4rem] overflow-hidden rotate-2 shadow-2xl shadow-indigo-100 border-8 border-white group">
+                             <Image src="/surajaya_corpu.webp" className="w-full h-full object-contain p-12 group-hover:scale-105 transition-all duration-1000" alt="Logo Surajaya Corpu" width={600} height={600} priority={true} />
+                         </div>
                         <div className="absolute -bottom-10 -left-10 bg-white p-8 rounded-3xl shadow-2xl border border-slate-100 space-y-2 animate-bounce-slow">
                             <p className="text-4xl font-black text-indigo-600 italic leading-none">Corpu</p>
                             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Initiative Spirit</p>
@@ -76,9 +77,9 @@ export default function AboutPage() {
                 <section className="py-40 px-6 lg:px-24 max-w-7xl mx-auto space-y-32">
                     <div className="grid lg:grid-cols-2 gap-24 items-center">
                         <div className="relative">
-                            <div className="aspect-[4/5] bg-indigo-600 rounded-[4rem] overflow-hidden shadow-3xl shadow-indigo-100 group">
-                                <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=2070" className="w-full h-full object-cover mix-blend-overlay opacity-60 group-hover:scale-110 transition-transform duration-1000" alt="ASN Bangkit" />
-                                <div className="absolute inset-0 flex flex-col justify-end p-12 space-y-4">
+<div className="aspect-[4/5] bg-indigo-600 rounded-[4rem] overflow-hidden shadow-3xl shadow-indigo-100 group">
+                                 <Image src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=2070" className="w-full h-full object-cover mix-blend-overlay opacity-60 group-hover:scale-110 transition-transform duration-1000" alt="ASN Bangkit" width={800} height={1000} loading="lazy" />
+                                 <div className="absolute inset-0 flex flex-col justify-end p-12 space-y-4">
                                     <h3 className="text-6xl font-black text-white italic tracking-tighter leading-none uppercase">ASN <br />BANGKIT!</h3>
                                     <p className="text-indigo-100 font-bold italic border-l-2 border-white/30 pl-4">"Belajar tanpa batas, berkarya dengan tuntas, untuk Lamongan Megilan!"</p>
                                 </div>

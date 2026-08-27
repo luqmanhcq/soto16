@@ -2,6 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useAuth } from '@/lib/contexts/auth-context'
 import ProtectedRoute from '@/components/ProtectedRoute'
@@ -66,7 +67,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm" onClick={() => setIsSidebarOpen(false)} />
                 <nav className="fixed inset-y-0 left-0 w-64 bg-white p-6 shadow-2xl flex flex-col">
                     <div className="flex items-center justify-between mb-10">
-                        <img src="/surajaya_corpu.webp" alt="Logo" className="h-10 w-auto" />
+                        <Image src="/surajaya_corpu.webp" alt="Logo" className="h-10 w-auto" width={40} height={40} priority={true} />
                         <button onClick={() => setIsSidebarOpen(false)}><X className="h-6 w-6 text-slate-400" /></button>
                     </div>
                     <div className="flex-1 space-y-2">
@@ -129,7 +130,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             {/* Desktop Sidebar */}
             <nav className="hidden lg:flex w-72 flex-col bg-white border-r border-slate-200 p-8">
                 <div className="mb-12">
-                    <img src="/surajaya_corpu.webp" alt="Logo" className="h-14 w-auto" />
+                    <Image src="/surajaya_corpu.webp" alt="Logo" className="h-14 w-auto" width={56} height={56} priority={true} />
                     <p className="text-[10px] text-slate-400 font-black tracking-[0.3em] mt-3 uppercase leading-none italic">Talent Hub Platform</p>
                 </div>
 
@@ -211,7 +212,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <div className="flex-1 flex flex-col overflow-hidden">
                 <header className="lg:hidden h-16 bg-white border-b border-slate-200 flex items-center px-6 gap-4">
                     <button onClick={() => setIsSidebarOpen(true)}><Menu className="h-6 w-6 text-slate-600" /></button>
-                    <img src="/surajaya_corpu.webp" alt="Logo" className="h-8 w-auto" />
+                    <Image src="/surajaya_corpu.webp" alt="Logo" className="h-8 w-auto" width={32} height={32} priority={true} />
                 </header>
                 <main className="flex-1 overflow-y-auto focus:outline-none">
                     {children}

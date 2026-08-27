@@ -178,6 +178,18 @@ export class PembelajaranQuestionRepository {
     }
 
     /**
+     * Get all user answers for a pembelajaran and type (all users, bulk).
+     */
+    async getAnswersByPembelajaran(pembelajaranId: number, type: string) {
+        return await db.query.pembelajaranUserAnswersTable.findMany({
+            where: and(
+                eq(pembelajaranUserAnswersTable.pembelajaran_id, pembelajaranId),
+                eq(pembelajaranUserAnswersTable.type, type as any)
+            ),
+        })
+    }
+
+    /**
      * Check if user has completed a specific test type (answered all questions).
      */
     async hasCompletedTest(userId: number, pembelajaranId: number, type: string): Promise<boolean> {

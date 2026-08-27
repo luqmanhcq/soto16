@@ -207,6 +207,79 @@ export const sertifikatUsulanTable = pgTable(
   })
 )
 
+export const manajemenPengetahuanTable = pgTable(
+  'manajemen_pengetahuan',
+  {
+    id: serial('id').primaryKey(),
+    nama: varchar('nama', { length: 255 }).notNull(),
+    slug: varchar('slug', { length: 255 }).notNull().unique(),
+    kategori: varchar('kategori', { length: 100 }),
+    deskripsi: text('deskripsi'),
+    jumlah_jp: integer('jumlah_jp'),
+    gambar: text('gambar'),
+    created_at: timestamp('created_at').defaultNow().notNull(),
+    updated_at: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    slugIdx: uniqueIndex('manajemen_pengetahuan_slug_idx').on(table.slug),
+  })
+)
+
+export const mpMateriTable = pgTable(
+  'mp_materi',
+  {
+    id: serial('id').primaryKey(),
+    manajemen_pengetahuan_id: integer('manajemen_pengetahuan_id').notNull(),
+    nama: varchar('nama', { length: 255 }).notNull(),
+    urutan: integer('urutan').notNull(),
+    tipe: varchar('tipe', { length: 20 }).default('video'),
+    link_file: text('link_file'),
+    link_video: text('link_video'),
+    created_at: timestamp('created_at').defaultNow().notNull(),
+    updated_at: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    mpFk: foreignKey({ columns: [table.manajemen_pengetahuan_id], foreignColumns: [manajemenPengetahuanTable.id] }).onDelete('cascade'),
+    mpIdIdx: index('mp_materi_manajemen_pengetahuan_id_idx').on(table.manajemen_pengetahuan_id),
+  })
+)
+
+export const mpProgressTable = pgTable(
+  'mp_progress',
+  {
+    id: serial('id').primaryKey(),
+    user_id: integer('user_id').notNull(),
+    manajemen_pengetahuan_id: integer('manajemen_pengetahuan_id').notNull(),
+    status: pembelajaranStatusEnum('status').default('belum_mulai').notNull(),
+    progress: integer('progress').default(0).notNull(),
+    current_materi_id: integer('current_materi_id'),
+    tanggal_selesai: timestamp('tanggal_selesai'),
+    created_at: timestamp('created_at').defaultNow().notNull(),
+    updated_at: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    userFk: foreignKey({ columns: [table.user_id], foreignColumns: [usersTable.id] }).onDelete('cascade'),
+    mpFk: foreignKey({ columns: [table.manajemen_pengetahuan_id], foreignColumns: [manajemenPengetahuanTable.id] }).onDelete('cascade'),
+    userMpIdx: uniqueIndex('mp_progress_user_manajemen_pengetahuan_idx').on(table.user_id, table.manajemen_pengetahuan_id),
+  })
+)
+
+export const mpParticipantsTable = pgTable(
+  'mp_participants',
+  {
+    id: serial('id').primaryKey(),
+    user_id: integer('user_id').notNull(),
+    manajemen_pengetahuan_id: integer('manajemen_pengetahuan_id').notNull(),
+    enrolled_at: timestamp('enrolled_at').defaultNow().notNull(),
+    status: varchar('status', { length: 20 }).default('aktif').notNull(),
+  },
+  (table) => ({
+    userFk: foreignKey({ columns: [table.user_id], foreignColumns: [usersTable.id] }).onDelete('cascade'),
+    mpFk: foreignKey({ columns: [table.manajemen_pengetahuan_id], foreignColumns: [manajemenPengetahuanTable.id] }).onDelete('cascade'),
+    userMpIdx: uniqueIndex('mp_participants_user_manajemen_pengetahuan_idx').on(table.user_id, table.manajemen_pengetahuan_id),
+  })
+)
+
 export const pengumumanTable = pgTable(
   'pengumuman',
   {
@@ -313,6 +386,7 @@ export const webinarAttendancesTable = pgTable(
 export const usersRelations = relations(usersTable, ({ many }) => ({
   webinar_participants: many(webinarParticipantsTable),
   pembelajaran_progress: many(pembelajaranProgressTable),
+  mp_progress: many(mpProgressTable),
   sertifikat_usulan: many(sertifikatUsulanTable),
 }))
 
@@ -371,6 +445,25 @@ export const pembelajaranParticipantsRelations = relations(pembelajaranParticipa
 export const pembelajaranSertifikatRelations = relations(pembelajaranSertifikatTable, ({ one }) => ({
   user: one(usersTable, { fields: [pembelajaranSertifikatTable.user_id], references: [usersTable.id] }),
   pembelajaran: one(pembelajaranTable, { fields: [pembelajaranSertifikatTable.pembelajaran_id], references: [pembelajaranTable.id] }),
+}))
+
+export const mpMateriRelations = relations(mpMateriTable, ({ one }) => ({
+  manajemenPengetahuan: one(manajemenPengetahuanTable, { fields: [mpMateriTable.manajemen_pengetahuan_id], references: [manajemenPengetahuanTable.id] }),
+}))
+
+export const manajemenPengetahuanRelations = relations(manajemenPengetahuanTable, ({ many }) => ({
+  materials: many(mpMateriTable),
+  progress: many(mpProgressTable),
+}))
+
+export const mpProgressRelations = relations(mpProgressTable, ({ one }) => ({
+  user: one(usersTable, { fields: [mpProgressTable.user_id], references: [usersTable.id] }),
+  manajemenPengetahuan: one(manajemenPengetahuanTable, { fields: [mpProgressTable.manajemen_pengetahuan_id], references: [manajemenPengetahuanTable.id] }),
+}))
+
+export const mpParticipantsRelations = relations(mpParticipantsTable, ({ one }) => ({
+  user: one(usersTable, { fields: [mpParticipantsTable.user_id], references: [usersTable.id] }),
+  manajemenPengetahuan: one(manajemenPengetahuanTable, { fields: [mpParticipantsTable.manajemen_pengetahuan_id], references: [manajemenPengetahuanTable.id] }),
 }))
 
 export const sertifikatUsulanRelations = relations(sertifikatUsulanTable, ({ one }) => ({

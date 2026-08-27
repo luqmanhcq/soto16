@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/lib/contexts/auth-context'
 import Navbar from '@/components/Navbar'
+import Image from 'next/image'
 import {
   ArrowRight,
   Search,
@@ -96,8 +97,8 @@ export default function LandingPage() {
             key={slide.id}
             className={`absolute inset-0 transition-all duration-1000 ease-in-out transform ${index === currentSlide ? 'opacity-100 scale-100' : 'opacity-0 scale-110 pointer-events-none'}`}
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-900/60 to-transparent z-10" />
-            <img src={slide.image} className="w-full h-full object-cover" alt={slide.title} />
+<div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-900/60 to-transparent z-10" />
+             <Image src={slide.image} className="w-full h-full object-cover" alt={slide.title} fill sizes="100vw" style={{objectFit: 'cover'}} />
             <div className="absolute inset-0 z-20 flex flex-col justify-center px-4 md:px-6 lg:px-24">
               <div className="max-w-3xl space-y-4 md:space-y-8">
                 <div className="inline-flex items-center gap-2 px-2 md:px-3 py-1 bg-amber-500 text-white text-[8px] md:text-[10px] font-black uppercase tracking-widest rounded-lg">
@@ -199,9 +200,9 @@ export default function LandingPage() {
               ) : featuredWebinars.length > 0 ? (
                 featuredWebinars.map((webinar) => (
                   <div key={webinar.id} className="group relative bg-white rounded-2xl md:rounded-[3rem] overflow-hidden border border-slate-100 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-3">
-                    <div className="aspect-video overflow-hidden">
-                      <img src={webinar.gambar || `https://images.unsplash.com/photo-1591115765373-520b7a21769b?auto=format&fit=crop&q=80&w=800`} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt={webinar.nama_webinar} />
-                    </div>
+<div className="aspect-video overflow-hidden">
+                       <Image src={webinar.gambar || `https://images.unsplash.com/photo-1591115765373-520b7a21769b?auto=format&fit=crop&q=80&w=800`} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt={webinar.nama_webinar} width={800} height={450} loading="lazy" />
+                     </div>
                     <div className="p-4 md:p-10 space-y-3 md:space-y-6">
                       <div className="flex items-center justify-between text-[10px] md:text-[11px] font-black text-slate-400 tracking-widest uppercase">
                         <span className="flex items-center gap-1.5"><Calendar className="h-3 w-3 text-indigo-600" /> {new Date(webinar.tanggal_mulai).toLocaleDateString('id-ID')}</span>
@@ -244,9 +245,9 @@ export default function LandingPage() {
               ) : featuredCourses.length > 0 ? (
                 featuredCourses.map((course) => (
                   <div key={course.id} className="group relative bg-white p-3 md:p-5 rounded-2xl md:rounded-[4rem] border border-slate-100 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-3">
-                    <div className="aspect-[4/3] rounded-xl md:rounded-[3rem] overflow-hidden mb-4 md:mb-8">
-                      <img src={course.gambar || `https://images.unsplash.com/photo-1434031211128-a391111cbb1b?auto=format&fit=crop&q=80&w=800`} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" alt={course.nama} />
-                    </div>
+<div className="aspect-[4/3] rounded-xl md:rounded-[3rem] overflow-hidden mb-4 md:mb-8">
+                       <Image src={course.gambar || `https://images.unsplash.com/photo-1434031211128-a391111cbb1b?auto=format&fit=crop&q=80&w=800`} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" alt={course.nama} width={800} height={600} loading="lazy" />
+                     </div>
                     <div className="px-2 md:px-5 pb-2 md:pb-5 space-y-3 md:space-y-6">
                       <div className="flex items-center gap-3">
                         <span className="text-[10px] bg-slate-900 text-white font-black px-3 py-1 rounded-full uppercase tracking-widest italic">{course.kategori || 'INTI'}</span>
@@ -278,10 +279,10 @@ export default function LandingPage() {
       <footer className="bg-slate-900 text-white py-16 md:py-32 px-4 md:px-6 lg:px-12">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-20">
           <div className="md:col-span-2 space-y-6 md:space-y-8">
-            <div className="flex items-center gap-3">
-              <img src="/surajaya_corpu.webp" alt="Logo" className="h-10 md:h-12 w-auto" />
-              <span className="text-xl md:text-2xl font-black tracking-tighter italic">SURAJAYA CORPU</span>
-            </div>
+<div className="flex items-center gap-3">
+               <Image src="/surajaya_corpu.webp" alt="Logo" className="h-10 md:h-12 w-auto" width={48} height={48} priority={true} />
+               <span className="text-xl md:text-2xl font-black tracking-tighter italic">SURAJAYA CORPU</span>
+             </div>
             <p className="text-slate-400 font-bold max-w-sm leading-relaxed uppercase text-[10px] tracking-widest italic">Kawah Candradimuka Pengembangan Kompetensi ASN <br />Kabupaten Lamongan.</p>
             <div className="flex gap-4">
               {[1, 2, 3, 4].map(i => <div key={i} className="h-10 w-10 rounded-xl bg-white/5 border border-white/10 hover:bg-white hover:text-slate-900 transition-all cursor-pointer flex items-center justify-center text-xs font-black">X{i}</div>)}

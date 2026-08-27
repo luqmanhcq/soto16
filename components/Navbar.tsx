@@ -2,6 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { ShieldCheck, ArrowRight, LayoutDashboard, Menu, X, LogOut } from 'lucide-react'
 import { useAuth } from '@/lib/contexts/auth-context'
@@ -24,13 +25,16 @@ export default function Navbar() {
     return (
         <nav className="fixed top-0 inset-x-0 z-50 bg-white/70 backdrop-blur-3xl border-b border-slate-100 px-6 lg:px-12 py-4">
             <div className="max-w-7xl mx-auto flex items-center justify-between">
-                <Link href="/" className="flex items-center gap-3 group transition-transform hover:scale-105">
-                    <img 
-                        src="/surajaya_corpu.webp"
-                        alt="Surajaya Corpu Logo" 
-                        className="h-16 w-auto object-contain"
-                    />
-                </Link>
+<Link href="/" className="flex items-center gap-3 group transition-transform hover:scale-105">
+<Image 
+     src="/surajaya_corpu.webp"
+     alt="Surajaya Corpu Logo" 
+     className="h-16 w-auto object-contain"
+     width={64}
+     height={64}
+     priority={true}
+ />
+                 </Link>
 
                 {/* Desktop Nav */}
                 <div className="hidden md:flex items-center gap-10">

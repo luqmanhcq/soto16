@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Save, Loader2, Link as LinkIcon, Image as ImageIcon, Calendar, Type, Upload, X, FileText } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
 import FullPageLoader from '@/components/FullPageLoader'
 
@@ -283,10 +284,13 @@ export default function WebinarForm({ id, initialData }: WebinarFormProps) {
                         <div className="relative group/banner border-2 border-dashed border-slate-200 rounded-3xl p-4 bg-slate-50 hover:bg-slate-100 hover:border-slate-300 transition-all text-center">
                             {formData.gambar ? (
                                 <div className="relative">
-                                    <img
+                                    <Image
                                         src={formData.gambar}
                                         alt="Banner Preview"
                                         className="w-full h-56 object-cover rounded-2xl shadow-md border-4 border-white"
+                                        width={800}
+                                        height={448}
+                                        unoptimized
                                     />
                                     <button
                                         type="button"

@@ -95,6 +95,12 @@ export class WebinarService {
             throw new Error('Webinar tidak tersedia untuk dikuti')
         }
 
+        // Tutup pendaftaran ketika tanggal selesai sudah lewat
+        if (webinar.tanggal_selesai && new Date(webinar.tanggal_selesai) < new Date()) {
+            console.log(`[Service] Registration closed for webinar ${webinarId}: end date passed`)
+            throw new Error('Pendaftaran webinar telah ditutup')
+        }
+
         const alreadyJoined = await webinarRepository.isJoined(webinarId, userId)
         console.log(`[Service] Already joined: ${alreadyJoined}`)
         if (alreadyJoined) {

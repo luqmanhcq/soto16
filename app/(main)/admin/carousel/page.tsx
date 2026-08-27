@@ -19,6 +19,7 @@ import {
 } from 'lucide-react'
 import { useAuth } from '@/lib/contexts/auth-context'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 
 export default function AdminCarouselPage() {
     const [carousels, setCarousels] = useState<any[]>([])
@@ -222,7 +223,7 @@ export default function AdminCarouselPage() {
                                     <tr key={carousel.id} className="hover:bg-slate-50/50 transition-colors group">
                                         <td className="px-8 py-6">
                                             <div className="h-16 w-28 rounded-xl overflow-hidden border border-slate-100 shadow-sm bg-slate-50">
-                                                <img src={carousel.image} className="w-full h-full object-cover" alt="" />
+                                                <Image src={carousel.image} className="w-full h-full object-cover" alt="" width={400} height={225} loading="lazy" />
                                             </div>
                                         </td>
                                         <td className="px-8 py-6">
@@ -350,7 +351,7 @@ export default function AdminCarouselPage() {
                                     </div>
                                     {formData.image && (
                                         <div className="mt-4 h-32 w-full rounded-2xl overflow-hidden border border-slate-100 relative group">
-                                            <img src={formData.image} className="w-full h-full object-cover" alt="Preview" />
+                                            <Image src={formData.image} className="w-full h-full object-cover" alt="Preview" width={400} height={225} loading="lazy" />
                                             <button 
                                                 type="button"
                                                 onClick={() => setFormData({...formData, image: ''})}

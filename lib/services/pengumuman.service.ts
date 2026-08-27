@@ -11,6 +11,12 @@ export class PengumumanService {
         return p
     }
 
+    async getBySlug(slug: string) {
+        const p = await pengumumanRepository.findBySlug(slug)
+        if (!p) throw new Error('Pengumuman tidak ditemukan')
+        return p
+    }
+
     async create(data: { judul: string; slug: string; kategori: string; deskripsi?: string; gambar?: string; link_file?: string }) {
         const existing = await pengumumanRepository.findBySlug(data.slug)
         if (existing) throw new Error('Slug pengumuman sudah digunakan')

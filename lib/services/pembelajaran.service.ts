@@ -203,6 +203,107 @@ export class PembelajaranService {
     async getCertificate(userId: number, pembelajaranId: number) {
         return await pembelajaranSertifikatRepository.getByUserAndPembelajaran(userId, pembelajaranId)
     }
+
+    // Recap / Rekap peserta
+    async getRecap(pembelajaranId: number) {
+        const course = await pembelajaranRepository.findById(pembelajaranId)
+        if (!course) throw new Error('Pembelajaran tidak ditemukan')
+
+        const [participants, progressRows, preQuestions, postQuestions, monevQuestions, preAnswers, postAnswers, monevAnswers] = await Promise.all([
+            pembelajaranParticipantsRepository.getRecapByPembelajaran(pembelajaranId),
+            progressRepository.findByPembelajaranId(pembelajaranId),
+            pembelajaranQuestionRepository.getByPembelajaranId(pembelajaranId, 'pre_test'),
+            pembelajaranQuestionRepository.getByPembelajaranId(pembelajaranId, 'post_test'),
+            pembelajaranQuestionRepository.getByPembelajaranId(pembelajaranId, 'monev'),
+            pembelajaranQuestionRepository.getAnswersByPembelajaran(pembelajaranId, 'pre_test'),
+            pembelajaranQuestionRepository.getAnswersByPembelajaran(pembelajaranId, 'post_test'),
+            pembelajaranQuestionRepository.getAnswersByPembelajaran(pembelajaranId, 'monev'),
+        ])
+
+        const groupAnswers = (answers: any[]) => {
+            const map = new Map<number, any[]>()
+            answers.forEach(a => {
+                if (!map.has(a.user_id)) map.set(a.user_id, [])
+                map.get(a.user_id)!.push(a)
+            })
+            return map
+        }
+
+        const preMap = groupAnswers(preAnswers)
+        const postMap = groupAnswers(postAnswers)
+        const monevMap = groupAnswers(monevAnswers)
+
+        const computeScore = (userAnswers: any[] | undefined, questions: any[]) => {
+            let correct = 0
+            for (const q of questions) {
+                const answer = (userAnswers || []).find((a: any) => a.question_id === q.id)
+                if (answer) {
+                    const correctOption = q.options?.find((o: any) => o.is_correct)
+                    if (correctOption && answer.option_id === correctOption.id) {
+                        correct++
+                    }
+                }
+            }
+            return {
+                correct,
+                total: questions.length,
+                score: questions.length > 0 ? Math.round((correct / questions.length) * 100) : 0,
+            }
+        }
+
+        const rows = participants.map(p => {
+            const user: any = p.user || {}
+            const pre = computeScore(preMap.get(p.user_id), preQuestions)
+            const post = computeScore(postMap.get(p.user_id), postQuestions)
+            const monevAnswered = monevMap.get(p.user_id)?.length || 0
+            const progress = progressRows.find(pr => pr.user_id === p.user_id) || null
+
+            return {
+                user_id: p.user_id,
+                nip: user.nip || '',
+                nama: user.nama || '-',
+                email: user.email || '',
+                jabatan: user.jabatan || '',
+                unit_kerja: user.unit_kerja || '',
+                enrolled_at: p.enrolled_at,
+                pre_test: {
+                    ...pre,
+                    completed: preQuestions.length === 0 || (preMap.get(p.user_id)?.length || 0) >= preQuestions.length,
+                },
+                post_test: {
+                    ...post,
+                    completed: postQuestions.length === 0 || (postMap.get(p.user_id)?.length || 0) >= postQuestions.length,
+                    lulus: postQuestions.length === 0 || (post.score >= 50 && (postMap.get(p.user_id)?.length || 0) >= postQuestions.length),
+                },
+                monev: {
+                    completed: monevQuestions.length === 0 || monevAnswered >= monevQuestions.length,
+                },
+                progress: {
+                    status: progress?.status || 'belum_mulai',
+                    progress: progress?.progress || 0,
+                    tanggal_selesai: progress?.tanggal_selesai || null,
+                }
+            }
+        })
+
+        const summary = {
+            total_peserta: rows.length,
+            pre_test_questions: preQuestions.length,
+            post_test_questions: postQuestions.length,
+            monev_questions: monevQuestions.length,
+            pre_test_selesai: rows.filter(r => r.pre_test.completed).length,
+            post_test_selesai: rows.filter(r => r.post_test.completed).length,
+            post_test_lulus: rows.filter(r => r.post_test.lulus).length,
+            monev_selesai: rows.filter(r => r.monev.completed).length,
+            selesai: rows.filter(r => r.progress.status === 'selesai').length,
+        }
+
+        return {
+            course: { id: course.id, nama: course.nama, jumlah_jp: course.jumlah_jp },
+            summary,
+            rows,
+        }
+    }
 }
 
 export const pembelajaranService = new PembelajaranService()

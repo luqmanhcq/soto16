@@ -4,7 +4,8 @@ import { useState, useEffect, use } from 'react'
 import { useRouter } from 'next/navigation'
 import {
     ArrowLeft, Plus, Edit, Trash2, Save, X, Loader2, BookOpen,
-    FileText, Video, ListVideo, HelpCircle, CheckCircle, AlertCircle, Upload
+    FileText, Video, ListVideo, HelpCircle, CheckCircle, AlertCircle, Upload,
+    BarChart2, Download, Users
 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -13,6 +14,7 @@ const TABS = [
     { key: 'pre_test', label: 'Pre-Test', icon: FileText },
     { key: 'post_test', label: 'Post-Test', icon: FileText },
     { key: 'monev', label: 'Monev', icon: HelpCircle },
+    { key: 'rekap', label: 'Rekap', icon: BarChart2 },
 ] as const
 
 const TIPE_OPTIONS = [
@@ -77,6 +79,7 @@ export default function AdminPembelajaranDetailPage({ params }: { params: Promis
             {activeTab === 'pre_test' && <QuestionManager pembelajaranId={id} type="pre_test" title="Pre-Test" />}
             {activeTab === 'post_test' && <QuestionManager pembelajaranId={id} type="post_test" title="Post-Test" />}
             {activeTab === 'monev' && <QuestionManager pembelajaranId={id} type="monev" title="Evaluasi (Monev)" />}
+            {activeTab === 'rekap' && <RecapManager pembelajaranId={id} />}
         </div>
     )
 }
@@ -436,6 +439,171 @@ function QuestionManager({ pembelajaranId, type, title }: { pembelajaranId: stri
                         </div>
                     ))}
                 </div>
+            )}
+        </div>
+    )
+}
+
+/* ===================== REKAP MANAGER ===================== */
+function RecapManager({ pembelajaranId }: { pembelajaranId: string }) {
+    const [recap, setRecap] = useState<any>(null)
+    const [loading, setLoading] = useState(true)
+    const [search, setSearch] = useState('')
+
+    useEffect(() => { fetchRecap() }, [pembelajaranId])
+
+    async function fetchRecap() {
+        setLoading(true)
+        const res = await fetch(`/api/pembelajaran/${pembelajaranId}/recap`)
+        const data = await res.json()
+        if (res.ok) setRecap(data.data)
+        setLoading(false)
+    }
+
+    const handleDownload = () => {
+        window.open(`/api/pembelajaran/${pembelajaranId}/recap?export=excel`, '_blank')
+    }
+
+    const statusBadge = (status: string) => {
+        const map: Record<string, { bg: string; label: string }> = {
+            selesai: { bg: 'bg-emerald-100 text-emerald-700', label: 'SELESAI' },
+            proses: { bg: 'bg-amber-100 text-amber-700', label: 'PROSES' },
+            belum_mulai: { bg: 'bg-slate-100 text-slate-500', label: 'BELUM' },
+        }
+        const s = map[status] || map.belum_mulai
+        return <span className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase whitespace-nowrap ${s.bg}`}>{s.label}</span>
+    }
+
+    const rows = recap?.rows || []
+    const summary = recap?.summary || {}
+    const filtered = rows.filter((r: any) =>
+        !search ||
+        r.nama.toLowerCase().includes(search.toLowerCase()) ||
+        r.nip.includes(search) ||
+        r.unit_kerja?.toLowerCase().includes(search.toLowerCase())
+    )
+
+    const summaryCards = [
+        { label: 'Total Peserta', value: summary.total_peserta ?? 0, icon: Users, color: 'text-indigo-600 bg-indigo-50' },
+        { label: 'Pre-Test Selesai', value: summary.pre_test_selesai ?? 0, icon: FileText, color: 'text-blue-600 bg-blue-50' },
+        { label: 'Post-Test Selesai', value: summary.post_test_selesai ?? 0, icon: FileText, color: 'text-amber-600 bg-amber-50' },
+        { label: 'Post-Test Lulus', value: summary.post_test_lulus ?? 0, icon: CheckCircle, color: 'text-emerald-600 bg-emerald-50' },
+        { label: 'Monev Selesai', value: summary.monev_selesai ?? 0, icon: HelpCircle, color: 'text-purple-600 bg-purple-50' },
+        { label: 'Materi Selesai', value: summary.selesai ?? 0, icon: BookOpen, color: 'text-rose-600 bg-rose-50' },
+    ]
+
+    return (
+        <div className="space-y-6">
+            <div className="flex items-center justify-between">
+                <h2 className="text-lg font-black text-slate-800">Rekap Peserta ({rows.length})</h2>
+                <button
+                    onClick={handleDownload}
+                    disabled={loading || rows.length === 0}
+                    className="flex items-center gap-3 px-6 py-3 bg-emerald-600 text-white rounded-2xl font-black text-sm shadow-xl shadow-emerald-100 hover:bg-emerald-700 disabled:opacity-50 disabled:bg-slate-300 disabled:shadow-none transition-all active:scale-95 leading-none"
+                >
+                    <Download className="h-5 w-5" /> EXPORT EXCEL (.xlsx)
+                </button>
+            </div>
+
+            {loading ? (
+                <div className="py-10 text-center"><Loader2 className="h-8 w-8 text-emerald-600 animate-spin mx-auto" /></div>
+            ) : rows.length === 0 ? (
+                <div className="py-20 text-center bg-white rounded-[2rem] border border-slate-100">
+                    <Users className="h-12 w-12 text-slate-300 mx-auto mb-4" />
+                    <p className="text-slate-400 font-bold">Belum ada peserta yang mendaftar pembelajaran ini</p>
+                </div>
+            ) : (
+                <>
+                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+                        {summaryCards.map(card => {
+                            const Icon = card.icon
+                            return (
+                                <div key={card.label} className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+                                    <div className={`h-9 w-9 rounded-xl flex items-center justify-center ${card.color} mb-2`}>
+                                        <Icon className="h-4 w-4" />
+                                    </div>
+                                    <p className="text-2xl font-black text-slate-900">{card.value}</p>
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{card.label}</p>
+                                </div>
+                            )
+                        })}
+                    </div>
+
+                    <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+                        <input
+                            value={search}
+                            onChange={e => setSearch(e.target.value)}
+                            placeholder="Cari NIP / Nama / Unit Kerja..."
+                            className="w-full bg-slate-50 rounded-xl px-4 py-3 outline-none ring-1 ring-slate-100 focus:ring-2 focus:ring-emerald-500 font-bold text-slate-900 text-sm"
+                        />
+                    </div>
+
+                    <div className="overflow-x-auto bg-white rounded-2xl border border-slate-100 shadow-sm">
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="bg-slate-50/50">
+                                    <th className="px-5 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">No</th>
+                                    <th className="px-5 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Peserta</th>
+                                    <th className="px-5 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Tanggal Daftar</th>
+                                    <th className="px-5 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Pre-Test</th>
+                                    <th className="px-5 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Post-Test</th>
+                                    <th className="px-5 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Monev</th>
+                                    <th className="px-5 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Materi</th>
+                                    <th className="px-5 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Tanggal Selesai</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-50 text-slate-900">
+                                {filtered.length > 0 ? filtered.map((r: any, idx: number) => (
+                                    <tr key={r.user_id} className="hover:bg-slate-50/50 transition-colors">
+                                        <td className="px-5 py-4 text-slate-400 font-bold text-sm">{idx + 1}</td>
+                                        <td className="px-5 py-4">
+                                            <p className="font-black text-slate-800 text-sm">{r.nama}</p>
+                                            <p className="text-xs text-slate-400 font-bold">{r.nip}</p>
+                                            <p className="text-xs text-slate-400">{r.jabatan}{r.unit_kerja ? ` — ${r.unit_kerja}` : ''}</p>
+                                        </td>
+                                        <td className="px-5 py-4 text-sm text-slate-500 font-semibold whitespace-nowrap">
+                                            {r.enrolled_at ? new Date(r.enrolled_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}
+                                        </td>
+                                        <td className="px-5 py-4 text-center whitespace-nowrap">
+                                            {r.pre_test.completed ? (
+                                                <span className={`px-2.5 py-1 rounded-lg text-sm font-black ${r.pre_test.score >= 50 ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-600'}`}>{r.pre_test.score}%</span>
+                                            ) : (
+                                                <span className="text-slate-300 font-bold text-sm">-</span>
+                                            )}
+                                        </td>
+                                        <td className="px-5 py-4 text-center whitespace-nowrap">
+                                            {r.post_test.completed ? (
+                                                <span className={`px-2.5 py-1 rounded-lg text-sm font-black ${r.post_test.score >= 50 ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-600'}`}>{r.post_test.score}%</span>
+                                            ) : (
+                                                <span className="text-slate-300 font-bold text-sm">-</span>
+                                            )}
+                                        </td>
+                                        <td className="px-5 py-4 text-center whitespace-nowrap">
+                                            {r.monev.completed ? (
+                                                <span className="px-2.5 py-1 rounded-lg text-sm font-black bg-purple-50 text-purple-700">Selesai</span>
+                                            ) : (
+                                                <span className="text-slate-300 font-bold text-sm">-</span>
+                                            )}
+                                        </td>
+                                        <td className="px-5 py-4 text-center">
+                                            <div className="flex flex-col items-center gap-1">
+                                                {statusBadge(r.progress.status)}
+                                                <span className="text-[10px] font-bold text-slate-400">{r.progress.progress}%</span>
+                                            </div>
+                                        </td>
+                                        <td className="px-5 py-4 text-sm text-slate-500 font-semibold whitespace-nowrap">
+                                            {r.progress.tanggal_selesai ? new Date(r.progress.tanggal_selesai).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}
+                                        </td>
+                                    </tr>
+                                )) : (
+                                    <tr>
+                                        <td colSpan={8} className="px-5 py-16 text-center text-slate-400 font-bold">Tidak ada hasil yang cocok</td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </>
             )}
         </div>
     )

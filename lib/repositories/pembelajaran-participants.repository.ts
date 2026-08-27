@@ -1,5 +1,5 @@
 import { db } from '@/lib/db'
-import { pembelajaranParticipantsTable } from '@/lib/db/schema'
+import { pembelajaranParticipantsTable, usersTable } from '@/lib/db/schema'
 import { eq, and } from 'drizzle-orm'
 
 export class PembelajaranParticipantsRepository {
@@ -34,6 +34,20 @@ export class PembelajaranParticipantsRepository {
         return await db.select().from(pembelajaranParticipantsTable).where(
             eq(pembelajaranParticipantsTable.pembelajaran_id, pembelajaranId)
         )
+    }
+
+    async getRecapByPembelajaran(pembelajaranId: number) {
+        const rows = await db
+            .select()
+            .from(pembelajaranParticipantsTable)
+            .leftJoin(usersTable, eq(pembelajaranParticipantsTable.user_id, usersTable.id))
+            .where(eq(pembelajaranParticipantsTable.pembelajaran_id, pembelajaranId))
+            .orderBy(pembelajaranParticipantsTable.enrolled_at)
+
+        return rows.map(row => ({
+            ...row.pembelajaran_participants,
+            user: row.users,
+        }))
     }
 }
 

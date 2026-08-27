@@ -170,10 +170,10 @@ export default function TestPage({ params }: { params: Promise<{ id: string; typ
         try {
             let correct = 0
             for (const q of questions) {
-                const userAnswer = existingAnswers.find((a: any) => a.question_id === q.id)
-                if (userAnswer) {
+                const selectedOptionId = answers[q.id]
+                if (selectedOptionId !== undefined) {
                     const correctOption = q.options?.find((o: any) => o.is_correct)
-                    if (correctOption && userAnswer.option_id === correctOption.id) {
+                    if (correctOption && selectedOptionId === correctOption.id) {
                         correct++
                     }
                 }
@@ -323,7 +323,7 @@ export default function TestPage({ params }: { params: Promise<{ id: string; typ
                     </div>
                 )}
 
-                {completed && score && (
+                {completed && isTimedTest && score && (
                     <div className={`p-6 rounded-2xl mt-6 ${score.score >= 50 ? 'bg-emerald-50 border border-emerald-200' : 'bg-amber-50 border border-amber-200'}`}>
                         <div className="flex items-center gap-4">
                             <Award className={`h-10 w-10 ${score.score >= 50 ? 'text-emerald-600' : 'text-amber-600'}`} />
@@ -335,6 +335,18 @@ export default function TestPage({ params }: { params: Promise<{ id: string; typ
                                     {score.correct} dari {score.total} jawaban benar
                                     {type === 'post_test' && score.score < 50 && ' — belum mencapai nilai minimum (50%)'}
                                 </p>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {completed && !isTimedTest && (
+                    <div className="p-6 rounded-2xl mt-6 bg-emerald-50 border border-emerald-200">
+                        <div className="flex items-center gap-4">
+                            <CheckCircle2 className="h-10 w-10 text-emerald-600" />
+                            <div>
+                                <p className="text-xl font-black text-emerald-700">Jawaban Anda telah tersimpan</p>
+                                <p className="text-sm font-bold text-emerald-600">Terima kasih telah mengisi evaluasi.</p>
                             </div>
                         </div>
                     </div>
@@ -375,14 +387,14 @@ export default function TestPage({ params }: { params: Promise<{ id: string; typ
                                                     : isSelected
                                                         ? 'border-indigo-400 bg-indigo-50'
                                                         : 'border-slate-100 bg-slate-50 hover:border-indigo-200 hover:bg-indigo-50/50'
-                                            } ${completed || !testStarted ? 'cursor-default' : ''}`}
+                                            } ${completed || (isTimedTest && !testStarted) ? 'cursor-default' : ''}`}
                                         >
                                             <input
                                                 type="radio"
                                                 name={`question-${q.id}`}
                                                 checked={isSelected}
                                                 onChange={() => handleAnswerChange(q.id, o.id)}
-                                                disabled={completed || !testStarted}
+                                                disabled={completed || (isTimedTest && !testStarted)}
                                                 className="h-5 w-5 text-indigo-600"
                                             />
                                             <span className={`font-medium flex-1 ${showResult && isCorrect ? 'text-emerald-700 font-bold' : 'text-slate-700'}`}>
@@ -402,7 +414,7 @@ export default function TestPage({ params }: { params: Promise<{ id: string; typ
             )}
 
             {/* Submit Button */}
-            {questions.length > 0 && !completed && testStarted && (
+            {questions.length > 0 && !completed && (!isTimedTest || testStarted) && (
                 <div className="sticky bottom-6 bg-white p-4 rounded-2xl shadow-xl border border-slate-100 flex items-center justify-between">
                     <p className="text-sm font-bold text-slate-500">
                         Dijawab: <span className="text-indigo-600 font-black">{Object.keys(answers).length}</span> / {questions.length}

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Save, Loader2, Type, Bell, Link as LinkIcon, FileText, Upload, X } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
 import FullPageLoader from '@/components/FullPageLoader'
 
@@ -188,7 +189,7 @@ export default function PengumumanForm({ id, initialData }: PengumumanFormProps)
                             <div className="relative group/banner border-2 border-dashed border-slate-200 rounded-3xl p-4 bg-slate-50 hover:bg-slate-100 transition-all text-center">
                                 {formData.gambar ? (
                                     <div className="relative">
-                                        <img src={formData.gambar} alt="Preview" className="w-full h-40 object-cover rounded-2xl shadow-md border-4 border-white" />
+                                        <Image src={formData.gambar} alt="Preview" className="w-full h-40 object-cover rounded-2xl shadow-md border-4 border-white" width={800} height={320} unoptimized />
                                         <button
                                             type="button"
                                             onClick={() => setFormData(prev => ({ ...prev, gambar: '' }))}

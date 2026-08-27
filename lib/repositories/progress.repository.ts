@@ -13,6 +13,12 @@ export class ProgressRepository {
         return result || null
     }
 
+    async findByPembelajaranId(pembelajaranId: number) {
+        return await db.query.pembelajaranProgressTable.findMany({
+            where: eq(pembelajaranProgressTable.pembelajaran_id, pembelajaranId)
+        })
+    }
+
     async findByUserId(userId: number) {
         const rows = await db
             .select()

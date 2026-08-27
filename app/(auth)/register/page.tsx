@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { ShieldCheck, User, Mail, Lock, ArrowRight, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react'
 
@@ -76,9 +77,9 @@ export default function RegisterPage() {
                     <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10" />
                     
                     <div className="relative z-10">
-                        <Link href="/" className="inline-flex items-center gap-3 group">
-                            <img src="/surajaya_corpu.webp" alt="Logo" className="h-16 w-auto" />
-                        </Link>
+<Link href="/" className="inline-flex items-center gap-3 group">
+                             <Image src="/surajaya_corpu.webp" alt="Logo" className="h-16 w-auto" width={64} height={64} priority={true} />
+                         </Link>
                     </div>
 
                     <div className="relative z-10 space-y-6">
@@ -107,9 +108,9 @@ export default function RegisterPage() {
                 <div className="p-10 lg:p-14 flex flex-col justify-center bg-white/[0.02] overflow-y-auto max-h-[90vh]">
                     <div className="max-w-md mx-auto w-full space-y-8">
                         <header className="space-y-3">
-                            <div className="lg:hidden flex justify-center mb-6">
-                                <img src="/surajaya_corpu.webp" alt="Logo" className="h-16 w-auto" />
-                            </div>
+<div className="lg:hidden flex justify-center mb-6">
+<Image src="/surajaya_corpu.webp" alt="Logo" className="h-16 w-auto" width={64} height={64} priority={true} />
+                             </div>
                             <h1 className="text-3xl font-black text-white tracking-tight leading-none">Buat Akun Baru</h1>
                             <p className="text-slate-500 font-bold text-sm">Lengkapi data diri Anda secara lengkap.</p>
                         </header>

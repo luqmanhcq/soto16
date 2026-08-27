@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     response.cookies.set('token', '', {
         httpOnly: true,
         secure: isSecure,
-        sameSite: isSecure ? 'none' : 'lax',
+        sameSite: 'lax', // Menggunakan SameSite=Lax untuk keamanan yang lebih baik
         expires: new Date(0),
         path: '/',
     })
@@ -40,14 +40,14 @@ export async function POST(request: NextRequest) {
     // Deteksi HTTPS dari header reverse proxy
     const isSecure = isProduction && (request.headers.get('x-forwarded-proto') === 'https')
 
-    // Clear the token cookie — opsi harus identik dengan saat set cookie agar berhasil dihapus
-    response.cookies.set('token', '', {
-        httpOnly: true,
-        secure: isSecure,
-        sameSite: isSecure ? 'none' : 'lax',
-        expires: new Date(0),
-        path: '/',
-    })
+// Clear the token cookie — opsi harus identik dengan saat set cookie agar berhasil dihapus
+     response.cookies.set('token', '', {
+         httpOnly: true,
+         secure: isSecure,
+         sameSite: 'lax', // Menggunakan SameSite=Lax untuk keamanan yang lebih baik
+         expires: new Date(0),
+         path: '/',
+     })
 
     return response
 }

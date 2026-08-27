@@ -23,6 +23,7 @@ import {
     AlertCircle
 } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 
 /**
@@ -243,7 +244,7 @@ export default function WebinarDetailPage({ params }: { params: Promise<{ id: st
 
                     <div className="aspect-video w-full rounded-[3rem] bg-slate-900 shadow-2xl relative overflow-hidden group">
                         {webinar.gambar ? (
-                            <img src={webinar.gambar} className="w-full h-full object-cover group-hover:scale-105 transition-all duration-700 opacity-90" />
+                            <Image src={webinar.gambar} alt={webinar.nama_webinar || 'Banner Webinar'} className="w-full h-full object-cover group-hover:scale-105 transition-all duration-700 opacity-90" width={1200} height={675} loading="lazy" />
                         ) : (
                             <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900">
                                 <Play className="h-20 w-20 text-white opacity-20 group-hover:opacity-100 transition-opacity" />
@@ -321,13 +322,27 @@ export default function WebinarDetailPage({ params }: { params: Promise<{ id: st
                         </div>
 
                         {!isJoined ? (
-                            <button
-                                onClick={handleJoin}
-                                disabled={joining}
-                                className="w-full bg-blue-600 text-white font-black text-lg py-5 rounded-2xl shadow-xl shadow-blue-100 hover:bg-blue-700 active:scale-95 transition-all disabled:opacity-50"
-                            >
-                                {joining ? 'Mendaftar...' : 'DAFTAR SEKARANG'}
-                            </button>
+                            (() => {
+                                const now = new Date()
+                                const endDate = webinar.tanggal_selesai ? new Date(webinar.tanggal_selesai) : null
+                                const registrationClosed = endDate ? now > endDate : false
+                                return (
+                                    <div className="space-y-4">
+                                        {registrationClosed && (
+                                            <div className="p-5 rounded-2xl bg-red-50 text-red-700 text-center font-black text-sm border border-red-100">
+                                                Pendaftaran telah ditutup
+                                            </div>
+                                        )}
+                                        <button
+                                            onClick={handleJoin}
+                                            disabled={joining || registrationClosed}
+                                            className="w-full bg-blue-600 text-white font-black text-lg py-5 rounded-2xl shadow-xl shadow-blue-100 hover:bg-blue-700 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-600 disabled:active:scale-100"
+                                        >
+                                            {joining ? 'Mendaftar...' : registrationClosed ? 'PENDAFTARAN DITUTUP' : 'DAFTAR SEKARANG'}
+                                        </button>
+                                    </div>
+                                )
+                            })()
                         ) : (
                             <div className="space-y-4">
                                 <div className="p-5 rounded-2xl bg-green-50 text-green-700 text-center font-black border border-green-100 text-sm tracking-widest">

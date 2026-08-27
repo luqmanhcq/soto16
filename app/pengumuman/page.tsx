@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import Navbar from '@/components/Navbar'
 import { Bell, Calendar, ArrowRight, Loader2, Search, GraduationCap, Zap, Newspaper, ExternalLink } from 'lucide-react'
 
@@ -137,7 +138,7 @@ export default function AnnouncementsPage() {
                     </p>
                   </div>
                   <div className="grid lg:grid-cols-2 gap-10">
-                    {filteredExternal.map((item) => (
+{filteredExternal.map((item) => (
                       <div
                         key={item.id}
                         className="group bg-white rounded-[3.5rem] border border-slate-100 shadow-xl shadow-slate-100 hover:shadow-2xl hover:shadow-emerald-100 transition-all duration-500 overflow-hidden flex flex-col justify-between"
@@ -145,11 +146,15 @@ export default function AnnouncementsPage() {
                         <div>
                           {item.gambar && (
                             <div className="h-56 overflow-hidden relative">
-                              <img
-                                src={item.gambar}
-                                alt={item.nama_webinar}
-                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                              />
+                                 <Image
+                                   src={item.gambar}
+                                   alt={item.nama_webinar}
+                                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                   width={800}
+                                   height={450}
+                                   loading="lazy"
+                                   unoptimized={item.gambar.startsWith('http')}
+                                 />
                               <div className="absolute top-6 left-6 px-4 py-2 bg-emerald-50 text-emerald-600 rounded-xl text-[9px] font-black uppercase tracking-widest border border-emerald-100 shadow-sm">
                                 {item.sumber_label || 'EKSTERNAL'}
                               </div>
@@ -219,8 +224,9 @@ export default function AnnouncementsPage() {
                     </p>
                   </div>
                   <div className="grid lg:grid-cols-2 gap-10">
-                    {filteredAnnouncements.map((item) => {
+{filteredAnnouncements.map((item) => {
                       const catInfo = CATEGORIES.find(c => c.name === item.kategori) || CATEGORIES[3]
+                      const isExternal = item.gambar?.startsWith('http')
                       return (
                         <div
                           key={item.id}
@@ -229,11 +235,15 @@ export default function AnnouncementsPage() {
                           <div>
                             {item.gambar && (
                               <div className="h-56 overflow-hidden">
-                                <img
-                                  src={item.gambar}
-                                  alt={item.judul}
-                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                />
+                                  <Image
+                                    src={item.gambar}
+                                    alt={item.judul}
+                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                    width={800}
+                                    height={450}
+                                    loading="lazy"
+                                    unoptimized={isExternal}
+                                  />
                               </div>
                             )}
                             <div className="p-10 lg:p-14 pb-0 space-y-6">

@@ -15,9 +15,6 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "SURAJAYA CORPU",
   description: "Kawah Candradimika Pengembangan Kompetensi ASN Kabupaten Lamongan",
-  icons: {
-    icon: '/surajaya_corpu.webp',
-  },
 };
 
 import { AuthProvider } from "@/lib/contexts/auth-context";

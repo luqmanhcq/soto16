@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import Navbar from '@/components/Navbar'
 import {
   Video, Search, Calendar, Users, ArrowRight, Loader2,
@@ -135,12 +136,15 @@ export default function PublicWebinarPage() {
                     className="group flex flex-col bg-white rounded-2xl md:rounded-[2rem] border border-slate-100 shadow-lg shadow-slate-50 hover:shadow-2xl hover:shadow-indigo-100 hover:-translate-y-2 transition-all duration-500 overflow-hidden"
                   >
                     {/* Image */}
-                    <div className="relative aspect-video overflow-hidden">
-                      <img
-                        src={item.gambar || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2070'}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
-                        alt={item.nama_webinar}
-                      />
+<div className="relative aspect-video overflow-hidden">
+                       <Image
+                         src={item.gambar || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2070'}
+                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
+                         alt={item.nama_webinar}
+                         width={800}
+                         height={450}
+                         loading="lazy"
+                       />
                       {/* Status badge */}
                       <div className={`absolute top-3 md:top-6 left-3 md:left-6 px-2 md:px-4 py-1 md:py-2 rounded-lg md:rounded-2xl shadow-xl border text-[8px] md:text-[9px] font-black uppercase tracking-widest leading-none ${
                         item.status === 'selesai' || item.status?.includes('Selesai')
@@ -191,7 +195,7 @@ export default function PublicWebinarPage() {
                         href={`/webinar/${item.id}`}
                         className="mt-auto inline-flex items-center justify-center gap-2 md:gap-4 py-3 md:py-5 bg-slate-900 text-white rounded-xl md:rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest hover:bg-indigo-600 transition-all active:scale-95 shadow-xl shadow-slate-200"
                       >
-                        Daftar Sekarang <ArrowRight className="h-3 w-3 md:h-4 md:w-4" />
+                        Detail <ArrowRight className="h-3 w-3 md:h-4 md:w-4" />
                       </Link>
                     </div>
                   </div>

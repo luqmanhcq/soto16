@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { ShieldCheck, Mail, Lock, ArrowRight, Loader2, AlertCircle, CheckCircle2, Zap, Building2 } from 'lucide-react'
 import { useAuth } from '@/lib/contexts/auth-context'
@@ -89,9 +90,9 @@ export default function LoginPage() {
                     <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-b from-transparent to-black/20" />
                     
                     <div className="relative z-10">
-                        <Link href="/" className="inline-flex items-center gap-3 group">
-                            <img src="/surajaya_corpu.webp" alt="Logo" className="h-16 w-auto" />
-                        </Link>
+<Link href="/" className="inline-flex items-center gap-3 group">
+                             <Image src="/surajaya_corpu.webp" alt="Logo" className="h-16 w-auto" width={64} height={64} priority={true} />
+                         </Link>
                     </div>
 
                     <div className="relative z-10 space-y-6">
@@ -108,9 +109,9 @@ export default function LoginPage() {
                     <div className="relative z-10 flex items-center gap-8 pt-6 border-t border-white/10">
                         <div className="flex -space-x-3">
                             {[1, 2, 3, 4].map(i => (
-                                <div key={i} className="h-10 w-10 rounded-full border-2 border-indigo-600 bg-slate-200 overflow-hidden">
-                                    <img src={`https://i.pravatar.cc/100?img=${i+10}`} alt="user" />
-                                </div>
+<div key={i} className="h-10 w-10 rounded-full border-2 border-indigo-600 bg-slate-200 overflow-hidden">
+                                     <Image src={`https://i.pravatar.cc/100?img=${i+10}`} alt="user" width={40} height={40} loading="lazy" />
+                                 </div>
                             ))}
                         </div>
                         <p className="text-indigo-100/60 text-xs font-bold uppercase tracking-widest">
@@ -123,9 +124,9 @@ export default function LoginPage() {
                 <div className="p-10 lg:p-20 flex flex-col justify-center bg-white/[0.02]">
                     <div className="max-w-sm mx-auto w-full space-y-10">
                         <header className="space-y-3">
-                            <div className="lg:hidden flex justify-center mb-8">
-                                <img src="/surajaya_corpu.webp" alt="Logo" className="h-16 w-auto" />
-                            </div>
+<div className="lg:hidden flex justify-center mb-8">
+<Image src="/surajaya_corpu.webp" alt="Logo" className="h-16 w-auto" width={64} height={64} priority={true} />
+                             </div>
                             <h1 className="text-3xl font-black text-white tracking-tight leading-none">Login Akun</h1>
                             <p className="text-slate-500 font-bold text-sm">Masuk ke Surajaya Corpu menggunakan akun SiMEGILAN Anda.</p>
                         </header>

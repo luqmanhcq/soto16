@@ -3,8 +3,16 @@ import { registerSchema } from '@/lib/validation'
 import { authService } from '@/lib/services/auth.service'
 import { createdResponse, errorResponse, validationErrorResponse, internalErrorResponse } from '@/lib/response'
 import { ZodError } from 'zod'
+import { rateLimit, getClientIP } from '@/lib/rateLimiter'
 
 export async function POST(request: NextRequest) {
+  // Rate limiting by IP
+  const ip = getClientIP(request);
+  const rateLimitResponse = rateLimit(`register_${ip}`, 60 * 1000, 5); // 5 permintaan per menit
+  if (rateLimitResponse) {
+    return rateLimitResponse;
+  }
+
   try {
     const body = await request.json()
 
@@ -34,7 +42,8 @@ export async function POST(request: NextRequest) {
     }
 
     if (error instanceof Error) {
-      return errorResponse(error.message, 400)
+      // Generic error message to prevent enumeration
+      return errorResponse('Registrasi gagal. Silakan periksa data Anda dan coba lagi.', 400)
     }
 
     return internalErrorResponse()

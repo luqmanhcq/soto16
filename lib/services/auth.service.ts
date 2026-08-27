@@ -8,12 +8,16 @@ export class AuthService {
     // Check if user already exists
     const existingByEmail = await userRepository.findByEmail(data.email)
     if (existingByEmail) {
-      throw new Error('Email sudah terdaftar')
+      // Log for debugging but don't reveal specific reason to client
+      console.warn('Registration attempt with existing email:', data.email)
+      throw new Error('Registrasi gagal. Silakan periksa data Anda dan coba lagi.')
     }
 
     const existingByNip = await userRepository.findByNip(data.nip)
     if (existingByNip) {
-      throw new Error('NIP sudah terdaftar')
+      // Log for debugging but don't reveal specific reason to client
+      console.warn('Registration attempt with existing NIP:', data.nip)
+      throw new Error('Registrasi gagal. Silakan periksa data Anda dan coba lagi.')
     }
 
     // Hash password
