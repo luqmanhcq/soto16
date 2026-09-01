@@ -11,7 +11,8 @@ import {
     Loader2,
     Settings,
     Eye,
-    Layers
+    Layers,
+    LayoutList
 } from 'lucide-react'
 import { useAuth } from '@/lib/contexts/auth-context'
 import { useRouter } from 'next/navigation'
@@ -121,7 +122,7 @@ export default function AdminManajemenPengetahuanPage() {
                                         </td>
                                         <td className="px-8 py-6 text-center">
                                             <div className="inline-flex items-center gap-1.5 bg-slate-900 text-white rounded-lg px-3 py-1 text-[10px] font-black lowercase tracking-tighter italic">
-                                                <Layers className="h-3 w-3 text-indigo-400" /> {course.materials_count || 12} MATERI
+                                                <Layers className="h-3 w-3 text-indigo-400" /> {course.materials_count ?? 0} MATERI
                                             </div>
                                         </td>
                                         <td className="px-8 py-6">
@@ -131,6 +132,12 @@ export default function AdminManajemenPengetahuanPage() {
                                         </td>
                                         <td className="px-8 py-6 text-right">
                                             <div className="flex items-center justify-end gap-2">
+                                                <Link
+                                                    href={`/admin/manajemen-pengetahuan/${course.id}`}
+                                                    className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
+                                                >
+                                                    <LayoutList className="h-5 w-5" />
+                                                </Link>
                                                 <Link
                                                     href={`/manajemen-pengetahuan/${course.slug}`}
                                                     className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"

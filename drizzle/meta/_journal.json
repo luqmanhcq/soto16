@@ -22,6 +22,13 @@
       "when": 1752500000000,
       "tag": "0002_webinar_date_columns",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1787900000000,
+      "tag": "0003_manajemen_pengetahuan",
+      "breakpoints": true
     }
   ]
 }

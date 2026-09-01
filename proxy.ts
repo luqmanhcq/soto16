@@ -22,6 +22,11 @@ export function proxy(request: NextRequest) {
     const token = request.cookies.get('token')?.value
     const { pathname } = request.nextUrl
 
+    // Allow static assets directly (images, fonts, etc.) — bypass auth check
+    if (/\.(webp|png|jpg|jpeg|svg|ico|gif|css|js|woff2?|ttf|eot)$/i.test(pathname)) {
+        return NextResponse.next()
+    }
+
     writeLog(`REQ: ${pathname} | hasToken: ${!!token} | tokenVal: ${token ? token.substring(0, 15) + '...' : 'none'}`)
 
     // SiMEGILAN SSO: redirect /?token=xxx&role=yyy to /api/auth/sso-callback?token=xxx&role=yyy
@@ -87,6 +92,6 @@ export function proxy(request: NextRequest) {
 
 export const config = {
     matcher: [
-        '/((?!_next/static|_next/image|favicon.ico|uploads).*)',
+        '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|woff2?|ttf|eot)$|uploads).*)',
     ],
 }

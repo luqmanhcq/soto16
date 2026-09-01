@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Save, Loader2, Type, LayoutDashboard, Globe, FileImage, Upload, X, Clock } from 'lucide-react'
+import { ArrowLeft, Save, Loader2, Type, LayoutDashboard, Globe, FileImage, Upload, X } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import FullPageLoader from '@/components/FullPageLoader'
@@ -19,7 +19,6 @@ export default function ManajemenPengetahuanForm({ id, initialData }: ManajemenP
         nama: '',
         slug: '',
         kategori: '',
-        jumlah_jp: '' as string | number,
         deskripsi: '',
         gambar: '',
     })
@@ -30,7 +29,6 @@ export default function ManajemenPengetahuanForm({ id, initialData }: ManajemenP
                 nama: initialData.nama || '',
                 slug: initialData.slug || '',
                 kategori: initialData.kategori || '',
-                jumlah_jp: initialData.jumlah_jp || '',
                 deskripsi: initialData.deskripsi || '',
                 gambar: initialData.gambar || '',
             })
@@ -92,7 +90,6 @@ export default function ManajemenPengetahuanForm({ id, initialData }: ManajemenP
 
             const payload = {
                 ...formData,
-                jumlah_jp: formData.jumlah_jp ? Number(formData.jumlah_jp) : null,
             }
 
             const res = await fetch(url, {
@@ -167,21 +164,7 @@ export default function ManajemenPengetahuanForm({ id, initialData }: ManajemenP
                             </div>
                         </div>
                         <div className="grid gap-6 sm:grid-cols-2 mt-6">
-                            <div>
-                                <label className="flex items-center gap-2 text-xs font-black text-slate-500 uppercase tracking-widest mb-2">
-                                    <Clock className="h-3 w-3 text-indigo-400" /> Jumlah Jam Pelajaran (JP)
-                                </label>
-                                <input
-                                    type="number"
-                                    name="jumlah_jp"
-                                    min={1}
-                                    placeholder="Contoh: 24"
-                                    className="w-full bg-slate-50 rounded-2xl px-6 py-4 outline-none ring-1 ring-slate-100 focus:ring-2 focus:ring-indigo-500/20 focus:bg-white transition-all text-lg font-black text-slate-900 placeholder:text-slate-300"
-                                    value={formData.jumlah_jp}
-                                    onChange={handleChange}
-                                />
-                            </div>
-                            <div>
+                            <div className="sm:col-span-2">
                                 <select
                                     name="kategori"
                                     className="w-full bg-slate-50 rounded-2xl px-6 py-4 outline-none ring-1 ring-slate-100 focus:ring-2 focus:ring-indigo-500/20 focus:bg-white transition-all font-bold text-slate-900"

@@ -78,7 +78,7 @@ export default function RegisterPage() {
                     
                     <div className="relative z-10">
 <Link href="/" className="inline-flex items-center gap-3 group">
-                             <Image src="/surajaya_corpu.webp" alt="Logo" className="h-16 w-auto" width={64} height={64} priority={true} />
+                             <Image src="/surajaya_corpu.webp" alt="Logo" className="h-16 w-auto" width={64} height={64} priority={true} unoptimized />
                          </Link>
                     </div>
 
@@ -109,7 +109,7 @@ export default function RegisterPage() {
                     <div className="max-w-md mx-auto w-full space-y-8">
                         <header className="space-y-3">
 <div className="lg:hidden flex justify-center mb-6">
-<Image src="/surajaya_corpu.webp" alt="Logo" className="h-16 w-auto" width={64} height={64} priority={true} />
+<Image src="/surajaya_corpu.webp" alt="Logo" className="h-16 w-auto" width={64} height={64} priority={true} unoptimized />
                              </div>
                             <h1 className="text-3xl font-black text-white tracking-tight leading-none">Buat Akun Baru</h1>
                             <p className="text-slate-500 font-bold text-sm">Lengkapi data diri Anda secara lengkap.</p>

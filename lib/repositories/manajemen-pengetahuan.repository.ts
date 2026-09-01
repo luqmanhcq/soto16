@@ -1,6 +1,6 @@
 import { db } from '@/lib/db'
 import { manajemenPengetahuanTable, mpMateriTable } from '@/lib/db/schema'
-import { eq, desc, asc } from 'drizzle-orm'
+import { eq, desc, asc, sql } from 'drizzle-orm'
 import { CreateManajemenPengetahuanDto, UpdateManajemenPengetahuanDto } from '@/lib/validations/manajemen-pengetahuan.validation'
 
 export type ManajemenPengetahuan = typeof manajemenPengetahuanTable.$inferSelect
@@ -9,13 +9,27 @@ export type ManajemenPengetahuanWithMaterials = ManajemenPengetahuan & { materia
 
 export class ManajemenPengetahuanRepository {
     async getAll(filters?: { kategori?: string }, limit?: number) {
-        return await db.query.manajemenPengetahuanTable.findMany({
-            where: (mp, { eq }) => {
-                return filters?.kategori ? eq(mp.kategori, filters.kategori) : undefined
-            },
-            orderBy: [desc(manajemenPengetahuanTable.created_at)],
-            limit: limit,
-        })
+        const rows = await db
+            .select({
+                id: manajemenPengetahuanTable.id,
+                nama: manajemenPengetahuanTable.nama,
+                slug: manajemenPengetahuanTable.slug,
+                kategori: manajemenPengetahuanTable.kategori,
+                deskripsi: manajemenPengetahuanTable.deskripsi,
+                jumlah_jp: manajemenPengetahuanTable.jumlah_jp,
+                gambar: manajemenPengetahuanTable.gambar,
+                created_at: manajemenPengetahuanTable.created_at,
+                updated_at: manajemenPengetahuanTable.updated_at,
+                materials_count: sql<number>`count(${mpMateriTable.id})`,
+            })
+            .from(manajemenPengetahuanTable)
+            .leftJoin(mpMateriTable, eq(mpMateriTable.manajemen_pengetahuan_id, manajemenPengetahuanTable.id))
+            .where(filters?.kategori ? eq(manajemenPengetahuanTable.kategori, filters.kategori) : undefined)
+            .groupBy(manajemenPengetahuanTable.id)
+            .orderBy(desc(manajemenPengetahuanTable.created_at))
+            .limit(limit || 1000)
+
+        return rows as (ManajemenPengetahuan & { materials_count: number })[]
     }
 
     async findById(id: number): Promise<ManajemenPengetahuanWithMaterials | null> {

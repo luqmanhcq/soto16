@@ -9,8 +9,6 @@ import {
   ChevronLeft, ChevronRight,
 } from 'lucide-react'
 
-// ─── Types ──────────────────────────────────────────────────────────────────
-
 type LocalWebinar = {
   id: number
   nama_webinar: string
@@ -23,11 +21,7 @@ type LocalWebinar = {
   sumber: 'lokal'
 }
 
-// ─── Pagination Config ──────────────────────────────────────────────────────
-
 const ITEMS_PER_PAGE = 6
-
-// ─── Component ──────────────────────────────────────────────────────────────
 
 export default function PublicWebinarPage() {
   const [localWebinars, setLocalWebinars] = useState<LocalWebinar[]>([])
@@ -35,7 +29,6 @@ export default function PublicWebinarPage() {
   const [search, setSearch] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
 
-  // Fetch local webinars
   useEffect(() => {
     async function load() {
       try {
@@ -55,19 +48,16 @@ export default function PublicWebinarPage() {
     load()
   }, [])
 
-  // Filter by search
   const filtered = localWebinars.filter(w =>
     w.nama_webinar.toLowerCase().includes(search.toLowerCase())
   )
 
-  // Pagination
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE)
   const paginatedWebinars = filtered.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
   )
 
-  // Reset to page 1 when search changes
   useEffect(() => {
     setCurrentPage(1)
   }, [search])
@@ -78,182 +68,167 @@ export default function PublicWebinarPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white w-full overflow-x-hidden">
       <Navbar />
 
-      <main className="pt-28 md:pt-32 pb-20 md:pb-40 px-4 md:px-6 lg:px-12 max-w-7xl mx-auto">
-        {/* Header */}
-        <header className="mb-10 md:mb-16 space-y-4 md:space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700">
-          <div className="inline-flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 bg-indigo-50 text-indigo-600 rounded-xl md:rounded-2xl border border-indigo-100">
-            <Video className="h-3 w-3 md:h-4 md:w-4" />
-            <span className="text-[8px] md:text-[10px] font-black uppercase tracking-widest italic">DRAJAT ASN</span>
+      <main className="pt-20 sm:pt-24 md:pt-28 pb-10 sm:pb-16 md:pb-20 px-4 sm:px-6 lg:px-8 xl:px-12 max-w-7xl mx-auto w-full min-w-0">
+        <header className="mb-8 sm:mb-10 md:mb-12 space-y-4 sm:space-y-6 w-full min-w-0">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-full border border-indigo-100">
+            <Video className="h-3.5 w-3.5 shrink-0" />
+            <span className="text-[10px] font-black uppercase tracking-widest">DRAJAT ASN</span>
           </div>
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-black text-slate-900 tracking-tighter italic uppercase leading-none">
-            Program Webinar &quot;DRAJAT ASN&quot;<br />
-            <span className="text-indigo-600 text-lg md:text-2xl lg:text-3xl">(Digitalisasi Ruang Ajar dan Talenta ASN)</span>
-          </h1>
-          <p className="max-w-2xl text-slate-400 font-bold text-sm md:text-lg leading-relaxed">
-            Belajar tanpa batas, berkarya dengan tuntas, untuk Lamongan Megilan.
-          </p>
+          <div className="space-y-3 min-w-0">
+            <h1 className="text-[22px] sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight leading-tight">
+              Program Webinar <span className="text-indigo-600">“DRAJAT ASN”</span>
+              <span className="block text-[13px] sm:text-lg lg:text-xl font-bold text-slate-500 normal-case tracking-normal mt-1">Digitalisasi Ruang Ajar dan Talenta ASN</span>
+            </h1>
+            <p className="max-w-2xl text-[13px] sm:text-sm md:text-base font-medium text-slate-500 leading-relaxed">
+              Belajar tanpa batas, berkarya dengan tuntas, untuk Lamongan Megilan.
+            </p>
+          </div>
 
-          {/* Search */}
-          <div className="pt-4 md:pt-6">
-            <div className="flex items-center gap-3 md:gap-4 bg-slate-50 border border-slate-100 p-3 md:p-5 rounded-xl md:rounded-[2rem] focus-within:bg-white focus-within:ring-4 focus-within:ring-indigo-50 transition-all shadow-inner group">
-              <Search className="h-5 w-5 md:h-6 md:w-6 text-slate-300 group-focus-within:text-indigo-600" />
+          <div className="pt-2 sm:pt-4 w-full max-w-full min-w-0">
+            <div className="flex items-center gap-2 sm:gap-3 bg-slate-50 border border-slate-100 p-2.5 sm:p-3 rounded-2xl focus-within:bg-white focus-within:ring-2 focus-within:ring-indigo-100 focus-within:border-indigo-200 transition-all group w-full overflow-hidden">
+              <Search className="h-5 w-5 text-slate-400 group-focus-within:text-indigo-600 shrink-0" />
               <input
                 type="text"
                 placeholder="Cari webinar berdasarkan judul..."
-                className="flex-1 bg-transparent outline-none font-bold text-sm md:text-base text-slate-700 placeholder:text-slate-300"
+                className="flex-1 min-w-0 bg-transparent outline-none font-bold text-sm text-slate-700 placeholder:text-slate-400"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
+              {search && (
+                <button onClick={() => setSearch('')} className="text-xs font-black text-indigo-600 hover:text-indigo-700 px-2 shrink-0">HAPUS</button>
+              )}
             </div>
           </div>
 
-          {/* Results count */}
           {!loading && (
-            <p className="text-xs md:text-sm font-bold text-slate-400">
-              Menampilkan <span className="text-indigo-600">{paginatedWebinars.length}</span> dari <span className="text-indigo-600">{filtered.length}</span> webinar
+            <p className="text-xs font-semibold text-slate-500">
+              Menampilkan <span className="text-indigo-600 font-black">{paginatedWebinars.length}</span> dari <span className="text-slate-900 font-black">{filtered.length}</span> webinar
             </p>
           )}
         </header>
 
-        {/* Results */}
-        <section>
+        <section className="w-full min-w-0">
           {loading ? (
-            <div className="flex flex-col items-center justify-center py-20 md:py-40 gap-4 md:gap-6">
-              <Loader2 className="h-10 w-10 md:h-12 md:w-12 text-indigo-600 animate-spin" />
-              <p className="font-black text-slate-300 uppercase tracking-widest text-[10px] md:text-xs italic">
+            <div className="flex flex-col items-center justify-center py-16 sm:py-20 gap-4">
+              <Loader2 className="h-8 w-8 sm:h-10 sm:w-10 text-indigo-600 animate-spin" />
+              <p className="font-black text-slate-400 uppercase tracking-widest text-xs">
                 Memuat Webinar...
               </p>
             </div>
           ) : paginatedWebinars.length > 0 ? (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6 w-full">
                 {paginatedWebinars.map((item) => (
                   <div
                     key={String(item.id)}
-                    className="group flex flex-col bg-white rounded-2xl md:rounded-[2rem] border border-slate-100 shadow-lg shadow-slate-50 hover:shadow-2xl hover:shadow-indigo-100 hover:-translate-y-2 transition-all duration-500 overflow-hidden"
+                    className="group flex flex-col bg-white rounded-2xl sm:rounded-3xl border border-slate-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 overflow-hidden w-full min-w-0"
                   >
-                    {/* Image */}
-<div className="relative aspect-video overflow-hidden">
-                       <Image
-                         src={item.gambar || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2070'}
-                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
-                         alt={item.nama_webinar}
-                         width={800}
-                         height={450}
-                         loading="lazy"
-                       />
-                      {/* Status badge */}
-                      <div className={`absolute top-3 md:top-6 left-3 md:left-6 px-2 md:px-4 py-1 md:py-2 rounded-lg md:rounded-2xl shadow-xl border text-[8px] md:text-[9px] font-black uppercase tracking-widest leading-none ${
+                    <div className="relative aspect-video overflow-hidden bg-slate-100">
+                      <Image
+                        src={item.gambar || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2070'}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        alt={item.nama_webinar}
+                        width={800}
+                        height={450}
+                        loading="lazy"
+                      />
+                      <div className={`absolute top-3 left-3 px-2.5 py-1 rounded-full shadow-md border text-[10px] font-black uppercase tracking-widest backdrop-blur-md ${
                         item.status === 'selesai' || item.status?.includes('Selesai')
-                          ? 'bg-emerald-50 text-emerald-600 border-emerald-100'
-                          : 'bg-indigo-50 text-indigo-600 border-indigo-100'
+                          ? 'bg-emerald-500 text-white border-emerald-600'
+                          : 'bg-white/95 text-indigo-600 border-white'
                       }`}>
                         {item.status === 'selesai' || item.status?.includes('Selesai') ? 'Selesai' : 'Registrasi Dibuka'}
                       </div>
-                      {/* Category badge */}
                       {item.kategori && (
-                        <div className="absolute top-3 md:top-6 right-3 md:right-6 px-2 md:px-3 py-1 md:py-1.5 bg-white/90 backdrop-blur rounded-lg md:rounded-xl shadow border border-white/50">
-                          <span className="text-[8px] md:text-[9px] font-black text-slate-600 uppercase tracking-widest leading-none">
+                        <div className="absolute top-3 right-3 px-2.5 py-1 bg-slate-900/80 backdrop-blur-md rounded-full border border-white/20">
+                          <span className="text-[10px] font-black text-white uppercase tracking-widest">
                             {item.kategori}
                           </span>
                         </div>
                       )}
                     </div>
 
-                    {/* Content */}
-                    <div className="p-4 md:p-8 lg:p-10 flex-1 flex flex-col">
-                      {/* Title */}
-                      <h3 className="text-lg md:text-xl lg:text-2xl font-black text-slate-900 group-hover:text-indigo-600 transition-colors uppercase italic tracking-tighter leading-none mb-3 md:mb-4">
+                    <div className="p-4 sm:p-5 flex-1 flex flex-col min-w-0">
+                      <h3 className="text-[15px] sm:text-base font-black text-slate-900 group-hover:text-indigo-600 transition-colors leading-tight line-clamp-2 min-w-0">
                         {item.nama_webinar}
                       </h3>
-
-                      {/* Description */}
-                      <p className="text-slate-400 font-bold text-sm md:text-base line-clamp-2 md:line-clamp-3 mb-4 md:mb-8 leading-relaxed italic">
+                      <p className="text-[13px] text-slate-500 font-medium line-clamp-2 leading-relaxed mt-2 min-w-0">
                         {item.deskripsi}
                       </p>
 
-                      {/* Meta */}
-                      <div className="space-y-2 md:space-y-4 mb-6 md:mb-10 pt-3 md:pt-6 border-t border-slate-50">
-                        {/* Date */}
-                        <div className="flex items-center gap-2 text-[10px] md:text-xs font-black text-slate-700 uppercase tracking-tighter">
-                          <Calendar className="h-3 w-3 md:h-4 md:w-4 text-indigo-400" />
-                          {new Date(item.tanggal_mulai).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
+                      <div className="flex flex-col gap-2 mt-4 pt-3 border-t border-slate-50">
+                        <div className="flex items-center gap-1.5 text-xs font-bold text-slate-600">
+                          <Calendar className="h-3.5 w-3.5 text-indigo-500 shrink-0" />
+                          <span className="truncate">{new Date(item.tanggal_mulai).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
                         </div>
-
-                        {/* Kuota */}
-                        <div className="flex items-center gap-2 text-[10px] md:text-xs font-black text-slate-700 uppercase tracking-tighter">
-                          <Users className="h-3 w-3 md:h-4 md:w-4 text-indigo-400" />
+                        <div className="flex items-center gap-1.5 text-xs font-bold text-slate-600">
+                          <Users className="h-3.5 w-3.5 text-indigo-500 shrink-0" />
                           {item.kuota || 'UNLIMITED'} PESERTA
                         </div>
                       </div>
 
-                      {/* CTA */}
                       <Link
                         href={`/webinar/${item.id}`}
-                        className="mt-auto inline-flex items-center justify-center gap-2 md:gap-4 py-3 md:py-5 bg-slate-900 text-white rounded-xl md:rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest hover:bg-indigo-600 transition-all active:scale-95 shadow-xl shadow-slate-200"
+                        className="mt-4 inline-flex items-center justify-center gap-2 py-3 bg-slate-900 text-white rounded-xl font-black text-xs uppercase tracking-widest hover:bg-indigo-600 transition-colors active:scale-[0.98] w-full"
                       >
-                        Detail <ArrowRight className="h-3 w-3 md:h-4 md:w-4" />
+                        Detail <ArrowRight className="h-4 w-4" />
                       </Link>
                     </div>
                   </div>
                 ))}
               </div>
 
-              {/* Pagination */}
               {totalPages > 1 && (
-                <div className="mt-10 md:mt-16 flex items-center justify-center gap-2 md:gap-3">
-                  {/* Previous */}
+                <div className="mt-8 sm:mt-10 flex items-center justify-center gap-1.5 sm:gap-2 flex-wrap">
                   <button
                     onClick={() => goToPage(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className="h-10 w-10 md:h-12 md:w-12 flex items-center justify-center rounded-xl md:rounded-2xl border border-slate-200 bg-white text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 transition-all disabled:opacity-30 disabled:cursor-not-allowed active:scale-95"
+                    aria-label="Halaman sebelumnya"
+                    className="h-9 w-9 sm:h-10 sm:w-10 flex items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 transition-colors disabled:opacity-30 disabled:cursor-not-allowed active:scale-95"
                   >
-                    <ChevronLeft className="h-4 w-4 md:h-5 md:w-5" />
+                    <ChevronLeft className="h-4 w-4" />
                   </button>
-
-                  {/* Page numbers */}
-                  <div className="flex items-center gap-1 md:gap-2">
+                  <div className="flex items-center gap-1.5 flex-wrap">
                     {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                       <button
                         key={page}
                         onClick={() => goToPage(page)}
-                        className={`h-10 w-10 md:h-12 md:w-12 flex items-center justify-center rounded-xl md:rounded-2xl font-black text-xs md:text-sm transition-all active:scale-95 ${
+                        className={`h-9 w-9 sm:h-10 sm:w-10 flex items-center justify-center rounded-xl font-black text-xs sm:text-sm transition-all active:scale-95 ${
                           currentPage === page
-                            ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-200'
-                            : 'bg-white text-slate-400 border border-slate-200 hover:bg-slate-50 hover:text-indigo-600'
+                            ? 'bg-indigo-600 text-white shadow-md'
+                            : 'bg-white text-slate-500 border border-slate-200 hover:bg-slate-50 hover:text-indigo-600'
                         }`}
                       >
                         {page}
                       </button>
                     ))}
                   </div>
-
-                  {/* Next */}
                   <button
                     onClick={() => goToPage(currentPage + 1)}
                     disabled={currentPage === totalPages}
-                    className="h-10 w-10 md:h-12 md:w-12 flex items-center justify-center rounded-xl md:rounded-2xl border border-slate-200 bg-white text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 transition-all disabled:opacity-30 disabled:cursor-not-allowed active:scale-95"
+                    aria-label="Halaman berikutnya"
+                    className="h-9 w-9 sm:h-10 sm:w-10 flex items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 transition-colors disabled:opacity-30 disabled:cursor-not-allowed active:scale-95"
                   >
-                    <ChevronRight className="h-4 w-4 md:h-5 md:w-5" />
+                    <ChevronRight className="h-4 w-4" />
                   </button>
                 </div>
               )}
             </>
           ) : (
-            <div className="bg-slate-50 rounded-2xl md:rounded-[4rem] p-12 md:p-40 text-center space-y-4 md:space-y-8 border-4 border-dashed border-slate-100">
-              <Video className="h-12 w-12 md:h-20 md:w-20 text-slate-200 mx-auto" />
-              <h3 className="text-2xl md:text-4xl font-black text-slate-300 uppercase italic tracking-tighter">
-                Katalog Sedang Kosong
+            <div className="bg-slate-50 rounded-2xl sm:rounded-3xl p-8 sm:p-12 md:p-16 text-center border-2 border-dashed border-slate-200 w-full">
+              <Video className="h-10 w-10 sm:h-12 sm:w-12 text-slate-300 mx-auto" />
+              <h3 className="mt-4 text-lg sm:text-xl font-black text-slate-700 uppercase tracking-tight">
+                Katalog Kosong
               </h3>
-              <p className="text-sm md:text-base text-slate-400 font-bold italic">
-                Nantikan rilis jadwal webinar terbaru di kanal pengumuman.
+              <p className="mt-2 text-sm text-slate-500 font-medium">
+                Nantikan rilis jadwal webinar terbaru.
               </p>
               <button
                 onClick={() => setSearch('')}
-                className="text-indigo-600 font-black border-b-2 border-indigo-100 hover:border-indigo-600 transition-all uppercase text-[10px] tracking-widest"
+                className="mt-6 inline-flex px-5 py-2.5 bg-white border border-slate-200 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-slate-900 hover:text-white transition-colors"
               >
                 Tampilkan Semua
               </button>
@@ -262,8 +237,8 @@ export default function PublicWebinarPage() {
         </section>
       </main>
 
-      <footer className="py-12 md:py-20 border-t border-slate-50 text-center bg-white">
-        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+      <footer className="py-8 sm:py-10 border-t border-slate-100 text-center bg-white w-full overflow-hidden">
+        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest px-4">
           &copy; 2026 SURAJAYA CORPU. DIGITAL LEARNING HUB.
         </p>
       </footer>

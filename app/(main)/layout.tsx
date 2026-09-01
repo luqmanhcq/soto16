@@ -17,7 +17,8 @@ import {
     Menu,
     Award,
     X,
-    Users
+    Users,
+    Lightbulb
 } from 'lucide-react'
 
 /**
@@ -36,18 +37,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const pathname = usePathname()
     const { user, logout } = useAuth()
 
-    const navigation = [
+const navigation = [
         { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
         { name: 'Webinar', href: '/webinar', icon: Video },
         { name: 'Pembelajaran', href: '/pembelajaran', icon: BookOpen },
+        { name: 'Manajemen Pengetahuan', href: '/manajemen-pengetahuan', icon: Lightbulb },
         { name: 'Sertifikat', href: '/sertifikat', icon: FileCheck },
         { name: 'Profil', href: '/profil', icon: User },
     ]
 
-    const adminNavigation = [
+const adminNavigation = [
         { name: 'Rekap Sertifikat Webinar', href: '/admin/sertifikat-webinar', icon: Award },
         { name: 'Data Webinar', href: '/admin/webinar', icon: Video },
         { name: 'Data E-Learning', href: '/admin/pembelajaran', icon: BookOpen },
+        { name: 'Data Manajemen Pengetahuan', href: '/admin/manajemen-pengetahuan', icon: Lightbulb },
         { name: 'Data Pengumuman', href: '/admin/pengumuman', icon: Home },
         { name: 'Data Carousel', href: '/admin/carousel', icon: LayoutDashboard },
         { name: 'Approval Sertifikat', href: '/admin/sertifikat', icon: FileCheck },
@@ -67,7 +70,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm" onClick={() => setIsSidebarOpen(false)} />
                 <nav className="fixed inset-y-0 left-0 w-64 bg-white p-6 shadow-2xl flex flex-col">
                     <div className="flex items-center justify-between mb-10">
-                        <Image src="/surajaya_corpu.webp" alt="Logo" className="h-10 w-auto" width={40} height={40} priority={true} />
+                        <Image src="/surajaya_corpu.webp" alt="Logo" className="h-10 w-auto" width={40} height={40} priority={true} unoptimized />
                         <button onClick={() => setIsSidebarOpen(false)}><X className="h-6 w-6 text-slate-400" /></button>
                     </div>
                     <div className="flex-1 space-y-2">
@@ -130,7 +133,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             {/* Desktop Sidebar */}
             <nav className="hidden lg:flex w-72 flex-col bg-white border-r border-slate-200 p-8">
                 <div className="mb-12">
-                    <Image src="/surajaya_corpu.webp" alt="Logo" className="h-14 w-auto" width={56} height={56} priority={true} />
+                    <Image src="/surajaya_corpu.webp" alt="Logo" className="h-14 w-auto" width={56} height={56} priority={true} unoptimized />
                     <p className="text-[10px] text-slate-400 font-black tracking-[0.3em] mt-3 uppercase leading-none italic">Talent Hub Platform</p>
                 </div>
 
@@ -209,13 +212,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </nav>
 
             {/* Main Content */}
-            <div className="flex-1 flex flex-col overflow-hidden">
-                <header className="lg:hidden h-16 bg-white border-b border-slate-200 flex items-center px-6 gap-4">
-                    <button onClick={() => setIsSidebarOpen(true)}><Menu className="h-6 w-6 text-slate-600" /></button>
-                    <Image src="/surajaya_corpu.webp" alt="Logo" className="h-8 w-auto" width={32} height={32} priority={true} />
+            <div className="flex-1 flex flex-col overflow-hidden min-w-0 w-full">
+                <header className="lg:hidden h-16 bg-white border-b border-slate-200 flex items-center px-4 gap-3 shrink-0">
+                    <button onClick={() => setIsSidebarOpen(true)} className="h-10 w-10 flex items-center justify-center rounded-xl hover:bg-slate-50 active:scale-95 transition-all"><Menu className="h-6 w-6 text-slate-600" /></button>
+                    <Image src="/surajaya_corpu.webp" alt="Logo" className="h-8 w-auto" width={32} height={32} priority={true} unoptimized />
+                    <span className="text-xs font-black tracking-widest uppercase text-slate-600 truncate">SURAJAYA CORPU</span>
                 </header>
-                <main className="flex-1 overflow-y-auto focus:outline-none">
-                    {children}
+                <main className="flex-1 overflow-y-auto overflow-x-hidden focus:outline-none min-w-0 w-full">
+                    <div className="min-w-0 w-full max-w-full overflow-x-hidden">
+                        {children}
+                    </div>
                 </main>
             </div>
         </div>

@@ -198,28 +198,45 @@ export default function ManajemenPengetahuanBelajarPage({ params }: { params: Pr
                         </div>
 
                         {/* Navigation */}
-                        <div className="flex items-center justify-between">
-                            <button
-                                disabled={!prevMateri || isLocked}
-                                className="inline-flex items-center gap-2 px-4 py-3 bg-white text-slate-700 rounded-xl font-bold border border-slate-200 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                <ChevronLeft className="h-5 w-5" />
-                                Materi Sebelumnya
-                            </button>
-                            <Link
-                                href={prevMateri ? `/manajemen-pengetahuan/${slug}/belajar/${prevMateri.id}` : '#'}
-                                className="inline-flex items-center gap-2 px-4 py-3 bg-white text-slate-700 rounded-xl font-bold border border-slate-200 hover:bg-slate-50"
-                            >
-                                <ChevronLeft className="h-5 w-5" />
-                                Materi Sebelumnya
-                            </Link>
-                            <Link
-                                href={nextMateri ? `/manajemen-pengetahuan/${slug}/belajar/${nextMateri.id}` : '#'}
-                                className="inline-flex items-center gap-2 px-4 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700"
-                            >
-                                Materi Selanjutnya
-                                <ChevronRight className="h-5 w-5" />
-                            </Link>
+                        <div className="flex items-center justify-between gap-3">
+                            {prevMateri ? (
+                                <Link
+                                    href={`/manajemen-pengetahuan/${slug}/belajar/${prevMateri.id}`}
+                                    className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 py-3 bg-white text-slate-700 rounded-xl font-bold border border-slate-200 hover:bg-slate-50 active:scale-[0.98] transition-all text-sm"
+                                >
+                                    <ChevronLeft className="h-4 w-4" />
+                                    <span className="hidden sm:inline">Sebelumnya</span>
+                                    <span className="sm:hidden">Prev</span>
+                                </Link>
+                            ) : (
+                                <button
+                                    disabled
+                                    className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 py-3 bg-slate-100 text-slate-400 rounded-xl font-bold border border-slate-200 cursor-not-allowed text-sm"
+                                >
+                                    <ChevronLeft className="h-4 w-4" />
+                                    <span className="hidden sm:inline">Sebelumnya</span>
+                                    <span className="sm:hidden">Prev</span>
+                                </button>
+                            )}
+                            {nextMateri ? (
+                                <Link
+                                    href={`/manajemen-pengetahuan/${slug}/belajar/${nextMateri.id}`}
+                                    className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 active:scale-[0.98] transition-all text-sm"
+                                >
+                                    <span className="hidden sm:inline">Selanjutnya</span>
+                                    <span className="sm:hidden">Next</span>
+                                    <ChevronRight className="h-4 w-4" />
+                                </Link>
+                            ) : (
+                                <button
+                                    disabled
+                                    className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 py-3 bg-slate-100 text-slate-400 rounded-xl font-bold border border-slate-200 cursor-not-allowed text-sm"
+                                >
+                                    <span className="hidden sm:inline">Selanjutnya</span>
+                                    <span className="sm:hidden">Next</span>
+                                    <ChevronRight className="h-4 w-4" />
+                                </button>
+                            )}
                         </div>
                     </div>
 
