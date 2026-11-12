@@ -20,7 +20,11 @@ export const createWebinarSchema = z.object({
     template_sertifikat: z.string().optional().nullable().or(z.literal('')),
     sertifikat_config: z.string().optional().nullable().or(z.literal('')),
     gambar: z.string().optional().nullable(),
+    virtual_bg: z.string().optional().nullable().or(z.literal('')),
     status: z.enum(['draft', 'publish', 'selesai']).default('draft'),
+    rumpun_id: z.string().optional().nullable(),
+    rumpun_nama: z.string().optional().nullable(),
+    jenis_kursus_id: z.string().optional().nullable(),
 });
 
 export const updateWebinarSchema = createWebinarSchema.partial();

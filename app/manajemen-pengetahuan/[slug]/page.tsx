@@ -202,57 +202,43 @@ export default function ManajemenPengetahuanDetailPage({ params }: { params: Pro
                 </div>
             </div>
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10">
-                {/* Hero */}
-                <div className="grid gap-6 lg:gap-8 lg:grid-cols-3 items-start">
-                    <div className="lg:col-span-2 space-y-6">
-                        <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+            <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 overflow-x-hidden">
+                {/* Hero - mobile compact */}
+                <div className="grid gap-4 sm:gap-6 lg:gap-8 lg:grid-cols-3 items-start">
+                    <div className="lg:col-span-2 space-y-4 sm:space-y-6 min-w-0">
+                        <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
                             {program.gambar && (
-                                <div className="relative h-48 sm:h-64 lg:h-72 overflow-hidden bg-slate-100">
+                                <div className="relative h-40 sm:h-56 lg:h-64 overflow-hidden bg-slate-100">
                                     <Image src={program.gambar} alt={program.nama} fill className="object-cover" sizes="(max-width:1024px) 100vw, 66vw" />
                                     <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-slate-900/10 to-transparent" />
                                     <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 flex items-center gap-2 flex-wrap">
                                         <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/95 backdrop-blur text-slate-900 text-xs font-black border border-white/20 shadow-sm">
                                             <Layers className="h-3.5 w-3.5 text-indigo-600" /> {program.kategori || 'UMUM'}
                                         </span>
-                                        {program.jumlah_jp && (
-                                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-400 text-slate-900 text-xs font-black shadow-sm">
-                                                <Award className="h-3.5 w-3.5" /> {program.jumlah_jp} JP
-                                            </span>
-                                        )}
                                     </div>
                                 </div>
                             )}
-                            <div className="p-5 sm:p-6 lg:p-8">
+                            <div className="p-4 sm:p-6">
                                 {!program.gambar && (
-                                    <div className="flex flex-wrap items-center gap-2 mb-4">
-                                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100 text-xs font-black tracking-widest">
+                                    <div className="flex flex-wrap items-center gap-2 mb-3">
+                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100 text-xs font-bold">
                                             <Sparkles className="h-3.5 w-3.5" /> {program.kategori || 'UMUM'}
                                         </span>
-                                        {program.jumlah_jp && (
-                                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 text-amber-700 border border-amber-100 text-xs font-black">
-                                                <Clock className="h-3.5 w-3.5" /> {program.jumlah_jp} JP
-                                            </span>
-                                        )}
                                     </div>
                                 )}
 
-                                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-slate-900 leading-tight">
+                                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-slate-900 leading-tight break-words">
                                     {program.nama}
                                 </h1>
-                                <p className="mt-3 text-sm sm:text-base leading-relaxed font-medium text-slate-600">
+                                <p className="mt-2 text-sm leading-relaxed text-slate-600 break-words">
                                     {program.deskripsi}
                                 </p>
 
-                                {/* meta stats */}
-                                <div className="mt-6 grid grid-cols-3 gap-3">
+                                {/* meta stats - JP dihapus untuk manajemen pengetahuan */}
+                                <div className="mt-6 grid grid-cols-2 gap-3">
                                     <div className="rounded-2xl bg-slate-50 border border-slate-100 p-3 text-center">
                                         <p className="text-[10px] font-black tracking-widest uppercase text-slate-500">Materi</p>
                                         <p className="mt-1 text-lg font-black text-slate-900">{totalMateri}</p>
-                                    </div>
-                                    <div className="rounded-2xl bg-indigo-50 border border-indigo-100 p-3 text-center">
-                                        <p className="text-[10px] font-black tracking-widest uppercase text-indigo-600">Jam Pelajaran</p>
-                                        <p className="mt-1 text-lg font-black text-indigo-700">{program.jumlah_jp || 0} JP</p>
                                     </div>
                                     <div className={`rounded-2xl border p-3 text-center ${allMaterialsCompleted ? 'bg-emerald-50 border-emerald-100' : 'bg-white border-slate-100'}`}>
                                         <p className={`text-[10px] font-black tracking-widest uppercase ${allMaterialsCompleted ? 'text-emerald-600' : 'text-slate-500'}`}>Status</p>
@@ -290,17 +276,17 @@ export default function ManajemenPengetahuanDetailPage({ params }: { params: Pro
                             </div>
                         </div>
 
-                        {/* Kurikulum */}
-                        <div id="kurikulum" className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden scroll-mt-20">
-                            <div className="p-5 sm:p-6 lg:p-7 border-b border-slate-100 flex items-center justify-between gap-4">
-                                <h2 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-3">
-                                    <span className="h-9 w-9 rounded-xl bg-slate-900 text-white flex items-center justify-center">
+                        {/* Kurikulum - mobile friendly */}
+                        <div id="kurikulum" className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-sm overflow-hidden scroll-mt-20">
+                            <div className="p-4 sm:p-6 border-b border-slate-100 flex items-center justify-between gap-3">
+                                <h2 className="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-2">
+                                    <span className="h-8 w-8 rounded-lg bg-slate-900 text-white flex items-center justify-center">
                                         <BookOpen className="h-4 w-4" />
                                     </span>
                                     Daftar Materi
-                                    <span className="hidden sm:inline-flex px-2.5 py-1 rounded-full bg-slate-100 border border-slate-200 text-xs font-black text-slate-600">{totalMateri} BAB</span>
+                                    <span className="hidden sm:inline-flex px-2 py-1 rounded-full bg-slate-100 border border-slate-200 text-xs font-bold text-slate-600">{totalMateri} BAB</span>
                                 </h2>
-                                <span className="sm:hidden px-2.5 py-1 rounded-full bg-slate-100 text-xs font-black">{totalMateri} Materi</span>
+                                <span className="sm:hidden px-2 py-1 rounded-full bg-slate-100 text-xs font-bold">{totalMateri} Materi</span>
                             </div>
 
                             {isLocked && (
@@ -360,27 +346,56 @@ export default function ManajemenPengetahuanDetailPage({ params }: { params: Pro
                                                     <div className="border-t border-slate-100 bg-white p-4 sm:p-5 space-y-4">
                                                         {/* Media */}
                                                         {mTipe !== 'pdf' && materi.link_video && (
-                                                            <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-slate-900 ring-1 ring-slate-900/5">
-                                                                <iframe
-                                                                    src={getVideoEmbedUrl(materi.link_video)}
-                                                                    className="absolute inset-0 w-full h-full border-none"
-                                                                    allowFullScreen
-                                                                    title={materi.nama}
-                                                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                                                />
+                                                            <div className="w-full rounded-2xl overflow-hidden ring-1 ring-slate-200 bg-black">
+                                                                {/\.(mp4|webm|ogg)(\?|$)/i.test(materi.link_video) ? (
+                                                                    <video controls playsInline className="w-full aspect-video bg-black" src={materi.link_video} preload="metadata" />
+                                                                ) : (
+                                                                    <div className="relative aspect-video w-full bg-slate-900">
+                                                                        <iframe
+                                                                            src={getVideoEmbedUrl(materi.link_video)}
+                                                                            className="absolute inset-0 w-full h-full border-none"
+                                                                            allowFullScreen
+                                                                            title={materi.nama}
+                                                                            loading="lazy"
+                                                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                                                                        />
+                                                                    </div>
+                                                                )}
+                                                                <div className="flex items-center justify-between px-3 py-2 bg-slate-50 border-t border-slate-200">
+                                                                    <span className="text-xs font-bold text-slate-600 flex items-center gap-1.5"><Video className="h-3.5 w-3.5 text-indigo-600" /> Video</span>
+                                                                    <a href={materi.link_video} target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-indigo-600 hover:underline flex items-center gap-1">Buka <ExternalLink className="h-3 w-3" /></a>
+                                                                </div>
                                                             </div>
                                                         )}
                                                         {mTipe === 'pdf' && materi.link_file && (
                                                             <div className="w-full rounded-2xl overflow-hidden ring-1 ring-slate-200 bg-white">
-                                                                <div className="flex items-center justify-between px-4 py-3 bg-slate-50 border-b border-slate-200">
+                                                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-3 sm:px-4 py-2.5 bg-slate-50 border-b border-slate-200">
                                                                     <span className="text-xs font-black tracking-widest uppercase text-slate-600 flex items-center gap-2"><FileText className="h-4 w-4 text-red-500" /> Dokumen PDF</span>
-                                                                    <a href={materi.link_file} target="_blank" rel="noopener noreferrer" className="text-xs font-black text-indigo-600 hover:text-indigo-700 flex items-center gap-1">Buka Tab Baru <ExternalLink className="h-3.5 w-3.5" /></a>
+                                                                    <div className="flex items-center gap-2">
+                                                                        <a href={materi.link_file.includes('drive.google.com') ? materi.link_file.replace('/view','/preview').replace('open?id=','file/d/').split('&')[0] : materi.link_file} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50">
+                                                                            <ExternalLink className="h-3.5 w-3.5" /> Buka
+                                                                        </a>
+                                                                        <a href={materi.link_file} download className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-700">
+                                                                            Unduh
+                                                                        </a>
+                                                                    </div>
                                                                 </div>
-                                                                <iframe
-                                                                    src={materi.link_file}
-                                                                    className="w-full h-[58vh] sm:h-[62vh] border-none"
-                                                                    title={materi.nama}
-                                                                />
+                                                                <div className="relative bg-slate-100">
+                                                                    <object
+                                                                        data={materi.link_file.includes('drive.google.com') ? materi.link_file.replace('/view','/preview').replace('open?id=','file/d/').split('&')[0] : materi.link_file}
+                                                                        type="application/pdf"
+                                                                        className="w-full h-[42vh] sm:h-[55vh] lg:h-[60vh] min-h-[280px] sm:min-h-[320px] border-none block"
+                                                                    >
+                                                                        <iframe
+                                                                            src={materi.link_file.includes('drive.google.com') ? materi.link_file.replace('/view','/preview').replace('open?id=','file/d/').split('&')[0] : materi.link_file}
+                                                                            className="w-full h-[42vh] sm:h-[55vh] lg:h-[60vh] min-h-[280px] sm:min-h-[320px] border-none"
+                                                                            title={materi.nama}
+                                                                            loading="lazy"
+                                                                            allow="fullscreen"
+                                                                        />
+                                                                    </object>
+                                                                    <p className="sm:hidden text-center text-xs text-slate-500 py-2 bg-white border-t border-slate-200">Geser untuk membaca • ketuk Buka untuk layar penuh</p>
+                                                                </div>
                                                             </div>
                                                         )}
                                                         {!hasContent && (
@@ -471,14 +486,8 @@ export default function ManajemenPengetahuanDetailPage({ params }: { params: Pro
                                 <div className="mt-7 pt-6 border-t border-white/10 space-y-3">
                                     <div className="flex items-center justify-between text-sm">
                                         <span className="text-slate-300 flex items-center gap-2"><Layers className="h-4 w-4" /> Total Materi</span>
-                                        <span className="font-black">{totalMateri}</span>
+                                        <span className="font-black">{totalMateri} materi</span>
                                     </div>
-                                    {program.jumlah_jp && (
-                                        <div className="flex items-center justify-between text-sm">
-                                            <span className="text-slate-300 flex items-center gap-2"><Award className="h-4 w-4" /> Jam Pelajaran</span>
-                                            <span className="font-black">{program.jumlah_jp} JP</span>
-                                        </div>
-                                    )}
                                     <div className="flex items-center justify-between text-sm">
                                         <span className="text-slate-300 flex items-center gap-2"><ShieldCheck className="h-4 w-4" /> Status</span>
                                         <span className={`px-2.5 py-1 rounded-full text-xs font-black ${allMaterialsCompleted ? 'bg-emerald-500 text-white' : isLocked ? 'bg-amber-500 text-slate-900' : 'bg-white/15 text-white'}`}>

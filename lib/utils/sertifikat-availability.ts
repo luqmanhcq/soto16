@@ -2,17 +2,17 @@
  * Sertifikat ketersediaan.
  *
  * Aturan:
- * - Sertifikat baru TERSEDIA setelah 24 jam (1x24 jam) sejak webinar selesai.
- * - Tidak ada batas waktu unduh (tersedia selamanya setelah tersedia).
+ * - Sertifikat langsung TERSEDIA begitu webinar selesai (tanpa jeda 1x24 jam).
+ * - Tidak ada batas waktu unduh (tersedia selamanya setelah webinar selesai).
  */
-export const SERTIFIKAT_AVAILABLE_AFTER_HOURS = 24
+export const SERTIFIKAT_AVAILABLE_AFTER_HOURS = 0
 
 export type SertifikatAvailability = {
   /** Status ketersediaan saat ini */
-  status: 'belum_selesai' | 'belum_tersedia' | 'tersedia'
+  status: 'belum_selesai' | 'tersedia'
   /** Timestamp webinar selesai */
   selesaiAt: Date | null
-  /** Timestamp mulai tersedia (selesai + 24 jam) */
+  /** Timestamp mulai tersedia (sama dengan waktu selesai) */
   tersediaAt: Date | null
   /** Timestamp berakhir tersedia (selalu null karena tidak ada batas waktu) */
   berakhirAt: Date | null
@@ -34,33 +34,22 @@ export function getSertifikatAvailability(tanggalSelesai: string | Date | null):
   }
 
   const selesaiAt = new Date(tanggalSelesai)
-  const tersediaAt = new Date(selesaiAt.getTime() + SERTIFIKAT_AVAILABLE_AFTER_HOURS * 60 * 60 * 1000)
 
   if (now < selesaiAt) {
     return {
       status: 'belum_selesai',
       selesaiAt,
-      tersediaAt,
+      tersediaAt: selesaiAt,
       berakhirAt: null,
       message: 'Sertifikat belum tersedia karena acara belum selesai.',
-    }
-  }
-
-  if (now < tersediaAt) {
-    return {
-      status: 'belum_tersedia',
-      selesaiAt,
-      tersediaAt,
-      berakhirAt: null,
-      message: 'Sertifikat dapat diunduh mulai 24 jam setelah webinar selesai.',
     }
   }
 
   return {
     status: 'tersedia',
     selesaiAt,
-    tersediaAt,
+    tersediaAt: selesaiAt,
     berakhirAt: null,
-    message: 'Sertifikat dapat diunduh mulai 24 jam setelah webinar selesai.',
+    message: 'Sertifikat siap diunduh.',
   }
 }

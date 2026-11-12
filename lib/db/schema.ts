@@ -25,6 +25,10 @@ export const usersTable = pgTable(
     unit_kerja: varchar('unit_kerja', { length: 255 }),
     role: userRoleEnum('role').default('asn').notNull(),
     is_active: boolean('is_active').default(true).notNull(),
+    // SIASN resilience
+    asn_source: varchar('asn_source', { length: 20 }),
+    asn_last_sync_at: timestamp('asn_last_sync_at'),
+    asn_sync_status: varchar('asn_sync_status', { length: 20 }).default('pending'),
     created_at: timestamp('created_at').defaultNow().notNull(),
     updated_at: timestamp('updated_at').defaultNow().notNull(),
   },
@@ -57,7 +61,12 @@ export const webinarsTable = pgTable(
     template_sertifikat: text('template_sertifikat'),
     sertifikat_config: text('sertifikat_config'),
     gambar: text('gambar'),
+    virtual_bg: text('virtual_bg'),
     status: webinarStatusEnum('status').default('draft').notNull(),
+    // SIASN kursus mapping: diisi saat pembuatan webinar agar sync tinggal upload
+    rumpun_id: varchar('rumpun_id', { length: 10 }),
+    rumpun_nama: varchar('rumpun_nama', { length: 100 }),
+    jenis_kursus_id: varchar('jenis_kursus_id', { length: 10 }).default('11'),
     created_at: timestamp('created_at').defaultNow().notNull(),
     updated_at: timestamp('updated_at').defaultNow().notNull(),
   },
@@ -571,4 +580,79 @@ export const sertifikatWebinarTable = pgTable(
 export const sertifikatWebinarRelations = relations(sertifikatWebinarTable, ({ one }) => ({
   user: one(usersTable, { fields: [sertifikatWebinarTable.user_id], references: [usersTable.id] }),
   webinar: one(webinarsTable, { fields: [sertifikatWebinarTable.webinar_id], references: [webinarsTable.id] }),
+}))
+
+// ============ SIASN RESILIENCE TABLES ============
+
+export const siasnSyncStatusEnum = pgEnum('siasn_sync_status', ['pending', 'queued_simegilan', 'synced', 'failed'])
+export const siasnSumberTypeEnum = pgEnum('siasn_sumber_type', ['webinar', 'pembelajaran', 'usulan'])
+
+export const siasnCacheTable = pgTable('siasn_cache', {
+  nip: varchar('nip', { length: 18 }).primaryKey(),
+  jabatan: varchar('jabatan', { length: 100 }),
+  golongan: varchar('golongan', { length: 50 }),
+  unit_kerja: varchar('unit_kerja', { length: 255 }),
+  unor_id: varchar('unor_id', { length: 64 }),
+  instansi_id: varchar('instansi_id', { length: 64 }),
+  pns_orang_id: varchar('pns_orang_id', { length: 64 }),
+  raw_json: text('raw_json'),
+  sumber: varchar('sumber', { length: 20 }).default('siasn'),
+  updated_at: timestamp('updated_at').defaultNow().notNull(),
+})
+
+export const siasnSyncQueueTable = pgTable(
+  'siasn_sync_queue',
+  {
+    id: serial('id').primaryKey(),
+    user_id: integer('user_id').notNull(),
+    nip: varchar('nip', { length: 18 }).notNull(),
+    jenis: varchar('jenis', { length: 30 }).default('asn_data').notNull(),
+    status: siasnSyncStatusEnum('status').default('pending').notNull(),
+    retry_count: integer('retry_count').default(0).notNull(),
+    next_retry_at: timestamp('next_retry_at').defaultNow().notNull(),
+    last_error: text('last_error'),
+    created_at: timestamp('created_at').defaultNow().notNull(),
+    updated_at: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    userFk: foreignKey({ columns: [table.user_id], foreignColumns: [usersTable.id] }).onDelete('cascade'),
+    statusIdx: index('siasn_sync_queue_status_idx').on(table.status),
+    nextRetryIdx: index('siasn_sync_queue_next_retry_idx').on(table.next_retry_at),
+  })
+)
+
+export const siasnRiwayatSyncTable = pgTable(
+  'siasn_riwayat_sync',
+  {
+    id: serial('id').primaryKey(),
+    user_id: integer('user_id').notNull(),
+    nip: varchar('nip', { length: 18 }).notNull(),
+    sumber_type: siasnSumberTypeEnum('sumber_type').notNull(),
+    sumber_id: integer('sumber_id').notNull(),
+    nomor_sertifikat: varchar('nomor_sertifikat', { length: 255 }),
+    payload: text('payload'),
+    status: siasnSyncStatusEnum('status').default('pending').notNull(),
+    siasn_id: varchar('siasn_id', { length: 64 }),
+    error_msg: text('error_msg'),
+    retry_count: integer('retry_count').default(0).notNull(),
+    next_retry_at: timestamp('next_retry_at').defaultNow().notNull(),
+    synced_at: timestamp('synced_at'),
+    created_at: timestamp('created_at').defaultNow().notNull(),
+    updated_at: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    userFk: foreignKey({ columns: [table.user_id], foreignColumns: [usersTable.id] }).onDelete('cascade'),
+    uniqueIdx: uniqueIndex('siasn_riwayat_sync_unique_idx').on(table.user_id, table.sumber_type, table.sumber_id),
+    statusIdx: index('siasn_riwayat_sync_status_idx').on(table.status),
+  })
+)
+
+export const siasnCacheRelations = relations(siasnCacheTable, ({ one }) => ({
+  // no relations
+}))
+export const siasnSyncQueueRelations = relations(siasnSyncQueueTable, ({ one }) => ({
+  user: one(usersTable, { fields: [siasnSyncQueueTable.user_id], references: [usersTable.id] }),
+}))
+export const siasnRiwayatSyncRelations = relations(siasnRiwayatSyncTable, ({ one }) => ({
+  user: one(usersTable, { fields: [siasnRiwayatSyncTable.user_id], references: [usersTable.id] }),
 }))

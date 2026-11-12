@@ -131,14 +131,23 @@ export class WebinarQuestionService {
         // Aggregate results
         return questions.map(q => {
             const questionAnswers = allAnswers.filter(a => a.question_id === q.id)
-            const optionStats = q.options.map((opt: any) => ({
+            const optionStats = q.options.map((opt: any, optIdx: number) => ({
                 ...opt,
+                // Skor opsi: opsi ke-n bernilai n (1 = 1, 2 = 2, dst.), sesuai urutan jawaban
+                value: optIdx + 1,
                 count: questionAnswers.filter(a => a.option_id === opt.id).length
             }))
+
+            // Rata-rata per soal: Σ(jumlah jawaban opsi × nilai opsi) / total responden
+            const totalWeighted = optionStats.reduce((sum: number, opt: any) => sum + (opt.count * opt.value), 0)
+            const average = questionAnswers.length > 0
+                ? Math.round((totalWeighted / questionAnswers.length) * 100) / 100
+                : 0
 
             return {
                 ...q,
                 totalAnswers: questionAnswers.length,
+                average,
                 options: optionStats
             }
         })

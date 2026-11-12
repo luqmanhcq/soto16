@@ -132,6 +132,7 @@ export default function AdminSertifikatWebinarPage() {
                     <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Total Sertifikat: {stats.total} | Tahun Terpilih: {filterYear || 'Semua'}</p>
                 </div>
                 <div className="flex flex-wrap items-center gap-3">
+                    <button onClick={() => { const ids = filtered.map(f=>f.id); if(!ids.length) return alert('Tidak ada data'); if(!confirm(`Sinkron ${ids.length} sertifikat ke SIASN?`)) return; (async()=>{ for(const sid of ids){ await fetch('/api/siasn/kursus/sync',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sumber_type:'webinar',sumber_id:sid})}); } alert('Bulk sinkron selesai'); })(); }} className="px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold text-sm shadow-lg hover:bg-indigo-700 transition-all flex items-center gap-2">Sinkron SIASN</button>
                     <button
                         onClick={handleExport}
                         className="px-6 py-3 bg-emerald-600 text-white rounded-xl font-bold text-sm shadow-lg hover:bg-emerald-700 transition-all flex items-center gap-2"
@@ -213,6 +214,7 @@ export default function AdminSertifikatWebinarPage() {
                                         <td className="px-6 py-4 text-sm text-slate-600 whitespace-nowrap">{formatDate(item.created_at)}</td>
                                         <td className="px-6 py-4 text-right">
                                             <div className="flex items-center justify-end gap-2">
+                                                <button onClick={async()=>{ const r=await fetch('/api/siasn/kursus/sync',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sumber_type:'webinar',sumber_id:item.id})}); const j=await r.json(); alert(j.message||j.status)}} className="p-2 text-amber-600 hover:bg-amber-50 rounded-lg" title="Sinkron SIASN"><FileText className="h-5 w-5" /></button>
                                                 <button
                                                     onClick={() => window.open(`/api/webinar/${item.webinar_id}/sertifikat/pdf?user_id=${item.id}`, '_blank')}
                                                     className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"

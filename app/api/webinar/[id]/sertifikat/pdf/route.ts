@@ -7,6 +7,9 @@ import { cookies } from 'next/headers'
 import fs from 'fs/promises'
 import path from 'path'
 
+// NOTE: Logika generate PDF diduplikasi di lib/services/webinar-sertifikat-pdf.service.ts
+// (ensureWebinarCertificatePdf) untuk dipakai bulk-sync SIASN. Jika mengubah template di sini,
+// samakan juga di sana.
 // Dynamic import pdf-lib
 async function getPdfLib() {
     try {
@@ -236,6 +239,8 @@ export async function GET(
                         'Content-Type': 'application/pdf',
                         'Content-Disposition': `inline; filename="sertifikat-${webinarId}-${targetUserId}.pdf"`,
                         'Cache-Control': 'no-store, no-cache, must-revalidate',
+                        'X-Frame-Options': 'SAMEORIGIN',
+                        'Content-Security-Policy': "frame-ancestors 'self' blob:",
                     },
                 })
             } catch {
@@ -243,7 +248,7 @@ export async function GET(
             }
         }
 
-        // Check ketersediaan sertifikat (1x24 jam setelah selesai, tanpa batas waktu unduh)
+        // Check ketersediaan sertifikat (langsung tersedia setelah webinar selesai, tanpa batas waktu unduh)
         const { getSertifikatAvailability } = await import('@/lib/utils/sertifikat-availability')
         const availability = getSertifikatAvailability(webinar.tanggal_selesai)
         if (availability.status !== 'tersedia') {
@@ -253,9 +258,9 @@ export async function GET(
         // 3. Fetch User Info
         let [user] = await db.select().from(usersTable).where(eq(usersTable.id, userId))
 
-        // 3b. Jika golongan/jabatan/unit_kerja kosong, sync dari SIASN lalu simpan
+        // 3b. Jika golongan/jabatan/unit_kerja kosong, sync dari simegilan data utama (full lokal, tanpa API SIASN)
         if (user && (!user.jabatan || !user.golongan || !user.unit_kerja)) {
-            console.log(`[Sertifikat] User ${userId} memiliki data ASN tidak lengkap, sync dari SIASN...`)
+            console.log(`[Sertifikat] User ${userId} memiliki data ASN tidak lengkap, sync dari simegilan...`)
             const { siasnService } = await import('@/lib/services/siasn.service')
             const synced = await siasnService.syncAsnData(userId, user.nip)
             if (synced) {
@@ -317,23 +322,23 @@ export async function GET(
         // ─────────────────────────────────────────────────────────────────────
         // 7. Jika PDF sudah ada dan tidak diminta refresh → langsung serve
         // ─────────────────────────────────────────────────────────────────────
+        const pdfHeaders = {
+            'Content-Type': 'application/pdf',
+            'Content-Disposition': `inline; filename="sertifikat-${webinarId}.pdf"`,
+            'Cache-Control': 'no-store, no-cache, must-revalidate',
+            'X-Frame-Options': 'SAMEORIGIN',
+            'Content-Security-Policy': "frame-ancestors 'self' blob:",
+        }
         if (!forceRefresh) {
             try {
                 await fs.access(savedPdfPath)
                 const existingPdf = await fs.readFile(savedPdfPath)
                 console.log(`[Sertifikat] Serving existing PDF: ${savedPdfPath}`)
-                return new NextResponse(new Uint8Array(existingPdf), {
-                    headers: {
-                        'Content-Type': 'application/pdf',
-                        'Content-Disposition': `inline; filename="sertifikat-${webinarId}.pdf"`,
-                        'Cache-Control': 'no-store, no-cache, must-revalidate',
-                    },
-                })
+                return new NextResponse(new Uint8Array(existingPdf), { headers: pdfHeaders })
             } catch {
                 // File belum ada, lanjutkan generate
             }
         } else {
-            // Hapus PDF lama agar tidak serve file stale dari percobaan gagal sebelumnya
             await fs.unlink(savedPdfPath).catch(() => {})
             console.log(`[Sertifikat] Deleted stale PDF for fresh generation: ${savedPdfPath}`)
         }
@@ -418,28 +423,54 @@ export async function GET(
             const pdfBuffer = await convertDocxToPdf(docxBuffer, tempDir, uniqueId)
 
             if (pdfBuffer && pdfBuffer.length > 1000) {
-                // Simpan PDF ke public/sertifikat/
                 await fs.writeFile(savedPdfPath, pdfBuffer)
                 console.log(`[Sertifikat] PDF saved to: ${savedPdfPath}`)
+                return new NextResponse(new Uint8Array(pdfBuffer), { headers: pdfHeaders })
+            }
 
-                return new NextResponse(new Uint8Array(pdfBuffer), {
+            // Jika konversi gagal → fallback generate PDF sederhana via pdf-lib agar preview tetap muncul (Chrome/Mozilla/Mobile)
+            console.warn('[Sertifikat] All PDF conversion stages failed. Generating fallback PDF via pdf-lib.')
+            try {
+                const { PDFDocument, rgb, StandardFonts } = await getPdfLib()
+                const pdfDoc = await PDFDocument.create()
+                const page = pdfDoc.addPage([842, 595])
+                const { width, height } = page.getSize()
+                const bold = await pdfDoc.embedFont(StandardFonts.HelveticaBold)
+                const regular = await pdfDoc.embedFont(StandardFonts.Helvetica)
+                const drawCentered = (text: string, y: number, font: any, size: number, color = rgb(0.12, 0.12, 0.12)) => {
+                    const w = font.widthOfTextAtSize(text, size)
+                    page.drawText(text, { x: (width - w) / 2, y, size, font, color })
+                }
+                drawCentered('SERTIFIKAT', height * 0.80, bold, 28, rgb(0.05, 0.2, 0.5))
+                drawCentered(valNomor, height * 0.72, regular, 9, rgb(0.3, 0.3, 0.3))
+                drawCentered(valNama, height * 0.58, bold, 22, rgb(0.05, 0.05, 0.05))
+                drawCentered(valNip, height * 0.50, regular, 11, rgb(0.2, 0.2, 0.2))
+                if (valJabatan) drawCentered(valJabatan, height * 0.46, regular, 11, rgb(0.2, 0.2, 0.2))
+                drawCentered(valOpd, height * 0.42, regular, 11, rgb(0.2, 0.2, 0.2))
+                drawCentered(webinar.nama_webinar || '', height * 0.32, regular, 10, rgb(0.3, 0.3, 0.3))
+                drawCentered(new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }), height * 0.18, regular, 9, rgb(0.4, 0.4, 0.4))
+                const pdfBytes = await pdfDoc.save()
+                const pdfBufferFallback = Buffer.from(pdfBytes)
+                await fs.writeFile(savedPdfPath, pdfBufferFallback).catch(() => {})
+                return new NextResponse(new Uint8Array(pdfBufferFallback), {
                     headers: {
                         'Content-Type': 'application/pdf',
                         'Content-Disposition': `inline; filename="sertifikat-${webinarId}.pdf"`,
                         'Cache-Control': 'no-store, no-cache, must-revalidate',
+                        'X-Frame-Options': 'SAMEORIGIN',
+                        'Content-Security-Policy': "frame-ancestors 'self' blob:",
+                    },
+                })
+            } catch (fallbackErr: any) {
+                console.error('[Sertifikat] Fallback PDF also failed, returning DOCX', fallbackErr)
+                return new NextResponse(new Uint8Array(docxBuffer), {
+                    headers: {
+                        'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                        'Content-Disposition': `attachment; filename="sertifikat-${webinarId}.docx"`,
+                        'Cache-Control': 'no-store, no-cache, must-revalidate',
                     },
                 })
             }
-
-            // Jika konversi gagal → kembalikan DOCX (fallback)
-            console.warn('[Sertifikat] All PDF conversion stages failed. Returning DOCX as fallback.')
-            return new NextResponse(new Uint8Array(docxBuffer), {
-                headers: {
-                    'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                    'Content-Disposition': `attachment; filename="sertifikat-${webinarId}.docx"`,
-                    'Cache-Control': 'no-store, no-cache, must-revalidate',
-                },
-            })
         }
 
         // ── Cabang PDF / Gambar ──────────────────────────────────────────────
@@ -611,13 +642,7 @@ export async function GET(
         await fs.writeFile(savedPdfPath, pdfBuffer)
         console.log(`[Sertifikat] PDF (image/pdf template) saved to: ${savedPdfPath}`)
 
-        return new NextResponse(new Uint8Array(pdfBuffer), {
-            headers: {
-                'Content-Type': 'application/pdf',
-                'Content-Disposition': `inline; filename="sertifikat-${webinarId}.pdf"`,
-                'Cache-Control': 'no-store, no-cache, must-revalidate',
-            },
-        })
+        return new NextResponse(new Uint8Array(pdfBuffer), { headers: pdfHeaders })
 
     } catch (err: any) {
         console.error('[Sertifikat PDF] Error:', err)

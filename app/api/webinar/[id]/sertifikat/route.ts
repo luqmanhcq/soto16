@@ -33,7 +33,7 @@ export async function GET(
             return NextResponse.json({ message: 'Template sertifikat belum diatur untuk webinar ini' }, { status: 400, headers: noStore })
         }
 
-        // Check ketersediaan sertifikat (1x24 jam setelah selesai, window 24 jam)
+        // Check ketersediaan sertifikat (langsung tersedia setelah webinar selesai)
         const { getSertifikatAvailability } = await import('@/lib/utils/sertifikat-availability')
         const availability = getSertifikatAvailability(webinar.tanggal_selesai)
         if (availability.status !== 'tersedia') {
@@ -51,9 +51,9 @@ export async function GET(
         // 3. Fetch User Info
         let [user] = await db.select().from(usersTable).where(eq(usersTable.id, userId))
 
-        // 3b. Jika golongan/jabatan/unit_kerja kosong, sync dari SIASN lalu simpan
+        // 3b. Jika golongan/jabatan/unit_kerja kosong, sync dari simegilan data utama (full lokal, tanpa API SIASN)
         if (user && (!user.jabatan || !user.golongan || !user.unit_kerja)) {
-            console.log(`[Sertifikat] User ${userId} memiliki data ASN tidak lengkap, sync dari SIASN...`)
+            console.log(`[Sertifikat] User ${userId} memiliki data ASN tidak lengkap, sync dari simegilan...`)
             const { siasnService } = await import('@/lib/services/siasn.service')
             const synced = await siasnService.syncAsnData(userId, user.nip)
             if (synced) {

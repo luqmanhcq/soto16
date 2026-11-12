@@ -29,17 +29,17 @@ export function proxy(request: NextRequest) {
 
     writeLog(`REQ: ${pathname} | hasToken: ${!!token} | tokenVal: ${token ? token.substring(0, 15) + '...' : 'none'}`)
 
-    // SiMEGILAN SSO: redirect /?token=xxx&role=yyy to /api/auth/sso-callback?token=xxx&role=yyy
+    // SiMEGILAN OIDC SSO: redirect /?code=xxx to /api/auth/sso-callback?code=xxx
     if (pathname === '/') {
-        const ssoToken = request.nextUrl.searchParams.get('token')
-        if (ssoToken) {
+        const oidcCode = request.nextUrl.searchParams.get('code')
+        if (oidcCode) {
             const callbackUrl = new URL('/api/auth/sso-callback', request.nextUrl.origin)
-            callbackUrl.searchParams.set('token', ssoToken)
+            callbackUrl.searchParams.set('code', oidcCode)
             const ssoRole = request.nextUrl.searchParams.get('role')
             if (ssoRole) {
                 callbackUrl.searchParams.set('role', ssoRole)
             }
-            writeLog(`REDIRECT /?token=...&role=${ssoRole || 'none'} -> /api/auth/sso-callback (SiMEGILAN SSO)`)
+            writeLog(`REDIRECT /?code=...&role=${ssoRole || 'none'} -> /api/auth/sso-callback (SiMEGILAN OIDC SSO)`)
             return NextResponse.redirect(callbackUrl)
         }
     }
@@ -52,15 +52,17 @@ export function proxy(request: NextRequest) {
         return NextResponse.redirect(url)
     }
 
-    // Public paths yang tidak memerlukan autentikasi
-    const publicPaths = ['/', '/login', '/register', '/tentang', '/pengumuman', '/webinar', '/pembelajaran']
+    // Public paths yang tidak memerlukan autentikasi — manajemen-pengetahuan detail harus public agar mobile bisa akses produk-hukum tanpa login
+    const publicPaths = ['/', '/login', '/register', '/tentang', '/pengumuman', '/webinar', '/pembelajaran', '/manajemen-pengetahuan']
     const isPublicPath =
-        publicPaths.includes(pathname) ||
+        publicPaths.some(p => pathname === p || pathname.startsWith(p + '/')) ||
         pathname.startsWith('/api/auth') ||
         pathname.startsWith('/api/webinar') ||
         pathname.startsWith('/api/pembelajaran') ||
         pathname.startsWith('/api/pengumuman') ||
-        pathname.startsWith('/uploads')
+        pathname.startsWith('/api/manajemen-pengetahuan') ||
+        pathname.startsWith('/uploads') ||
+        pathname.startsWith('/_next')
 
     // SSO callback endpoint — always allowed (no token required, it SETS the token)
     // Already covered by pathname.startsWith('/api/auth') above, but explicit for clarity

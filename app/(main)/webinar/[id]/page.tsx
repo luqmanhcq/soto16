@@ -19,7 +19,9 @@ import {
     UserCheck,
     Loader2,
     Youtube,
-    AlertCircle
+    AlertCircle,
+    Image as ImageIcon,
+    Download
 } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -181,7 +183,7 @@ export default function WebinarDetailPage({ params }: { params: Promise<{ id: st
 
                         <section className="bg-white rounded-2xl sm:rounded-3xl border border-slate-100 p-5 sm:p-6 md:p-8 space-y-4 w-full min-w-0 overflow-hidden">
                             <h2 className="text-base sm:text-lg font-black text-slate-900 border-l-4 border-indigo-600 pl-3">Deskripsi Kegiatan</h2>
-                            <div className="text-[13px] sm:text-sm md:text-base text-slate-600 leading-relaxed whitespace-pre-wrap break-words">{webinar.deskripsi}</div>
+                            <div className="text-[13px] sm:text-sm md:text-base text-slate-600 leading-relaxed whitespace-pre-wrap break-words">{webinar.deskripsi?.trim() ? webinar.deskripsi : 'Belum ada deskripsi kegiatan.'}</div>
                         </section>
 
                         <section className="bg-white rounded-2xl sm:rounded-3xl border border-slate-100 p-5 sm:p-6 md:p-8 space-y-5 w-full min-w-0 overflow-hidden">
@@ -308,7 +310,6 @@ export default function WebinarDetailPage({ params }: { params: Promise<{ id: st
 
                                         {(() => {
                                             const isFinished = hasEnded
-                                            const isTimeElapsed = isFinished && endDate ? (now.getTime() - endDate.getTime()) >= 24 * 60 * 60 * 1000 : false
                                             const getNotReadyReason = () => {
                                                 if (!webinar.template_sertifikat) return 'Template sertifikat belum diatur'
                                                 if (!isJoined) return 'Anda belum mendaftar'
@@ -316,7 +317,6 @@ export default function WebinarDetailPage({ params }: { params: Promise<{ id: st
                                                 if (!isAttended) return 'Anda belum absen'
                                                 if (!hasPostTest) return 'Belum mengerjakan post-test'
                                                 if (!hasMonev) return 'Belum mengerjakan MONEV'
-                                                if (!isTimeElapsed) return 'Sertifikat tersedia 1x24 jam setelah selesai'
                                                 return null
                                             }
                                             const notReadyReason = getNotReadyReason()
@@ -346,17 +346,19 @@ export default function WebinarDetailPage({ params }: { params: Promise<{ id: st
                                             {[
                                                 { name: 'Zoom Meeting', href: webinar.link_zoom, icon: VideoIcon },
                                                 { name: 'YouTube Live', href: webinar.link_youtube, icon: Youtube },
+                                                { name: 'Virtual BG', href: webinar.virtual_bg, icon: ImageIcon, download: true },
                                                 { name: 'Materi & PPT', href: webinar.link_materi, icon: FileText },
-                                            ].map((link, idx) => (
+                                            ].map((link: any, idx) => (
                                                 <a
                                                     key={idx}
                                                     href={link.href || undefined}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className={`flex items-center justify-between p-3.5 rounded-xl font-bold text-sm border transition-all w-full min-w-0 ${!link.href ? 'bg-slate-50 text-slate-300 border-slate-100 pointer-events-none' : 'bg-white text-slate-700 border-slate-100 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-100'}`}
+                                                    download={link.download ? '' : undefined}
+                                                    className={`flex items-center justify-between p-3.5 rounded-xl font-bold text-sm border transition-all w-full min-w-0 ${!link.href ? 'bg-slate-50 text-slate-300 border-slate-100 pointer-events-none' : link.download ? 'bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-700' : 'bg-white text-slate-700 border-slate-100 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-100'}`}
                                                 >
-                                                    <span className="flex items-center gap-2.5 min-w-0"><link.icon className={`h-4 w-4 shrink-0 ${!link.href ? 'text-slate-300' : 'text-indigo-500'}`} /><span className="truncate">{link.name}</span></span>
-                                                    {link.href && <ExternalLink className="h-3.5 w-3.5 opacity-40 shrink-0" />}
+                                                    <span className="flex items-center gap-2.5 min-w-0"><link.icon className={`h-4 w-4 shrink-0 ${!link.href ? 'text-slate-300' : link.download ? 'text-white' : 'text-indigo-500'}`} /><span className="truncate">{link.name}</span></span>
+                                                    {link.href && (link.download ? <Download className="h-3.5 w-3.5 opacity-80 shrink-0" /> : <ExternalLink className="h-3.5 w-3.5 opacity-40 shrink-0" />)}
                                                 </a>
                                             ))}
                                         </div>

@@ -39,8 +39,16 @@ export default function LoginPage() {
     const handleSsoLogin = () => {
         const ssoBaseUrl = process.env.NEXT_PUBLIC_SSO_BASE_URL || 'https://simegilan.lamongankab.go.id'
         const callbackUrl = `${window.location.origin}/api/auth/sso-callback`
-        const ssoLoginUrl = `${ssoBaseUrl}/login?redirect_uri=${encodeURIComponent(callbackUrl)}`
-        window.location.href = ssoLoginUrl
+        const state = Math.random().toString(36).substring(2) + Math.random().toString(36).substring(2)
+        const params = new URLSearchParams({
+            client_id: 'corpu_app',
+            redirect_uri: callbackUrl,
+            response_type: 'code',
+            scope: 'openid profile',
+            state: state,
+        })
+        const ssoAuthorizeUrl = `${ssoBaseUrl}/oauth/authorize?${params.toString()}`
+        window.location.href = ssoAuthorizeUrl
     }
 
     const handleSubmit = async (e: React.FormEvent) => {

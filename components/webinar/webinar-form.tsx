@@ -37,8 +37,14 @@ export default function WebinarForm({ id, initialData }: WebinarFormProps) {
         link_materi: '',
         template_sertifikat: '',
         gambar: '',
-        status: 'draft'
+        virtual_bg: '',
+        status: 'draft',
+        rumpun_id: '11',
+        rumpun_nama: 'PERINDUSTRIAN',
+        jenis_kursus_id: '11'
     })
+    const [rumpunList, setRumpunList] = useState<{id:string,nama:string}[]>([])
+    const [rumpunTouched, setRumpunTouched] = useState(false)
 
 
 
@@ -52,12 +58,31 @@ export default function WebinarForm({ id, initialData }: WebinarFormProps) {
         return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
     }
 
+    // load rumpun BKN
+    useEffect(() => {
+        fetch('/api/referensi/rumpun-jabatan').then(r=>r.json()).then(j=>{ if(j.success) setRumpunList(j.data)}).catch(()=>{})
+    }, [])
+    // auto-suggest rumpun dari judul webinar (sesuikan dengan link json BKN)
+    useEffect(() => {
+        if (rumpunTouched || !rumpunList.length || !formData.nama_webinar) return
+        const title = formData.nama_webinar.toUpperCase()
+        // keyword map rumpun
+        const found = rumpunList.find(r => title.includes(r.nama)) || rumpunList.find(r => r.nama==='PERINDUSTRIAN')
+        if (found && found.id !== formData.rumpun_id) {
+            setFormData(prev => ({ ...prev, rumpun_id: found.id, rumpun_nama: found.nama }))
+        }
+    }, [formData.nama_webinar, rumpunList, rumpunTouched])
+
     useEffect(() => {
         if (initialData) {
             setFormData({
                 ...initialData,
                 tanggal_mulai: formatDateTimeLocal(initialData.tanggal_mulai),
                 tanggal_selesai: formatDateTimeLocal(initialData.tanggal_selesai),
+                virtual_bg: initialData.virtual_bg || '',
+                rumpun_id: initialData.rumpun_id || '11',
+                rumpun_nama: initialData.rumpun_nama || 'PERINDUSTRIAN',
+                jenis_kursus_id: initialData.jenis_kursus_id || '11',
             })
             if (initialData.narasumber) {
                 // Gunakan JSON jika memungkinkan (Clean Code & Best Practice)
@@ -154,6 +179,41 @@ export default function WebinarForm({ id, initialData }: WebinarFormProps) {
             alert('Kesalahan jaringan saat mengunggah')
         } finally {
             setLoading(false)
+        }
+    }
+
+    const handleVirtualBgUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (!file) return
+
+        // Pastikan file gambar saja
+        if (!file.type.startsWith('image/')) {
+            alert('File virtual background harus berupa gambar (JPG, PNG, WebP, GIF).')
+            e.target.value = ''
+            return
+        }
+
+        const uploadData = new FormData()
+        uploadData.append('file', file)
+
+        setLoading(true)
+        try {
+            const res = await fetch('/api/upload', {
+                method: 'POST',
+                body: uploadData,
+            })
+            const data = await res.json()
+            if (res.ok) {
+                setFormData(prev => ({ ...prev, virtual_bg: data.url }))
+            } else {
+                alert(data.message || 'Gagal mengunggah virtual background')
+            }
+        } catch (error) {
+            console.error('Upload Error:', error)
+            alert('Kesalahan jaringan saat mengunggah')
+        } finally {
+            setLoading(false)
+            e.target.value = ''
         }
     }
 
@@ -279,6 +339,38 @@ export default function WebinarForm({ id, initialData }: WebinarFormProps) {
                         />
                     </div>
 
+                    <div>
+                        <label className="block text-sm font-bold text-slate-700 mb-2">Rumpun Jabatan (SIASN) <span className="text-[10px] font-normal text-slate-400">auto dari judul / BKN</span></label>
+                        <select
+                            name="rumpun_id"
+                            className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-slate-900"
+                            value={formData.rumpun_id}
+                            onChange={(e)=>{
+                                const v=e.target.value
+                                const nama=rumpunList.find(r=>r.id===v)?.nama || ''
+                                setRumpunTouched(true)
+                                setFormData(prev=>({...prev, rumpun_id:v, rumpun_nama:nama}))
+                            }}
+                        >
+                            {rumpunList.length===0 && <option value="11">PERINDUSTRIAN (11) - default</option>}
+                            {rumpunList.map(r=>(
+                                <option key={r.id} value={r.id}>{r.nama} ({r.id})</option>
+                            ))}
+                        </select>
+                        <p className="text-[10px] text-slate-400 mt-1">Disuikan dengan judul webinar dan <a href="https://api-siasn.bkn.go.id/referensi/rumpun-jabatan-new" target="_blank" className="text-blue-600 underline">BKN JSON</a>. Saat sinkron SIASN, rumpun ini langsung terisi — tinggal upload.</p>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-bold text-slate-700 mb-2">Jenis Kursus ID</label>
+                        <input
+                            name="jenis_kursus_id"
+                            className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-slate-900"
+                            value={formData.jenis_kursus_id}
+                            onChange={handleChange}
+                        />
+                        <p className="text-[10px] text-slate-400 mt-1">Default 11 (fungsional) — sesuikan jika perlu.</p>
+                    </div>
+
                     <div className="md:col-span-2">
                         <label className="block text-sm font-bold text-slate-700 mb-2 italic">Visual Banner / Poster Webinar (Upload)</label>
                         <div className="relative group/banner border-2 border-dashed border-slate-200 rounded-3xl p-4 bg-slate-50 hover:bg-slate-100 hover:border-slate-300 transition-all text-center">
@@ -365,7 +457,7 @@ export default function WebinarForm({ id, initialData }: WebinarFormProps) {
                                     <span className="text-[10px] text-slate-300 mt-1 uppercase">PDF, PNG, JPG, atau DOCX (Maks 5MB) (Sistem otomatis mengganti {"${nomer}, ${nama}, ${nip}, ${opd} atau [nomer], [nama], [nip], [opd]"})</span>
                                     <input
                                         type="file"
-                                        accept="application/pdf,image/png,image/jpeg,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                                        accept="application/pdf,image/png,image/jpeg,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,.doc,.docx"
                                         className="hidden"
                                         onChange={handleTemplateUpload}
                                     />
@@ -374,7 +466,52 @@ export default function WebinarForm({ id, initialData }: WebinarFormProps) {
                         </div>
                     </div>
 
-
+                    <div className="md:col-span-2">
+                        <label className="block text-sm font-bold text-slate-700 mb-2">Virtual Background (Gambar) — tombol download tampil di detail webinar</label>
+                        <div className="relative group/vbg border-2 border-dashed border-slate-200 rounded-3xl p-4 bg-slate-50 hover:bg-slate-100 hover:border-slate-300 transition-all text-center">
+                            {formData.virtual_bg ? (
+                                <div className="relative">
+                                    <Image
+                                        src={formData.virtual_bg}
+                                        alt="Virtual BG Preview"
+                                        className="w-full h-56 object-cover rounded-2xl shadow-md border-4 border-white"
+                                        width={800}
+                                        height={448}
+                                        unoptimized
+                                    />
+                                    <a
+                                        href={formData.virtual_bg}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-xs text-blue-600 font-semibold hover:underline mt-2 inline-block"
+                                    >
+                                        Lihat / Unduh File
+                                    </a>
+                                    <button
+                                        type="button"
+                                        onClick={() => setFormData(prev => ({ ...prev, virtual_bg: '' }))}
+                                        className="absolute -top-2 -right-2 h-8 w-8 bg-red-600 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-red-700 transition-all"
+                                    >
+                                        <X className="h-4 w-4" />
+                                    </button>
+                                </div>
+                            ) : (
+                                <label className="flex flex-col items-center justify-center py-10 cursor-pointer">
+                                    <div className="h-16 w-16 rounded-2xl bg-white border border-slate-100 shadow-sm flex items-center justify-center text-slate-400 group-hover/vbg:scale-110 group-hover/vbg:text-blue-600 transition-all">
+                                        <Upload className="h-8 w-8" />
+                                    </div>
+                                    <span className="text-xs font-black text-slate-400 mt-4 uppercase tracking-widest">Pilih Gambar Virtual Background</span>
+                                    <span className="text-[10px] text-slate-300 mt-1 uppercase">JPG, PNG, WebP, GIF (Maks 5MB)</span>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        className="hidden"
+                                        onChange={handleVirtualBgUpload}
+                                    />
+                                </label>
+                            )}
+                        </div>
+                    </div>
 
                     <div className="md:col-span-2">
                         <label className="block text-sm font-bold text-slate-700 mb-2">Deskripsi Webinar</label>

@@ -38,17 +38,20 @@ const nextConfig = {
           { key: "X-Frame-Options", value: "SAMEORIGIN" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           { key: "X-XSS-Protection", value: "1; mode=block" },
-          // Content Security Policy
+          // Content Security Policy — allow PDF/video preview di manajemen pengetahuan & sertifikat (self, blob:, youtube, drive)
           {
             key: "Content-Security-Policy",
             value:
               "default-src 'self'; " +
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline'; " +
-              "style-src 'self' 'unsafe-inline'; " +
-              "img-src 'self' data: https:; " +
-              "font-src 'self'; " +
-              "connect-src 'self'; " +
-              "frame-ancestors 'none'; " +
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https:; " +
+              "style-src 'self' 'unsafe-inline' https:; " +
+              "img-src 'self' data: https: blob:; " +
+              "font-src 'self' data: https:; " +
+              "connect-src 'self' blob: https:; " +
+              "media-src 'self' blob: https:; " +
+              "frame-src 'self' blob: https: https://www.youtube.com https://youtube.com https://drive.google.com https://docs.google.com; " +
+              "object-src 'self' blob: https:; " +
+              "frame-ancestors 'self' blob:; " +
               "base-uri 'self'; " +
               "form-action 'self';"
           },

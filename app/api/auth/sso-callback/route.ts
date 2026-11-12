@@ -19,18 +19,18 @@ import { ssoService } from '@/lib/services/sso.service'
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const token = searchParams.get('token')
+    const code = searchParams.get('code')
     const redirectRole = searchParams.get('role')
 
-    if (!token) {
-      // No token provided — redirect to login with error
+    if (!code) {
+      // No code provided — redirect to login with error
       const url = new URL('/login', request.nextUrl.origin)
-      url.searchParams.set('error', 'sso_no_token')
+      url.searchParams.set('error', 'sso_no_code')
       return NextResponse.redirect(url)
     }
 
-    // Authenticate via SSO (pass redirect role from SiMEGILAN URL)
-    const result = await ssoService.authenticateWithSsoToken(token, redirectRole || undefined)
+    // Authenticate via OIDC (pass redirect role from SiMEGILAN URL)
+    const result = await ssoService.authenticateWithOidcCode(code, request.nextUrl.origin, redirectRole || undefined)
 
     // Determine if we're on HTTPS (for Secure cookie flag)
     const isProduction = process.env.NODE_ENV === 'production'

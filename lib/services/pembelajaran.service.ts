@@ -164,16 +164,24 @@ export class PembelajaranService {
         const existing = await pembelajaranSertifikatRepository.getByUserAndPembelajaran(userId, pembelajaranId)
         if (existing) return existing
 
-        const [course, user, completionStatus] = await Promise.all([
+        const [course, userRows, completionStatus] = await Promise.all([
             pembelajaranRepository.findById(pembelajaranId),
             db.select().from(usersTable).where(eq(usersTable.id, userId)).limit(1),
             this.getCompletionStatus(pembelajaranId, userId)
         ])
 
         if (!course) throw new Error('Pembelajaran tidak ditemukan')
-        if (!user.length) throw new Error('User tidak ditemukan')
+        if (!userRows.length) throw new Error('User tidak ditemukan')
 
-        const u = user[0]
+        // Samakan dengan webinar: lengkapi jabatan/golongan/unit_kerja dari simegilan data utama (full lokal, tanpa API SIASN)
+        let u = userRows[0]
+        if (!u.jabatan || !u.golongan || !u.unit_kerja) {
+            console.log(`[Sertifikat-Pembelajaran] User ${userId} data ASN tidak lengkap, sync dari simegilan...`)
+            const { siasnService } = await import('@/lib/services/siasn.service')
+            await siasnService.syncAsnData(userId, u.nip)
+            const [refetched] = await db.select().from(usersTable).where(eq(usersTable.id, userId)).limit(1)
+            if (refetched) u = refetched
+        }
         const nomor = await this.generateNomorSertifikat(pembelajaranId)
 
         const sertifikat = await pembelajaranSertifikatRepository.create({

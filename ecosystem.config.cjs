@@ -22,10 +22,10 @@ module.exports = {
         NEXT_PUBLIC_SERVER_URL: 'http://soto.lokermegilan.my.id',
         NEXT_PUBLIC_APP_URL: 'http://soto.lokermegilan.my.id',
         NEXT_PUBLIC_API_URL: 'https://absensisscasn.lamongankab.go.id',
-        DATABASE_URL: 'postgresql://postgres:1453@localhost:5432/sisoto',
+        DATABASE_URL: 'postgresql://postgres:1453@localhost:5434/sisoto',
         JWT_SECRET: 'ganti-dengan-secret-yang-kuat-dan-panjang-minimal-32-karakter',
         // SSO Integration with SiMEGILAN
-        SIMEGILAN_DATABASE_URL: 'postgresql://postgres:1453@localhost:5432/simegilan',
+        SIMEGILAN_DATABASE_URL: 'postgresql://postgres:1453@localhost:5434/simegilan',
         SSO_BASE_URL: 'https://simegilan.lamongankab.go.id',
         NEXT_PUBLIC_SSO_BASE_URL: 'https://simegilan.lamongankab.go.id',
         // SSO Role Mapping (comma-separated NIPs for initial admin provisioning)

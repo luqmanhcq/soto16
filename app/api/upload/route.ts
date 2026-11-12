@@ -7,7 +7,12 @@ import { withRole } from '@/lib/middleware/auth'
 
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024 // 5 MB
 const MAX_PDF_SIZE = 20 * 1024 * 1024 // 20 MB
+const MAX_DOC_SIZE = 5 * 1024 * 1024 // 5 MB — template sertifikat docx/doc
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+const ALLOWED_DOC_TYPES = [
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
+    'application/msword', // .doc
+]
 const MAX_WIDTH = 1600
 const WEBP_QUALITY = 80
 
@@ -24,12 +29,16 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ message: 'Tidak ada file yang diunggah' }, { status: 400 })
         }
 
+        const fileNameRaw = (file as any).name as string || ''
+        const extRaw = fileNameRaw.split('.').pop()?.toLowerCase() || ''
         const isImage = ALLOWED_IMAGE_TYPES.includes(file.type)
-        const isPdf = file.type === 'application/pdf'
+        const isPdf = file.type === 'application/pdf' || extRaw === 'pdf'
+        // Beberapa browser kirim docx sebagai octet-stream — deteksi via ekstensi juga
+        const isDoc = ALLOWED_DOC_TYPES.includes(file.type) || extRaw === 'docx' || extRaw === 'doc'
 
-        if (!isImage && !isPdf) {
+        if (!isImage && !isPdf && !isDoc) {
             return NextResponse.json(
-                { message: 'Tipe file tidak diizinkan. Gunakan JPG, PNG, WebP, GIF, atau PDF.' },
+                { message: 'Tipe file tidak diizinkan. Gunakan JPG, PNG, WebP, GIF, PDF, DOC, atau DOCX.' },
                 { status: 400 }
             )
         }
@@ -48,6 +57,13 @@ export async function POST(request: NextRequest) {
             )
         }
 
+        if (isDoc && file.size > MAX_DOC_SIZE) {
+            return NextResponse.json(
+                { message: 'Ukuran template terlalu besar. Maksimal 5 MB.' },
+                { status: 400 }
+            )
+        }
+
         const bytes = await file.arrayBuffer()
         const buffer = Buffer.from(bytes)
 
@@ -62,6 +78,16 @@ export async function POST(request: NextRequest) {
                 .webp({ quality: WEBP_QUALITY })
                 .toBuffer()
             fileName = `${uuidv4()}.webp`
+        } else if (isDoc) {
+            // DOCX = ZIP (magic PK\x03\x04), DOC lama = OLE (D0CF11E0)
+            const isZip = buffer[0] === 0x50 && buffer[1] === 0x4b
+            const isOle = buffer[0] === 0xd0 && buffer[1] === 0xcf
+            if (!isZip && !isOle) {
+                return NextResponse.json({ message: 'File bukan dokumen Word yang valid (DOC/DOCX).' }, { status: 400 })
+            }
+            output = buffer
+            const ext = extRaw === 'doc' ? 'doc' : 'docx'
+            fileName = `${uuidv4()}.${ext}`
         } else {
             // PDF disimpan apa adanya (validasi magic number %PDF)
             const header = buffer.subarray(0, 5).toString('ascii')

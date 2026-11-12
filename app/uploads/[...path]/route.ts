@@ -56,10 +56,14 @@ export async function GET(
             contentType = mimeTypes[extension]
         }
 
+        const isPdf = extension === 'pdf'
         return new NextResponse(fileBuffer, {
             headers: {
                 'Content-Type': contentType,
-                'Cache-Control': 'public, max-age=31536000, immutable',
+                'Cache-Control': isPdf ? 'public, max-age=3600' : 'public, max-age=31536000, immutable',
+                'Content-Disposition': isPdf ? 'inline' : 'inline',
+                'X-Frame-Options': 'SAMEORIGIN',
+                'Content-Security-Policy': "frame-ancestors 'self' blob: https:",
             },
         })
     } catch (error) {

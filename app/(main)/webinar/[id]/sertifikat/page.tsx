@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, use } from 'react'
-import { ArrowLeft, Loader2, Download, AlertTriangle, RefreshCw, FileText, Info } from 'lucide-react'
+import { ArrowLeft, Loader2, Download, AlertTriangle, RefreshCw, FileText, Info, CloudUpload, CheckCircle2, Clock } from 'lucide-react'
 import Link from 'next/link'
 
 type CertData = {
@@ -41,7 +41,11 @@ export default function SertifikatPage({ params }: { params: Promise<{ id: strin
     const [generating, setGenerating]   = useState(false)
     const [pdfReady, setPdfReady]       = useState(false)
     const [pdfError, setPdfError]       = useState('')
-    const [pdfKey, setPdfKey]           = useState(0)   // increment to reload iframe
+    const [pdfKey, setPdfKey]           = useState(0)
+    const [pdfBlobUrl, setPdfBlobUrl]   = useState<string | null>(null)
+    const [siasnStatus, setSiasnStatus] = useState<any>(null)
+    const [siasnLoading, setSiasnLoading] = useState(false)
+    const [siasnMsg, setSiasnMsg] = useState('')
 
     // Step 1: Ambil metadata sertifikat (cek syarat, nomor, dll)
     useEffect(() => {
@@ -65,28 +69,67 @@ export default function SertifikatPage({ params }: { params: Promise<{ id: strin
         fetchMeta()
     }, [id])
 
-    // Step 2: Setelah metadata berhasil, trigger generate/load PDF
+    // Step 2: Setelah metadata berhasil, trigger generate/load PDF + cek status SIASN
     useEffect(() => {
         if (!data) return
         generatePdf()
+        fetchSiasnStatus()
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [data])
+
+    async function fetchSiasnStatus() {
+        try {
+            const res = await fetch(`/api/siasn/kursus/status?webinar_id=${id}`, { credentials: 'include' })
+            const j = await res.json()
+            if (res.ok) setSiasnStatus(j.data)
+        } catch {}
+    }
+    async function handleSiasnSync() {
+        setSiasnLoading(true); setSiasnMsg('')
+        try {
+            const res = await fetch('/api/siasn/kursus/sync', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sumber_type: 'webinar', sumber_id: Number(id) }) })
+            const j = await res.json()
+            setSiasnMsg(j.message || j.status || '')
+            await fetchSiasnStatus()
+        } catch (e: any) { setSiasnMsg(e.message) }
+        finally { setSiasnLoading(false) }
+    }
+    async function handleUploadDok(e: React.ChangeEvent<HTMLInputElement>) {
+        const file = e.target.files?.[0]; if (!file) return
+        setSiasnLoading(true); setSiasnMsg('')
+        try {
+            const fd = new FormData()
+            fd.append('sumber_type', 'webinar'); fd.append('sumber_id', String(id)); fd.append('file', file)
+            const res = await fetch('/api/siasn/kursus/upload-dok', { method: 'POST', credentials: 'include', body: fd })
+            const j = await res.json()
+            setSiasnMsg(j.message || (j.success ? 'Upload berhasil' : 'Gagal'))
+            await fetchSiasnStatus()
+        } catch (e: any) { setSiasnMsg(e.message) }
+        finally { setSiasnLoading(false); e.target.value='' }
+    }
+
+    // cleanup blob URL
+    useEffect(() => { return () => { if (pdfBlobUrl) URL.revokeObjectURL(pdfBlobUrl) } }, [pdfBlobUrl])
 
     async function generatePdf(refresh = false) {
         setGenerating(true)
         setPdfReady(false)
         setPdfError('')
+        if (pdfBlobUrl) { URL.revokeObjectURL(pdfBlobUrl); setPdfBlobUrl(null) }
 
         try {
             const url = `/api/webinar/${id}/sertifikat/pdf${refresh ? '?refresh=1' : ''}`
             const res = await fetch(url, { credentials: 'include' })
+            const ct = res.headers.get('Content-Type') || ''
 
-            if (res.ok && res.headers.get('Content-Type')?.includes('application/pdf')) {
-                // PDF berhasil dihasilkan / sudah ada → tampilkan iframe
+            if (res.ok && ct.includes('application/pdf')) {
+                const blob = await res.blob()
+                const objUrl = URL.createObjectURL(blob)
+                setPdfBlobUrl(objUrl)
                 setPdfReady(true)
                 setPdfKey(k => k + 1)
-            } else if (res.ok && res.headers.get('Content-Type')?.includes('officedocument')) {
-                // Fallback: LibreOffice gagal, server kirim DOCX
+            } else if (res.ok && ct.includes('officedocument')) {
+                // Server fallback DOCX — tampilkan fallback (backend sekarang jarang kirim ini, tapi tetap handle)
                 setPdfError('DOCX_FALLBACK')
             } else {
                 const json = await res.json().catch(() => ({}))
@@ -126,11 +169,8 @@ export default function SertifikatPage({ params }: { params: Promise<{ id: strin
                         <div className="mt-4 bg-amber-50 border border-amber-100 rounded-2xl p-4 text-left space-y-1.5">
                             <p className="text-sm font-bold text-amber-700">Informasi Unduhan Sertifikat</p>
                             <ul className="text-xs text-slate-600 font-medium space-y-1">
-                                <li>• Sertifikat dapat diunduh mulai <b>24 jam (1x24 jam)</b> setelah webinar selesai.</li>
-                                <li>• Sertifikat <b>tidak ada batas waktu</b> unduh setelah tersedia.</li>
-                                {availability?.tersediaAt && (
-                                    <li>• Buka halaman ini kembali pada {new Date(availability.tersediaAt).toLocaleString('id-ID')}.</li>
-                                )}
+                                <li>• Sertifikat dapat diunduh setelah webinar selesai.</li>
+                                <li>• Sertifikat <b>tidak ada batas waktu</b> unduh.</li>
                             </ul>
                         </div>
                     )}
@@ -161,6 +201,17 @@ export default function SertifikatPage({ params }: { params: Promise<{ id: strin
                     </Link>
 
                     <div className="flex items-center gap-3">
+                        {/* Sinkron SIASN */}
+                        <div className="flex items-center gap-2">
+                            <button onClick={handleSiasnSync} disabled={siasnLoading} className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold border transition-all text-sm ${siasnStatus?.status==='synced' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : siasnStatus?.status==='queued_simegilan' ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-700'} disabled:opacity-50`}>
+                                {siasnLoading ? <Loader2 className="h-4 w-4 animate-spin"/> : siasnStatus?.status==='synced' ? <CheckCircle2 className="h-4 w-4"/> : siasnStatus?.status==='queued_simegilan' ? <Clock className="h-4 w-4"/> : <CloudUpload className="h-4 w-4"/>}
+                                {siasnStatus?.status==='synced' ? 'Tersinkron' : siasnStatus?.status==='queued_simegilan' ? 'Antre' : 'Sinkron ke SIASN'}
+                            </button>
+                            <label className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-slate-100 text-slate-600 text-xs font-bold cursor-pointer hover:bg-slate-200">
+                                <CloudUpload className="h-3 w-3"/> Upload Dok
+                                <input type="file" accept="application/pdf" className="hidden" onChange={handleUploadDok} disabled={siasnLoading || !siasnStatus?.siasn_id} />
+                            </label>
+                        </div>
                         {/* Regenerate button */}
                         <button
                             onClick={() => generatePdf(true)}
@@ -172,11 +223,13 @@ export default function SertifikatPage({ params }: { params: Promise<{ id: strin
                             <span className="text-sm">Buat Ulang</span>
                         </button>
 
-                        {/* Download button — only visible when PDF is ready */}
+                        {/* Download button — uses blob URL jika ada, fallback ke endpoint */}
                         {pdfReady && (
                             <a
-                                href={`/api/webinar/${id}/sertifikat/pdf`}
+                                href={pdfBlobUrl || `/api/webinar/${id}/sertifikat/pdf`}
                                 download={`Sertifikat-${data?.webinar?.nama || id}.pdf`}
+                                target="_blank"
+                                rel="noopener"
                                 className="flex items-center gap-2 bg-blue-600 text-white px-6 py-2.5 rounded-xl font-bold shadow-lg shadow-blue-100 hover:bg-blue-700 transition-all active:scale-95"
                             >
                                 <Download className="h-5 w-5" />
@@ -206,16 +259,18 @@ export default function SertifikatPage({ params }: { params: Promise<{ id: strin
                     </div>
                 </div>
 
-                {/* Info banner: window unduhan 24 jam */}
-                <div className="bg-blue-50 border border-blue-100 rounded-2xl px-5 py-3.5 flex items-start gap-3 text-sm text-blue-700">
-                    <Info className="h-5 w-5 shrink-0 mt-0.5" />
-                    <div className="space-y-0.5">
-                        <p className="font-bold">Masa Unduh Sertifikat</p>
-                        <p className="text-xs font-medium text-blue-600">
-                            Sertifikat dapat diunduh mulai <b>24 jam (1x24 jam)</b> setelah webinar selesai, <b>tanpa batas waktu</b> unduh.
-                        </p>
+                {/* SIASN status */}
+                {(siasnStatus || siasnMsg) && (
+                    <div className={`rounded-2xl px-5 py-3.5 border text-sm flex items-start gap-3 ${siasnStatus?.status==='synced' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : siasnStatus?.status==='queued_simegilan' ? 'bg-amber-50 border-amber-200 text-amber-800' : siasnStatus?.status==='failed' ? 'bg-red-50 border-red-200 text-red-700' : 'bg-slate-50 border-slate-200 text-slate-600'}`}>
+                        {siasnStatus?.status==='synced' ? <CheckCircle2 className="h-5 w-5 shrink-0"/> : siasnStatus?.status==='queued_simegilan' ? <Clock className="h-5 w-5 shrink-0"/> : <Info className="h-5 w-5 shrink-0"/>}
+                        <div className="flex-1">
+                            <p className="font-bold">Status SIASN: {siasnStatus?.status || 'belum sinkron'} {siasnStatus?.siasn_id ? `• ${siasnStatus.siasn_id}` : ''}</p>
+                            {siasnStatus?.error_msg && <p className="text-xs mt-1 opacity-80">{siasnStatus.error_msg}</p>}
+                            {siasnMsg && <p className="text-xs mt-1 font-semibold">{siasnMsg}</p>}
+                            {siasnStatus?.status==='queued_simegilan' && <p className="text-xs mt-1">SIASN down — data antre di Simegilan, cron akan retry otomatis.</p>}
+                        </div>
                     </div>
-                </div>
+                )}
 
                 {/* ── PDF Preview Area ─────────────────────────────────────── */}
                 <div className="relative bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-100 w-full h-[72vh] min-h-[520px]">
@@ -257,7 +312,9 @@ export default function SertifikatPage({ params }: { params: Promise<{ id: strin
                                 </p>
                             </div>
                             <a
-                                href={`/api/webinar/${id}/sertifikat/pdf`}
+                                href={pdfBlobUrl || `/api/webinar/${id}/sertifikat/pdf`}
+                                target="_blank"
+                                rel="noopener"
                                 download={`Sertifikat-${data?.webinar?.nama || id}.docx`}
                                 className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white font-bold px-8 py-3 rounded-2xl shadow-lg transition-all active:scale-95"
                             >
@@ -285,8 +342,21 @@ export default function SertifikatPage({ params }: { params: Promise<{ id: strin
                         </div>
                     )}
 
-                    {/* The PDF iframe — shown when pdfReady */}
-                    {pdfReady && (
+                    {/* PDF preview — blob URL, cross-browser (Chrome/Mozilla/Mobile). Fallback object+embed */}
+                    {pdfReady && pdfBlobUrl && (
+                        <object key={pdfKey} data={pdfBlobUrl} type="application/pdf" className="w-full h-full border-none">
+                            <embed src={pdfBlobUrl} type="application/pdf" className="w-full h-full border-none" />
+                            <div className="flex flex-col items-center justify-center h-full gap-4 p-8 text-center">
+                                <FileText className="h-12 w-12 text-slate-400" />
+                                <p className="text-sm text-slate-500">Preview tidak didukung di browser ini.</p>
+                                <a href={pdfBlobUrl} target="_blank" rel="noopener" download={`Sertifikat-${data?.webinar?.nama || id}.pdf`} className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-xl font-bold">
+                                    <Download className="h-5 w-5" /> Buka / Unduh PDF
+                                </a>
+                            </div>
+                        </object>
+                    )}
+                    {/* Fallback jika pdfReady tapi blob belum siap (mis. direct link) */}
+                    {pdfReady && !pdfBlobUrl && (
                         <iframe
                             key={pdfKey}
                             src={`/api/webinar/${id}/sertifikat/pdf`}

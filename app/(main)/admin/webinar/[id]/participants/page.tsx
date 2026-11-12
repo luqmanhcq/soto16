@@ -14,6 +14,7 @@ import {
     BadgeCheck
 } from 'lucide-react'
 import { useAuth } from '@/lib/contexts/auth-context'
+import SiasnBulkSyncPanel from '@/components/admin/siasn-bulk-sync'
 
 export default function WebinarParticipantsPage() {
     const params = useParams()
@@ -101,6 +102,9 @@ export default function WebinarParticipantsPage() {
                     </button>
                 </div>
             </div>
+
+            {/* Sinkron All SIASN — hanya webinar selesai; cek syarat → generate sertifikat → sync per NIP + file */}
+            {webinarId && <SiasnBulkSyncPanel webinarId={String(webinarId)} />}
 
             {/* Main Content Table Area */}
             <div className="bg-white rounded-[3rem] border border-slate-100 shadow-xl overflow-hidden">

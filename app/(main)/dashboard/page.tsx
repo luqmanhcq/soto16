@@ -22,6 +22,9 @@ import {
     Lightbulb,
     ChevronRight,
     Target,
+    MessageCircle,
+    FileText,
+    Download,
 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -417,17 +420,44 @@ export default function DashboardPage() {
                         <div className="rounded-3xl bg-white border border-slate-100 p-6 shadow-sm">
                             <h3 className="text-xs font-black tracking-widest uppercase text-slate-500">Pusat Bantuan</h3>
                             <div className="mt-4 space-y-1">
-                                <Link href="/tentang" className="flex items-center justify-between p-3.5 rounded-xl hover:bg-slate-50 transition-colors group">
-                                    <span className="text-sm font-bold text-slate-700">Panduan Penggunaan</span>
-                                    <span className="h-8 w-8 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-white group-hover:text-indigo-600 transition-colors">
-                                        <ArrowRight className="h-4 w-4" />
+                                <div className="flex items-center gap-2 rounded-xl hover:bg-slate-50 transition-colors group">
+                                    <a
+                                        href="/4.%20Buku%20Panduan%20Pengguna%20DRAJAT%20ASN.pdf"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center gap-3 flex-1 min-w-0 p-3.5"
+                                    >
+                                        <span className="h-9 w-9 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100 flex items-center justify-center shrink-0 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                                            <FileText className="h-4 w-4" />
+                                        </span>
+                                        <span className="min-w-0">
+                                            <span className="block text-sm font-black text-slate-800">Panduan Penggunaan</span>
+                                            <span className="block text-xs font-semibold text-slate-500">Buku Panduan DRAJAT ASN</span>
+                                        </span>
+                                    </a>
+                                    <a
+                                        href="/4.%20Buku%20Panduan%20Pengguna%20DRAJAT%20ASN.pdf"
+                                        download="Buku Panduan Pengguna DRAJAT ASN.pdf"
+                                        title="Unduh panduan"
+                                        className="h-9 w-9 mr-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-colors shrink-0"
+                                    >
+                                        <Download className="h-4 w-4" />
+                                    </a>
+                                </div>
+                                <a
+                                    href="https://wa.me/6281336980266?text=Halo%20Helpdesk%20SURAJAYA%20CORPU%2C%20saya%20butuh%20bantuan."
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center gap-3 p-3.5 rounded-xl bg-emerald-50 border border-emerald-100 hover:bg-emerald-600 transition-colors group"
+                                >
+                                    <span className="h-9 w-9 rounded-xl bg-emerald-500 text-white flex items-center justify-center shrink-0 group-hover:bg-white group-hover:text-emerald-600 transition-colors">
+                                        <MessageCircle className="h-4 w-4" />
                                     </span>
-                                </Link>
-                                <a href="mailto:bkpsdm@lamongankab.go.id" className="flex items-center justify-between p-3.5 rounded-xl hover:bg-slate-50 transition-colors group">
-                                    <span className="text-sm font-bold text-slate-700">Hubungi Helpdesk</span>
-                                    <span className="h-8 w-8 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-white group-hover:text-indigo-600 transition-colors">
-                                        <ArrowRight className="h-4 w-4" />
+                                    <span className="min-w-0">
+                                        <span className="block text-sm font-black text-slate-800 group-hover:text-white">Hubungi Helpdesk</span>
+                                        <span className="block text-xs font-semibold text-emerald-700 group-hover:text-emerald-50">WA +62 813-3698-0266</span>
                                     </span>
+                                    <ArrowRight className="h-4 w-4 ml-auto text-emerald-600 group-hover:text-white shrink-0" />
                                 </a>
                             </div>
                         </div>

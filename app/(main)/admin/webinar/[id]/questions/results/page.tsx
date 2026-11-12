@@ -245,7 +245,7 @@ export default function WebinarResultsPage({ params }: { params: Promise<{ id: s
                                                     <div key={oIdx} className="space-y-2">
                                                         <div className="flex justify-between items-center px-2">
                                                             <span className={`text-[11px] font-bold flex items-center gap-2 ${opt.is_correct && activeTab === 'post_test' ? 'text-emerald-600' : 'text-slate-600'}`}>
-                                                                {opt.option_text}
+                                                                {`Opsi ${oIdx + 1}: `}{opt.option_text}
                                                                 {opt.is_correct && activeTab === 'post_test' && <CheckCircle2 className="h-3 w-3" />}
                                                             </span>
                                                             <span className="text-[11px] font-black text-slate-900">{opt.count}</span>
@@ -260,6 +260,13 @@ export default function WebinarResultsPage({ params }: { params: Promise<{ id: s
                                                 )
                                             })}
                                         </div>
+
+                                        {activeTab === 'monev' && (
+                                            <div className="bg-indigo-50/70 border border-indigo-100 rounded-2xl px-6 py-4 flex items-center justify-between">
+                                                <p className="text-[10px] font-black text-indigo-500 uppercase tracking-widest">Rata-rata per Soal</p>
+                                                <p className="text-2xl font-black text-indigo-700 italic tracking-tight">{q.average?.toFixed(2) ?? '0.00'}</p>
+                                            </div>
+                                        )}
                                     </div>
                                     <div className="px-10 py-6 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between">
                                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Respons: {q.totalAnswers}</p>

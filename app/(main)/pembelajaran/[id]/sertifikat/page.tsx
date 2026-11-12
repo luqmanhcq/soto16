@@ -12,7 +12,10 @@ import {
     FileText,
     GraduationCap,
     ClipboardCheck,
-    BookOpen
+    BookOpen,
+    CloudUpload,
+    Clock,
+    Info
 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -22,6 +25,9 @@ export default function CertificatePage({ params }: { params: Promise<{ id: stri
     const [data, setData] = useState<any>(null)
     const [loading, setLoading] = useState(true)
     const [downloading, setDownloading] = useState(false)
+    const [siasnStatus, setSiasnStatus] = useState<any>(null)
+    const [siasnLoading, setSiasnLoading] = useState(false)
+    const [siasnMsg, setSiasnMsg] = useState('')
 
     useEffect(() => {
         async function fetchData() {
@@ -38,7 +44,31 @@ export default function CertificatePage({ params }: { params: Promise<{ id: stri
             }
         }
         fetchData()
+        fetchSiasnStatus()
     }, [id])
+
+    async function fetchSiasnStatus() {
+        try {
+            const res = await fetch(`/api/siasn/kursus/status?sumber_type=pembelajaran&sumber_id=${id}`, { credentials: 'include' })
+            const j = await res.json(); if (res.ok) setSiasnStatus(j.data)
+        } catch {}
+    }
+    async function handleSiasnSync() {
+        setSiasnLoading(true); setSiasnMsg('')
+        try {
+            const res = await fetch('/api/siasn/kursus/sync', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sumber_type: 'pembelajaran', sumber_id: Number(id) }) })
+            const j = await res.json(); setSiasnMsg(j.message || j.status); await fetchSiasnStatus()
+        } catch (e: any) { setSiasnMsg(e.message) } finally { setSiasnLoading(false) }
+    }
+    async function handleUploadDok(e: React.ChangeEvent<HTMLInputElement>) {
+        const file = e.target.files?.[0]; if (!file) return
+        setSiasnLoading(true); setSiasnMsg('')
+        try {
+            const fd = new FormData(); fd.append('sumber_type','pembelajaran'); fd.append('sumber_id',String(id)); fd.append('file',file)
+            const res = await fetch('/api/siasn/kursus/upload-dok', { method:'POST', credentials:'include', body: fd })
+            const j = await res.json(); setSiasnMsg(j.message || (j.success?'Upload berhasil':'Gagal')); await fetchSiasnStatus()
+        } catch (e:any){ setSiasnMsg(e.message)} finally { setSiasnLoading(false); e.target.value='' }
+    }
 
     async function handleDownload() {
         setDownloading(true)
@@ -139,9 +169,9 @@ export default function CertificatePage({ params }: { params: Promise<{ id: stri
                 </div>
             </div>
 
-            {/* Download Button */}
+            {/* Download + SIASN */}
             {eligible ? (
-                <div className="text-center">
+                <div className="space-y-4 text-center">
                     <button
                         onClick={handleDownload}
                         disabled={downloading}
@@ -150,6 +180,22 @@ export default function CertificatePage({ params }: { params: Promise<{ id: stri
                         {downloading ? <Loader2 className="h-6 w-6 animate-spin" /> : <Download className="h-6 w-6" />}
                         UNDUH SERTIFIKAT PDF
                     </button>
+                    <div className="flex flex-wrap justify-center gap-3">
+                        <button onClick={handleSiasnSync} disabled={siasnLoading} className={`inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold border text-sm ${siasnStatus?.status==='synced' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : siasnStatus?.status==='queued_simegilan' ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-700'} disabled:opacity-50`}>
+                            {siasnLoading ? <Loader2 className="h-4 w-4 animate-spin"/> : siasnStatus?.status==='synced' ? <CheckCircle2 className="h-4 w-4"/> : siasnStatus?.status==='queued_simegilan' ? <Clock className="h-4 w-4"/> : <CloudUpload className="h-4 w-4"/>}
+                            {siasnStatus?.status==='synced' ? 'Tersinkron SIASN' : siasnStatus?.status==='queued_simegilan' ? 'Antre SIASN' : 'Sinkron ke SIASN'}
+                        </button>
+                        <label className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-slate-100 text-slate-700 text-sm font-bold cursor-pointer hover:bg-slate-200 border border-slate-200">
+                            <CloudUpload className="h-4 w-4"/> Upload Dok
+                            <input type="file" accept="application/pdf" className="hidden" onChange={handleUploadDok} disabled={siasnLoading || !siasnStatus?.siasn_id} />
+                        </label>
+                    </div>
+                    {(siasnStatus || siasnMsg) && (
+                        <div className={`mx-auto max-w-xl rounded-2xl px-5 py-3 border text-sm text-left flex gap-3 ${siasnStatus?.status==='synced' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : siasnStatus?.status==='queued_simegilan' ? 'bg-amber-50 border-amber-200 text-amber-800' : 'bg-slate-50 border-slate-200 text-slate-600'}`}>
+                            {siasnStatus?.status==='synced' ? <CheckCircle2 className="h-5 w-5 shrink-0"/> : siasnStatus?.status==='queued_simegilan' ? <Clock className="h-5 w-5 shrink-0"/> : <Info className="h-5 w-5 shrink-0"/>}
+                            <div><p className="font-bold">SIASN: {siasnStatus?.status || 'belum'} {siasnStatus?.siasn_id ? `• ${siasnStatus.siasn_id}`:''}</p>{siasnStatus?.error_msg && <p className="text-xs opacity-80">{siasnStatus.error_msg}</p>}{siasnMsg && <p className="text-xs font-semibold">{siasnMsg}</p>}</div>
+                        </div>
+                    )}
                 </div>
             ) : (
                 <div className="text-center">

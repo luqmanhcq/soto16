@@ -156,7 +156,7 @@ export default function PublicWebinarPage() {
                         {item.nama_webinar}
                       </h3>
                       <p className="text-[13px] text-slate-500 font-medium line-clamp-2 leading-relaxed mt-2 min-w-0">
-                        {item.deskripsi}
+                        {item.deskripsi?.trim() ? item.deskripsi : 'Belum ada deskripsi kegiatan.'}
                       </p>
 
                       <div className="flex flex-col gap-2 mt-4 pt-3 border-t border-slate-50">

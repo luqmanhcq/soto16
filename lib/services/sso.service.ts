@@ -24,31 +24,62 @@ type SsoTokenValidationData = {
 
 export class SsoService {
   /**
-   * Call SiMEGILAN's Api::validate_token endpoint to validate the SSO token.
-   * This exchanges the one-time token for pegawai data + role.
-   * The API also marks the token as used (one-time use).
-   *
-   * Endpoint: POST {SSO_BASE_URL}/api/validate_token
-   * Body: { "token": "xxx" }
-   * Response: { status: "success", data: { nip_baru, nama, nama_lengkap, role, ... } }
+   * Exchange OIDC Authorization Code for Access Token via /oauth/token,
+   * then fetch user profile via /oauth/userinfo.
    */
-  private async validateTokenViaApi(token: string): Promise<SsoTokenValidationData> {
+  async exchangeOidcCode(code: string, origin?: string): Promise<SsoTokenValidationData> {
     const ssoBaseUrl = process.env.SSO_BASE_URL || 'https://simegilan.lamongankab.go.id'
-    const apiUrl = `${ssoBaseUrl}/api/validate_token`
+    const tokenUrl = `${ssoBaseUrl}/oauth/token`
+    const userinfoUrl = `${ssoBaseUrl}/oauth/userinfo`
 
-    const res = await fetch(apiUrl, {
+    const clientId = process.env.OIDC_CLIENT_ID || 'corpu_app'
+    const clientSecret = process.env.OIDC_CLIENT_SECRET || 'corpu_app_secret_key_2026'
+    const redirectUri = process.env.OIDC_REDIRECT_URI || `${origin || 'https://corpu.lamongankab.go.id'}/api/auth/sso-callback`
+
+    const params = new URLSearchParams()
+    params.append('grant_type', 'authorization_code')
+    params.append('code', code)
+    params.append('redirect_uri', redirectUri)
+    params.append('client_id', clientId)
+    params.append('client_secret', clientSecret)
+
+    // 1. Exchange Code -> Access Token
+    const tokenRes = await fetch(tokenUrl, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token }),
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: params.toString(),
     })
 
-    const result = await res.json()
-
-    if (!res.ok || result.status !== 'success' || !result.data) {
-      throw new Error(result.message || 'Token SSO tidak valid atau sudah kadaluarsa')
+    const tokenData = await tokenRes.json()
+    if (!tokenRes.ok || !tokenData.access_token) {
+      const errDesc = tokenData.error_description || tokenData.error || 'Gagal menukar OIDC code'
+      throw new Error(`OIDC Token Error: ${errDesc}`)
     }
 
-    return result.data as SsoTokenValidationData
+    // 2. Fetch Userinfo via Bearer Access Token
+    const userinfoRes = await fetch(userinfoUrl, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${tokenData.access_token}`,
+        Accept: 'application/json',
+      },
+    })
+
+    const userinfoData = await userinfoRes.json()
+    if (!userinfoRes.ok || !userinfoData.nip_baru) {
+      throw new Error('Gagal mengambil data profil pengguna dari OIDC userinfo')
+    }
+
+    return {
+      pegawai_id: String(userinfoData.pegawai_id || ''),
+      nip_lama: String(userinfoData.nip_lama || ''),
+      nip_baru: String(userinfoData.nip_baru || ''),
+      nama: String(userinfoData.nama || ''),
+      nama_lengkap: String(userinfoData.nama_lengkap || userinfoData.nama || ''),
+      status_pegawai: String(userinfoData.status_pegawai || '1'),
+      status_pegawai_nama: String(userinfoData.status_pegawai_nama || 'PNS'),
+      role: String(userinfoData.role || 'user'),
+    }
   }
 
   /**
@@ -138,21 +169,12 @@ export class SsoService {
   }
 
   /**
-   * Main SSO authentication flow.
+   * Main SSO authentication flow using OIDC Authorization Code.
    * Called by the /api/auth/sso-callback endpoint.
-   *
-   * Flow:
-   * 1. Call SiMEGILAN's Api::validate_token to validate token + get pegawai data + role
-   *    (the API also consumes/marks the token as used)
-   * 2. Resolve the final role (env var overrides take priority over API role)
-   * 3. Find or create user in sisoto.users table
-   *    - If exists: update nama and role from SiMEGILAN API response
-   *    - If new: create with resolved role
-   * 4. Issue JWT token
    */
-  async authenticateWithSsoToken(token: string, redirectRole?: string): Promise<LoginResponseDto> {
-    // 1. Validate token via SiMEGILAN API (also consumes the token)
-    const pegawaiData = await this.validateTokenViaApi(token)
+  async authenticateWithOidcCode(code: string, origin?: string, redirectRole?: string): Promise<LoginResponseDto> {
+    // 1. Exchange code via OIDC Token & Userinfo
+    const pegawaiData = await this.exchangeOidcCode(code, origin)
 
     const nipBaru = pegawaiData.nip_baru
     const fullNama = this.buildNama(pegawaiData.nama, pegawaiData.nama_lengkap) || nipBaru
@@ -192,9 +214,10 @@ export class SsoService {
       throw new Error('Gagal membuat atau memperbarui user')
     }
 
-    // 3. Sync ASN data from SIASN BKN API (only if jabatan/golongan/unit_kerja is empty)
+    // 3. Sync ASN data — FULL dari simegilan.siasn_data_utama (lokal).
+    // Tidak lagi tergantung API BKN saat login, sehingga API down bukan kendala.
     if (siasnService.needsAsnData(user)) {
-      console.log('[SSO] User needs ASN data sync, calling SIASN API...')
+      console.log('[SSO] User needs ASN data sync, loading from simegilan data utama...')
       await siasnService.syncAsnData(user.id, user.nip)
       // Re-fetch user to get updated data
       const updatedUser = await userRepository.findById(user.id)
