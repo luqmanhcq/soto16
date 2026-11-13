@@ -1,350 +1,314 @@
+# 🏗️ SI-SOTO Backend Architecture
 
-ARCHITECTURE.md
+## Clean Architecture Diagram
 
-SI-SOTO — Sistem Informasi Strategi Optimalisasi Talenta Organisasi
-Corporate University Platform for ASN (Aparatur Sipil Negara)
-
-----
-
-⚠️ AI CODING RULES (WAJIB DIBACA)
-
-AI HARUS mengikuti aturan ini TANPA PENGECUALIAN:
-
-1. Gunakan Layered Architecture:
-   API → Service → Repository → Database
-
-2. DILARANG:
-   
-   - Business logic di API Route
-   - Business logic di Repository
-   - Query database langsung dari Service
-
-3. WAJIB:
-   
-   - TypeScript strict mode
-   - Validasi pakai Zod di API layer
-   - Gunakan DTO untuk semua data transfer
-   - Gunakan Drizzle ORM untuk semua query
-
-4. Struktur folder HARUS sama persis dengan dokumen ini
-
----
-
-1. SYSTEM OVERVIEW
-
-SI-SOTO adalah platform pembelajaran ASN berbasis Next.js fullstack.
-
-👥 Roles
-
-- "asn" → user biasa
-- "admin" → admin instansi
-- "super_admin" → admin global
-
-🎯 Core Features
-
-- Home (public dan terdapat carosel slider, pencarian, list webinar, list pembelajaran mandiri)
-- Webinar 
-- Pembelajaran Mandiri 
-- Sertifikat
-- Profil ASN
-- Dashboard (admin only)
+```
+┌─────────────────────────────────────────┐
+│        NEXT.JS API ROUTES               │
+│  app/api/auth/register/route.ts         │
+│  app/api/auth/login/route.ts            │
+│  app/api/auth/me/route.ts               │
+│  app/api/users/profile/route.ts         │
+└────────────────┬────────────────────────┘
+                 │
+       ┌─────────▼──────────┐
+       │  VALIDATION        │
+       │  (Zod Schemas)     │
+       └─────────┬──────────┘
+                 │
+       ┌─────────▼──────────────┐
+       │  SERVICE LAYER         │
+       │  (Business Logic)      │
+       │  auth.service.ts       │
+       └────────┬───────────────┘
+                │
+       ┌────────▼──────────────┐
+       │  REPOSITORY LAYER     │
+       │  (Data Access)        │
+       │  user.repository.ts   │
+       └────────┬──────────────┘
+                │
+       ┌────────▼──────────────┐
+       │  DATABASE             │
+       │  (PostgreSQL +        │
+       │   Drizzle ORM)        │
+       └───────────────────────┘
+```
 
 ---
 
-2. ARCHITECTURE
+## Configuration Files
 
-🧠 Pattern
-
-Fullstack Monorepo
-Next.js App Router + Clean Architecture
-
-🔄 Layer Flow
-
-Client
-↓
-Next.js (App Router)
-↓
-API Route
-↓
-Service
-↓
-Repository
-↓
-Database (PostgreSQL)
+```
+drizzle.config.ts       # Drizzle configuration
+.env.example            # Environment variables template
+```
 
 ---
 
-📦 Layer Responsibility
+## Folder Structure
 
-API Route ("/app/api/**")
-
-- Validasi input (Zod)
-- Call service
-- Return response
-
-❌ Tidak boleh ada business logic
-
----
-
-Service ("/lib/services/**")
-
-- Semua business logic
-- Orkestrasi repository
-
-❌ Tidak boleh query DB langsung
-
----
-
-Repository ("/lib/repositories/**")
-
-- Query database via Drizzle
-
-❌ Tidak boleh ada business logic
-
----
-
-Database
-
-- PostgreSQL
-- Semua schema di Drizzle
-
----
-
-3. RENDERING STRATEGY
-
-Gunakan aturan ini:
-
-- Server Component → default (data fetching)
-- Client Component → interaksi user
-- Server Action → simple mutation
-- API Route → complex logic / auth / external API
+```
+project/
+├── app/
+│   ├── api/
+│   │   ├── auth/
+│   │   │   ├── register/route.ts        ✅ POST - Registrasi user
+│   │   │   ├── login/route.ts           ✅ POST - Login user
+│   │   │   └── me/route.ts              ✅ GET  - Get current user
+│   │   └── users/
+│   │       └── profile/route.ts         ✅ PUT  - Update profile
+│   ├── globals.css
+│   ├── layout.tsx
+│   └── page.tsx
+│
+├── lib/
+│   ├── db/
+│   │   ├── index.ts                     ✅ Database connection
+│   │   └── schema.ts                    ✅ Drizzle schema + relations
+│   │
+│   ├── repositories/
+│   │   └── user.repository.ts           ✅ User database operations
+│   │
+│   ├── services/
+│   │   └── auth.service.ts              ✅ Auth business logic
+│   │
+│   ├── middleware/
+│   │   └── auth.ts                      ✅ JWT middleware
+│   │
+│   ├── jwt.ts                           ✅ JWT utilities
+│   ├── response.ts                      ✅ Response helpers
+│   └── validation.ts                    ✅ Zod schemas
+│
+├── types/
+│   └── dto.ts                           ✅ DTO definitions
+│
+├── drizzle.config.ts                    ✅ Drizzle config
+├── .env.example                         ✅ Env template
+├── package.json                         ✅ Dependencies
+└── API_AUTH_DOCS.md                     ✅ Dokumentasi lengkap
+```
 
 ---
 
-4. TECH STACK
+## 📋 Implementation Checklist
 
-- Next.js 16 (App Router)
-- TypeScript (strict)
-- Tailwind CSS
-- shadcn/ui
-- PostgreSQL
-- Drizzle ORM
-- Zod
-- JWT (HTTP-only cookies)
+### Phase 1: Auth Module ✅
 
----
+- [x] Database schema (users table)
+- [x] Drizzle ORM setup
+- [x] User repository
+- [x] Auth service
+- [x] JWT utilities
+- [x] Response helpers
+- [x] Zod validation
+- [x] Register endpoint
+- [x] Login endpoint
+- [x] Get profile endpoint
+- [x] Update profile endpoint
+- [x] Auth middleware
+- [x] Documentation
 
-5. FOLDER STRUCTURE (WAJIB SAMA)
+### Phase 2: Webinar Module (Kerjakan Next)
 
-project-root/
+- [ ] WebinarRepository
+  - [ ] findAll (with filters)
+  - [ ] findById
+  - [ ] create (admin only)
+  - [ ] update (admin only)
+  - [ ] delete (admin only)
 
-app/
-  (auth)/
-    login/page.tsx
-    register/page.tsx
+- [ ] WebinarService
+  - [ ] getWebinars
+  - [ ] getWebinarById
+  - [ ] createWebinar
+  - [ ] updateWebinar
+  - [ ] deleteWebinar
+  - [ ] joinWebinar
+  - [ ] getParticipants
 
-  (main)/
-    layout.tsx
-    dashboard/page.tsx
-    webinar/page.tsx
-    webinar/[id]/page.tsx
-    pembelajaran/page.tsx
-    pembelajaran/[id]/page.tsx
-    sertifikat/page.tsx
-    profil/page.tsx
+- [ ] API Routes
+  - [ ] GET /api/webinars
+  - [ ] GET /api/webinars/:id
+  - [ ] POST /api/webinars (admin)
+  - [ ] PUT /api/webinars/:id (admin)
+  - [ ] DELETE /api/webinars/:id (admin)
+  - [ ] POST /api/webinars/:id/join
+  - [ ] GET /api/webinars/:id/participants
 
-  api/
-    auth/
-      login/route.ts
-      register/route.ts
-      logout/route.ts
+### Phase 3: Pembelajaran Module
 
-    webinar/
-      route.ts
-      [id]/route.ts
+- [ ] PembelajaranRepository
+- [ ] PembelajaranService
+- [ ] API Routes
 
-    pembelajaran/
-      route.ts
+### Phase 4: Progress & Certificates
 
-    sertifikat/
-      route.ts
+- [ ] Progress tracking
+- [ ] Certificate management
+- [ ] Approval workflow
 
-    dashboard/
-      route.ts
+### Phase 5: Admin Dashboard
 
-components/
-  ui/
-  shared/
+- [ ] Dashboard stats
+- [ ] User management
+- [ ] Content management
 
-lib/
-  db/
-    schema.ts
-    index.ts
+### Phase 6: Additional Features
 
-  services/
-    auth.service.ts
-    user.service.ts
-    webinar.service.ts
-    pembelajaran.service.ts
-    sertifikat.service.ts
-    dashboard.service.ts
-
-  repositories/
-    user.repository.ts
-    webinar.repository.ts
-    pembelajaran.repository.ts
-    sertifikat.repository.ts
-
-  validations/
-    auth.validation.ts
-    user.validation.ts
-    webinar.validation.ts
-    sertifikat.validation.ts
-
-hooks/
-types/
-utils/
-styles/
-public/
-
-drizzle/migrations/
-
-.env
-drizzle.config.ts
-next.config.js
-tsconfig.json
+- [ ] File uploads
+- [ ] Email notifications
+- [ ] Search & filtering
+- [ ] Pagination
+- [ ] Rate limiting
+- [ ] Logging
+- [ ] Caching
 
 ---
 
-6. SERVICE CONTRACT (WAJIB DIIKUTI)
+## 🔑 Naming Conventions Applied
 
-AuthService
+✅ **Database**
+- Table names: `snake_case` (users, webinars, pembelajaran)
+- Column names: `snake_case` (user_id, created_at, unit_kerja)
+- Primary key: `id`
+- Foreign keys: `{table}_id` (user_id, webinar_id)
+- Timestamps: `created_at`, `updated_at`
 
-login(dto: LoginDto)
-register(dto: RegisterDto)
-logout(token: string)
-verifyToken(token: string)
+✅ **Code**
+- Folders: `kebab-case` (auth, repositories, services)
+- Files: `kebab-case` (auth.service.ts, user.repository.ts)
+- Classes: `PascalCase` (UserRepository, AuthService)
+- Functions: `camelCase` (createUser, getUserById)
+- Variables: `camelCase` (userId, userName)
+- Constants: `UPPER_CASE`
 
-UserService
-
-getProfile(userId: string)
-updateProfile(userId: string, dto: UpdateProfileDto)
-
-WebinarService
-
-getAll(filters?)
-getById(id: string)
-create(dto)
-join(webinarId, userId)
-
-PembelajaranService
-
-getAll()
-getById(id)
-trackProgress(userId, materiId)
-
-SertifikatService
-
-submit(dto)
-approve(id, adminId)
-reject(id, adminId, reason)
-generate(id)
-download(id, userId)
-
-DashboardService
-
-getStats()
-getActivityLogs()
+✅ **API**
+- Routes: `/api/resource/action` (GET, POST, PUT, DELETE)
+- Response: Standard JSON with `success`, `message`, `data`
 
 ---
 
-7. REQUEST FLOW (WAJIB DIIKUTI)
+## 🚀 Development Workflow
 
-Contoh: Submit Sertifikat
+### 1. Setup Database
 
-1. Client → POST /api/sertifikat
+```bash
+# Install dependencies
+npm install
 
-2. API:
-   
-   - Validate Zod
-   - Call service
+# Generate migrations
+npm run db:generate
 
-3. Service:
-   
-   - Validasi bisnis
-   - Call repository
+# Run migrations
+npm run db:migrate
 
-4. Repository:
-   
-   - Insert DB via Drizzle
+# (Optional) Open Drizzle Studio
+npm run db:studio
+```
 
-5. Return response ke client
+### 2. Start Development
 
----
+```bash
+npm run dev
+```
 
-8. NAMING CONVENTION
+Server akan jalan di `http://localhost:3000`
 
-- file → kebab-case
-- component → PascalCase
-- function → camelCase
-- variable → camelCase
-- table → snake_case
-- DTO → PascalCaseDto
-- schema → camelCaseSchema
+### 3. Test API
+
+Gunakan cURL, Postman, atau Thunder Client untuk test endpoints.
 
 ---
 
-9. ENVIRONMENT
+## 🛡️ Security Implemented
 
-DATABASE_URL=
-JWT_SECRET=
-JWT_EXPIRES_IN=7d
-NEXT_PUBLIC_APP_URL=
-
----
-
-10. SECURITY RULES
-
-- JWT disimpan di HTTP-only cookie
-- Role check di middleware / API (BUKAN di service)
-- Validasi semua input
-- Jangan expose error sensitif
+- [x] Password hashing dengan bcryptjs
+- [x] JWT token authentication
+- [x] Input validation dengan Zod
+- [x] Role-based access control (struktur siap)
+- [x] Error handling tanpa exposing sensitive info
+- [x] CORS ready
 
 ---
 
-11. BEST PRACTICES (PENTING UNTUK AI)
+## ⚡ Performance
 
-- Selalu gunakan DTO (jangan kirim raw object)
-- Gunakan transaction jika multi query
-- Pisahkan logic per feature
-- Jangan hardcode value
-- Gunakan error handling standar
-
----
-
-12. AI OUTPUT FORMAT (WAJIB)
-
-Jika AI generate code:
-
-- Gunakan TypeScript
-- Gunakan async/await
-- Gunakan Zod di API
-- Gunakan struktur folder di atas
-- Jangan buat file di luar struktur
-
-13. Deskripsi Fitur (WAJIB)
-- Home (public dan terdapat carosel slider, pencarian, list webinar, list pembelajaran mandiri)
-- Webinar (terdapat crud, dimana bentuk list bisa lihat banyak orang untuk yang lain hanya admin dan admin super)
-- Pembelajaran Mandiri  (terdapat crud, dimana bentuk list bisa lihat banyak orang untuk yang lain hanya admin dan admin super)
-- Sertifikat(pengajuan sertifikat dari kegiatan, kemudian di aprove dan dibuatkan sertifikat)
-- Profil ASN (profil asn, edit password, dan lain lain)
-- Dashboard (semuanya bisa melihat cuma perbedaan informasi jika user biasa mengenai informasi tentang webinar yang diikuti, pemeblajan yang di ikuti, progres dan lain lain sehingga bisa seinformatif mungkin.)
+- [ ] Database indexing sudah setup (created in schema)
+- [ ] Query optimization ready
+- [ ] Connection pooling (postgres driver handles)
+- [ ] Caching ready for implementation
+- [ ] Rate limiting ready for implementation
 
 ---
 
-🚀 FINAL NOTE
+## 📚 Key Technologies
 
-Dokumen ini adalah single source of truth.
-Semua code HARUS mengikuti aturan ini.
+| Technology | Version | Purpose |
+|-----------|---------|---------|
+| Next.js | 16.2.1 | Framework |
+| React | 19.2.4 | UI Library |
+| TypeScript | ^5 | Type Safety |
+| Drizzle ORM | ^0.33.0 | Database ORM |
+| PostgreSQL | - | Database |
+| Zod | ^3.22.4 | Validation |
+| bcryptjs | ^2.4.3 | Password Hashing |
+| jsonwebtoken | ^9.1.2 | JWT |
+| Tailwind CSS | ^4 | Styling |
 
-Jika melanggar → dianggap ERROR.
+---
+
+## 📖 Entry Points
+
+**Register User:**
+```
+POST /api/auth/register
+→ app/api/auth/register/route.ts
+→ authService.register()
+→ userRepository.create()
+```
+
+**Login User:**
+```
+POST /api/auth/login
+→ app/api/auth/login/route.ts
+→ authService.login()
+→ userRepository.findByEmail()
+→ JWT token generated
+```
+
+**Get Profile:**
+```
+GET /api/auth/me (with token)
+→ app/api/auth/me/route.ts
+→ withAuth middleware (verify JWT)
+→ authService.getUserById()
+```
+
+---
+
+## 🎯 Next Steps
+
+1. **Test Auth Module**
+   - Test register, login, get profile, update profile
+   - Verify error handling
+   - Test JWT expiration
+
+2. **Implement Webinar Module**
+   - Following same clean architecture pattern
+   - Add role-based access control
+   - Add filtering & pagination
+
+3. **Add Logging & Monitoring**
+   - Implement structured logging
+   - Add error tracking
+
+4. **Add Tests**
+   - Unit tests for services
+   - Integration tests for API routes
+   - E2E tests for workflows
+
+5. **Deploy**
+   - Setup CI/CD pipeline
+   - Prepare production environment
+   - Database backup strategy
